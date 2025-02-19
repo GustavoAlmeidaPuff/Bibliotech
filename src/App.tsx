@@ -6,7 +6,7 @@ import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import Layout from './components/layout/Layout';
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <AuthProvider>
       <Router>
