@@ -13,11 +13,17 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  transform: translateY(0);
 }
 
 .header.scrolled {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header.hidden {
+  transform: translateY(-100%);
+  box-shadow: none;
 }
 
 .headerContent {
@@ -237,6 +243,10 @@
   .navSection a,
   .logoutButton {
     padding: 0.75rem 0.5rem;
+  }
+
+  .header.hidden .nav.open {
+    display: none;
   }
 }
 

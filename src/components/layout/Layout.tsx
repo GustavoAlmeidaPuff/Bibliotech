@@ -18,7 +18,7 @@ const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const scrolled = useScrollPosition();
+  const { scrolled, visible } = useScrollPosition();
 
   // Fecha o menu quando mudar de página
   useEffect(() => {
@@ -36,7 +36,11 @@ const Layout = () => {
 
   return (
     <div className={styles.layout}>
-      <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
+      <header 
+        className={`${styles.header} 
+          ${scrolled ? styles.scrolled : ''} 
+          ${!visible ? styles.hidden : ''}`}
+      >
         <div className={styles.headerContent}>
           <Link to="/dashboard" className={styles.logoLink}>
             <BookOpenIcon className={styles.logoIcon} />
