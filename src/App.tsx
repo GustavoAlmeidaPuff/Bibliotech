@@ -5,6 +5,14 @@ import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import Layout from './components/layout/Layout';
+import Students from './pages/students/Students';
+import Staff from './pages/staff/Staff';
+import Books from './pages/books/Books';
+import StudentLoans from './pages/loans/StudentLoans';
+import StaffLoans from './pages/loans/StaffLoans';
+import StudentReturns from './pages/returns/StudentReturns';
+import StaffReturns from './pages/returns/StaffReturns';
+import Settings from './pages/settings/Settings';
 
 const App = () => {
   return (
@@ -18,7 +26,14 @@ const App = () => {
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              {/* Add more routes here later */}
+              <Route path="/students" element={<Students />} />
+              <Route path="/staff" element={<Staff />} />
+              <Route path="/books" element={<Books />} />
+              <Route path="/student-loans" element={<StudentLoans />} />
+              <Route path="/staff-loans" element={<StaffLoans />} />
+              <Route path="/student-returns" element={<StudentReturns />} />
+              <Route path="/staff-returns" element={<StaffReturns />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>
           

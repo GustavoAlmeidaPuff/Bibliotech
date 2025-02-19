@@ -1,0 +1,23 @@
+.container {
+  padding: 2rem;
+}
+
+.container h2 {
+  margin-bottom: 2rem;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+.content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content p {
+  color: #666;
+  font-size: 1rem;
+  text-align: center;
+  margin: 2rem 0;
+} 
