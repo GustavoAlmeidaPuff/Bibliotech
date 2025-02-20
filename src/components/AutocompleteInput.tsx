@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTags } from '../contexts/TagsContext';
 import styles from './AutocompleteInput.module.css';
 
 interface AutocompleteInputProps {
@@ -22,13 +23,15 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const [hoveredSuggestion, setHoveredSuggestion] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { capitalizeTag, removeGenre } = useTags();
 
   useEffect(() => {
-    // Filtra sugestões baseado no valor atual
     if (value.trim()) {
+      const searchTerm = value.toLowerCase();
       const filtered = suggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase())
+        suggestion.toLowerCase().includes(searchTerm)
       );
       setFilteredSuggestions(filtered);
       setIsOpen(true);
@@ -54,11 +57,9 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     if (e.key === 'Enter' && value.trim()) {
       e.preventDefault();
       if (filteredSuggestions.length === 0) {
-        // Se não houver sugestões, adiciona o valor atual como nova tag
         onSelect(value.trim());
         onChange('');
       } else {
-        // Se houver sugestões, seleciona a primeira
         onSelect(filteredSuggestions[0]);
         onChange('');
       }
@@ -78,18 +79,26 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     setIsOpen(false);
   };
 
+  const handleRemoveSuggestion = (e: React.MouseEvent, suggestion: string) => {
+    e.stopPropagation();
+    removeGenre(suggestion);
+  };
+
+  const displayValue = value ? capitalizeTag(value) : '';
+
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       <label htmlFor={id} className={styles.label}>{label}</label>
       <input
         type="text"
         id={id}
-        value={value}
+        value={displayValue}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={() => value.trim() && setIsOpen(true)}
         placeholder={placeholder}
         className={styles.input}
+        autoComplete="off"
       />
       {isOpen && (value.trim() !== '') && (
         <div className={styles.dropdown}>
@@ -100,16 +109,28 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
                   key={index}
                   className={styles.suggestion}
                   onClick={() => handleSuggestionClick(suggestion)}
+                  onMouseEnter={() => setHoveredSuggestion(suggestion)}
+                  onMouseLeave={() => setHoveredSuggestion(null)}
                 >
                   {suggestion}
+                  {hoveredSuggestion === suggestion && (
+                    <button
+                      type="button"
+                      className={styles.removeSuggestion}
+                      onClick={(e) => handleRemoveSuggestion(e, suggestion)}
+                      title="Remover sugestão"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
               ))}
-              {!filteredSuggestions.includes(value.trim()) && (
+              {!filteredSuggestions.includes(capitalizeTag(value.trim())) && (
                 <div
                   className={`${styles.suggestion} ${styles.addNew}`}
                   onClick={handleAddNew}
                 >
-                  Adicionar "{value.trim()}"
+                  Adicionar "{capitalizeTag(value.trim())}"
                 </div>
               )}
             </>
@@ -118,7 +139,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
               className={`${styles.suggestion} ${styles.addNew}`}
               onClick={handleAddNew}
             >
-              Adicionar "{value.trim()}"
+              Adicionar "{capitalizeTag(value.trim())}"
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { TagsProvider } from './contexts/TagsContext';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -18,31 +19,33 @@ import Settings from './pages/settings/Settings';
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          
-          {/* Protected routes */}
-          <Route element={<PrivateRoute />}>
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/students" element={<Students />} />
-              <Route path="/staff" element={<Staff />} />
-              <Route path="/books" element={<Books />} />
-              <Route path="/books/register" element={<RegisterBook />} />
-              <Route path="/student-loans" element={<StudentLoans />} />
-              <Route path="/staff-loans" element={<StaffLoans />} />
-              <Route path="/student-returns" element={<StudentReturns />} />
-              <Route path="/staff-returns" element={<StaffReturns />} />
-              <Route path="/settings" element={<Settings />} />
+      <TagsProvider>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            
+            {/* Protected routes */}
+            <Route element={<PrivateRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/students" element={<Students />} />
+                <Route path="/staff" element={<Staff />} />
+                <Route path="/books" element={<Books />} />
+                <Route path="/books/register" element={<RegisterBook />} />
+                <Route path="/student-loans" element={<StudentLoans />} />
+                <Route path="/staff-loans" element={<StaffLoans />} />
+                <Route path="/student-returns" element={<StudentReturns />} />
+                <Route path="/staff-returns" element={<StaffReturns />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
             </Route>
-          </Route>
-          
-          {/* Default redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Router>
+            
+            {/* Default redirect */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Router>
+      </TagsProvider>
     </AuthProvider>
   );
 };

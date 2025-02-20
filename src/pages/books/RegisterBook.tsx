@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTags } from '../../contexts/TagsContext';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css';
 
@@ -71,6 +72,7 @@ const RegisterBook = () => {
   const [error, setError] = useState('');
   
   const { currentUser } = useAuth();
+  const { genres, addGenre, capitalizeTag } = useTags();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -120,11 +122,13 @@ const RegisterBook = () => {
   };
 
   const handleGenreSelect = (genre: string) => {
-    if (!formData.genres.includes(genre)) {
+    const capitalizedGenre = capitalizeTag(genre);
+    if (!formData.genres.includes(capitalizedGenre)) {
       setFormData(prev => ({
         ...prev,
-        genres: [...prev.genres, genre]
+        genres: [...prev.genres, capitalizedGenre]
       }));
+      addGenre(capitalizedGenre); // Adiciona à lista de sugestões
     }
   };
 
@@ -247,7 +251,7 @@ const RegisterBook = () => {
                 value={currentGenre}
                 onChange={setCurrentGenre}
                 onSelect={handleGenreSelect}
-                suggestions={SUGGESTED_GENRES}
+                suggestions={genres}
                 placeholder="Digite para buscar ou adicionar"
               />
               <div className={styles.tags}>
