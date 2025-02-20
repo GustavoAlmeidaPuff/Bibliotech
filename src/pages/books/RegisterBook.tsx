@@ -24,7 +24,7 @@ const RegisterBook = () => {
     genres: [],
     authors: [],
     publisher: '',
-    acquisitionDate: '',
+    acquisitionDate: new Date().toISOString().split('T')[0], // Data atual como padrão
     shelf: '',
     collection: '',
     quantity: 1
@@ -139,127 +139,139 @@ const RegisterBook = () => {
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
         
-        <div className={styles.formGroup}>
-          <label htmlFor="code">Código *</label>
-          <input
-            type="text"
-            id="code"
-            value={formData.code}
-            onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
-            required
-          />
-        </div>
+        <div className={styles.formGrid}>
+          <div className={styles.mainSection}>
+            <div className={styles.formGroup}>
+              <label htmlFor="code">Código *</label>
+              <input
+                type="text"
+                id="code"
+                value={formData.code}
+                onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                required
+              />
+            </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="title">Título *</label>
-          <input
-            type="text"
-            id="title"
-            value={formData.title}
-            onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-            required
-          />
-        </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="title">Título do Livro *</label>
+              <input
+                type="text"
+                id="title"
+                value={formData.title}
+                onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                required
+              />
+            </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="genres">Gêneros/Classes (pressione Enter para adicionar)</label>
-          <input
-            type="text"
-            id="genres"
-            value={currentGenre}
-            onChange={e => setCurrentGenre(e.target.value)}
-            onKeyDown={handleGenreKeyDown}
-          />
-          <div className={styles.tags}>
-            {formData.genres.map(genre => (
-              <span key={genre} className={styles.tag}>
-                {genre}
-                <button
-                  type="button"
-                  onClick={() => removeGenre(genre)}
-                  className={styles.removeTag}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="publisher">Editora</label>
+                <input
+                  type="text"
+                  id="publisher"
+                  value={formData.publisher}
+                  onChange={e => setFormData(prev => ({ ...prev, publisher: e.target.value }))}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="collection">Coleção</label>
+                <input
+                  type="text"
+                  id="collection"
+                  value={formData.collection}
+                  onChange={e => setFormData(prev => ({ ...prev, collection: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label htmlFor="acquisitionDate">Data de Aquisição</label>
+                <input
+                  type="date"
+                  id="acquisitionDate"
+                  value={formData.acquisitionDate}
+                  onChange={e => setFormData(prev => ({ ...prev, acquisitionDate: e.target.value }))}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="shelf">Prateleira</label>
+                <input
+                  type="text"
+                  id="shelf"
+                  value={formData.shelf}
+                  onChange={e => setFormData(prev => ({ ...prev, shelf: e.target.value }))}
+                />
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="authors">Autores (pressione Enter para adicionar)</label>
-          <input
-            type="text"
-            id="authors"
-            value={currentAuthor}
-            onChange={e => setCurrentAuthor(e.target.value)}
-            onKeyDown={handleAuthorKeyDown}
-          />
-          <div className={styles.tags}>
-            {formData.authors.map(author => (
-              <span key={author} className={styles.tag}>
-                {author}
-                <button
-                  type="button"
-                  onClick={() => removeAuthor(author)}
-                  className={styles.removeTag}
-                >
-                  ×
-                </button>
-              </span>
-            ))}
+          <div className={styles.sideSection}>
+            <div className={styles.formGroup}>
+              <label htmlFor="genres">Gêneros/Classes</label>
+              <input
+                type="text"
+                id="genres"
+                value={currentGenre}
+                onChange={e => setCurrentGenre(e.target.value)}
+                onKeyDown={handleGenreKeyDown}
+                placeholder="Pressione Enter para adicionar"
+              />
+              <div className={styles.tags}>
+                {formData.genres.map(genre => (
+                  <span key={genre} className={styles.tag}>
+                    {genre}
+                    <button
+                      type="button"
+                      onClick={() => removeGenre(genre)}
+                      className={styles.removeTag}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="authors">Autores</label>
+              <input
+                type="text"
+                id="authors"
+                value={currentAuthor}
+                onChange={e => setCurrentAuthor(e.target.value)}
+                onKeyDown={handleAuthorKeyDown}
+                placeholder="Pressione Enter para adicionar"
+              />
+              <div className={styles.tags}>
+                {formData.authors.map(author => (
+                  <span key={author} className={styles.tag}>
+                    {author}
+                    <button
+                      type="button"
+                      onClick={() => removeAuthor(author)}
+                      className={styles.removeTag}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="quantity">Quantidade</label>
+              <input
+                type="number"
+                id="quantity"
+                min="1"
+                value={formData.quantity}
+                onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+              />
+            </div>
           </div>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="publisher">Editora</label>
-          <input
-            type="text"
-            id="publisher"
-            value={formData.publisher}
-            onChange={e => setFormData(prev => ({ ...prev, publisher: e.target.value }))}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="acquisitionDate">Data de Aquisição</label>
-          <input
-            type="date"
-            id="acquisitionDate"
-            value={formData.acquisitionDate}
-            onChange={e => setFormData(prev => ({ ...prev, acquisitionDate: e.target.value }))}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="shelf">Prateleira</label>
-          <input
-            type="text"
-            id="shelf"
-            value={formData.shelf}
-            onChange={e => setFormData(prev => ({ ...prev, shelf: e.target.value }))}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="collection">Coleção</label>
-          <input
-            type="text"
-            id="collection"
-            value={formData.collection}
-            onChange={e => setFormData(prev => ({ ...prev, collection: e.target.value }))}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="quantity">Quantidade</label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            value={formData.quantity}
-            onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-          />
         </div>
 
         <div className={styles.formActions}>
