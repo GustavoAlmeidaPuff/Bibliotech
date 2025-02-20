@@ -60,11 +60,20 @@
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .bookCard:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  background-color: var(--bg-primary);
+}
+
+.bookCard:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .bookCard h3 {

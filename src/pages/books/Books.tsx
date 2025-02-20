@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -79,7 +79,11 @@ const Books = () => {
         ) : (
           <div className={styles.booksGrid}>
             {books.map(book => (
-              <div key={book.id} className={styles.bookCard}>
+              <Link
+                key={book.id}
+                to={`/books/${book.id}`}
+                className={styles.bookCard}
+              >
                 <h3>{book.title}</h3>
                 <p className={styles.bookCode}>Código: {book.code}</p>
                 {book.authors && (
@@ -96,7 +100,7 @@ const Books = () => {
                     ))}
                   </div>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         )}
