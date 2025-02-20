@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useScrollPosition } from '../../hooks/useScrollPosition';
@@ -18,12 +18,7 @@ const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { scrolled, visible } = useScrollPosition();
-
-  // Fecha o menu quando mudar de página
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [navigate]);
+  const { isSticky } = useScrollPosition();
 
   const handleLogout = async () => {
     try {
@@ -36,11 +31,7 @@ const Layout = () => {
 
   return (
     <div className={styles.layout}>
-      <header 
-        className={`${styles.header} 
-          ${scrolled ? styles.scrolled : ''} 
-          ${!visible ? styles.hidden : ''}`}
-      >
+      <header className={styles.header}>
         <div className={styles.headerContent}>
           <Link to="/dashboard" className={styles.logoLink}>
             <BookOpenIcon className={styles.logoIcon} />
@@ -54,7 +45,10 @@ const Layout = () => {
             <span className={styles.menuIcon}></span>
           </button>
         </div>
-        <nav className={`${styles.nav} ${isMenuOpen ? styles.open : ''}`}>
+      </header>
+
+      <nav className={`${styles.nav} ${isSticky ? styles.sticky : ''} ${isMenuOpen ? styles.open : ''}`}>
+        <div className={styles.navContent}>
           <div className={styles.navSection}>
             <h2>
               <UserGroupIcon className={styles.navIcon} />
@@ -69,6 +63,7 @@ const Layout = () => {
               Professores e Funcionários
             </Link>
           </div>
+
           <div className={styles.navSection}>
             <h2>
               <BookOpenIcon className={styles.navIcon} />
@@ -87,6 +82,7 @@ const Layout = () => {
               Locações Professores
             </Link>
           </div>
+
           <div className={styles.navSection}>
             <h2>
               <ArrowPathIcon className={styles.navIcon} />
@@ -101,6 +97,7 @@ const Layout = () => {
               Professores e Funcionários
             </Link>
           </div>
+
           <div className={styles.navSection}>
             <h2>
               <Cog6ToothIcon className={styles.navIcon} />
@@ -119,8 +116,9 @@ const Layout = () => {
               Sair
             </button>
           </div>
-        </nav>
-      </header>
+        </div>
+      </nav>
+
       <main className={styles.main}>
         <Outlet />
       </main>

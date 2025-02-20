@@ -1,24 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const useScrollPosition = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [prevScroll, setPrevScroll] = useState(0);
+  const [isSticky, setIsSticky] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  const navPositionRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      const isScrolled = currentScroll > 10;
-      const isVisible = prevScroll > currentScroll || currentScroll < 10;
+    const nav = document.querySelector('.nav') as HTMLElement;
+    if (nav) {
+      navRef.current = nav;
+      // Guarda a posição original do nav
+      navPositionRef.current = nav.offsetTop;
+    }
 
-      setScrolled(isScrolled);
-      setVisible(isVisible);
-      setPrevScroll(currentScroll);
+    const handleScroll = () => {
+      if (navPositionRef.current !== null) {
+        const shouldBeSticky = window.scrollY >= navPositionRef.current;
+        setIsSticky(shouldBeSticky);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [prevScroll]);
+    // Chama uma vez para definir o estado inicial
+    handleScroll();
 
-  return { scrolled, visible };
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return { isSticky };
 }; 

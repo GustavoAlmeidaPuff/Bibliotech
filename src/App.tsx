@@ -8,6 +8,7 @@ import Layout from './components/layout/Layout';
 import Students from './pages/students/Students';
 import Staff from './pages/staff/Staff';
 import Books from './pages/books/Books';
+import RegisterBook from './pages/books/RegisterBook';
 import StudentLoans from './pages/loans/StudentLoans';
 import StaffLoans from './pages/loans/StaffLoans';
 import StudentReturns from './pages/returns/StudentReturns';
@@ -29,6 +30,7 @@ const App = () => {
               <Route path="/students" element={<Students />} />
               <Route path="/staff" element={<Staff />} />
               <Route path="/books" element={<Books />} />
+              <Route path="/books/register" element={<RegisterBook />} />
               <Route path="/student-loans" element={<StudentLoans />} />
               <Route path="/staff-loans" element={<StaffLoans />} />
               <Route path="/student-returns" element={<StudentReturns />} />
