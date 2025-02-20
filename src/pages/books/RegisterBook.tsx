@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css';
 
 interface BookForm {
@@ -16,6 +17,40 @@ interface BookForm {
   collection: string;
   quantity: number;
 }
+
+// Lista de gêneros/classes sugeridos
+const SUGGESTED_GENRES = [
+  'Romance',
+  'Ficção Científica',
+  'Fantasia',
+  'Terror',
+  'Suspense',
+  'Drama',
+  'Aventura',
+  'História',
+  'Biografia',
+  'Autoajuda',
+  'Educacional',
+  'Infantil',
+  'Juvenil',
+  'Técnico',
+  'Científico',
+  'Literatura Brasileira',
+  'Literatura Estrangeira',
+  'Poesia',
+  'Quadrinhos',
+  'Mangá',
+  'Religião',
+  'Filosofia',
+  'Psicologia',
+  'Sociologia',
+  'Política',
+  'Economia',
+  'Direito',
+  'Medicina',
+  'Engenharia',
+  'Informática'
+];
 
 const RegisterBook = () => {
   const [formData, setFormData] = useState<BookForm>({
@@ -84,16 +119,12 @@ const RegisterBook = () => {
     }
   };
 
-  const handleGenreKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && currentGenre.trim()) {
-      e.preventDefault();
-      if (!formData.genres.includes(currentGenre.trim())) {
-        setFormData(prev => ({
-          ...prev,
-          genres: [...prev.genres, currentGenre.trim()]
-        }));
-      }
-      setCurrentGenre('');
+  const handleGenreSelect = (genre: string) => {
+    if (!formData.genres.includes(genre)) {
+      setFormData(prev => ({
+        ...prev,
+        genres: [...prev.genres, genre]
+      }));
     }
   };
 
@@ -210,14 +241,14 @@ const RegisterBook = () => {
 
           <div className={styles.sideSection}>
             <div className={styles.formGroup}>
-              <label htmlFor="genres">Gêneros/Classes</label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="genres"
+                label="Gêneros/Classes"
                 value={currentGenre}
-                onChange={e => setCurrentGenre(e.target.value)}
-                onKeyDown={handleGenreKeyDown}
-                placeholder="Pressione Enter para adicionar"
+                onChange={setCurrentGenre}
+                onSelect={handleGenreSelect}
+                suggestions={SUGGESTED_GENRES}
+                placeholder="Digite para buscar ou adicionar"
               />
               <div className={styles.tags}>
                 {formData.genres.map(genre => (
