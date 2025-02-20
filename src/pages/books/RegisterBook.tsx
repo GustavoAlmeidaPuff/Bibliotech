@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
+import { useAuthors } from '../../contexts/AuthorsContext';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css';
 
@@ -73,6 +74,7 @@ const RegisterBook = () => {
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
+  const { authors, addAuthor, capitalizeAuthor } = useAuthors();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -128,20 +130,18 @@ const RegisterBook = () => {
         ...prev,
         genres: [...prev.genres, capitalizedGenre]
       }));
-      addGenre(capitalizedGenre); // Adiciona à lista de sugestões
+      addGenre(capitalizedGenre);
     }
   };
 
-  const handleAuthorKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && currentAuthor.trim()) {
-      e.preventDefault();
-      if (!formData.authors.includes(currentAuthor.trim())) {
-        setFormData(prev => ({
-          ...prev,
-          authors: [...prev.authors, currentAuthor.trim()]
-        }));
-      }
-      setCurrentAuthor('');
+  const handleAuthorSelect = (author: string) => {
+    const capitalizedAuthor = capitalizeAuthor(author);
+    if (!formData.authors.includes(capitalizedAuthor)) {
+      setFormData(prev => ({
+        ...prev,
+        authors: [...prev.authors, capitalizedAuthor]
+      }));
+      addAuthor(capitalizedAuthor);
     }
   };
 
@@ -271,14 +271,14 @@ const RegisterBook = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="authors">Autores</label>
-              <input
-                type="text"
+              <AutocompleteInput
                 id="authors"
+                label="Autores"
                 value={currentAuthor}
-                onChange={e => setCurrentAuthor(e.target.value)}
-                onKeyDown={handleAuthorKeyDown}
-                placeholder="Pressione Enter para adicionar"
+                onChange={setCurrentAuthor}
+                onSelect={handleAuthorSelect}
+                suggestions={authors}
+                placeholder="Digite para adicionar"
               />
               <div className={styles.tags}>
                 {formData.authors.map(author => (
