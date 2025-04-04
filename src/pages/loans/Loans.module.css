@@ -295,4 +295,175 @@
 .noResults p {
   margin-bottom: 1rem;
   color: var(--text-secondary);
+}
+
+.returnButton {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.returnButton:hover {
+  background-color: #2171cd;
+}
+
+/* Estilos para os modais */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.readingInfo {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.readingInfo h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.readingCompletedField {
+  margin-bottom: 1.5rem;
+}
+
+.readingCompletedField label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.progressField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressField label {
+  font-weight: 500;
+  color: #333;
+}
+
+.progressSlider {
+  width: 100%;
+  accent-color: #4a90e2;
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton,
+.confirmButton {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancelButton:hover {
+  background-color: #e5e7eb;
+}
+
+.confirmButton {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #2171cd;
+}
+
+/* Estilo para mensagens de sucesso e erro */
+.successMessage,
+.errorMessage {
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.successMessage {
+  background-color: #e6fffa;
+  color: #047857;
+  border-left: 4px solid #047857;
+}
+
+.errorMessage {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #b91c1c;
+}
+
+.successMessage p,
+.errorMessage p {
+  margin: 0;
+  flex: 1;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smallIcon {
+  width: 1rem;
+  height: 1rem;
 } 

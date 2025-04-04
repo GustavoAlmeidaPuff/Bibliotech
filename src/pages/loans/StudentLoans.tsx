@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { collection, query, getDocs, orderBy, where } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, orderBy, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -14,8 +14,11 @@ interface Loan {
   bookTitle: string;
   borrowDate: any;
   dueDate: any;
+  returnDate?: any;
   status: 'active' | 'returned';
   createdAt: any;
+  readingProgress?: number;
+  completed?: boolean;
 }
 
 interface Filters {
@@ -44,6 +47,12 @@ const StudentLoans = () => {
     bookTitle: '',
     status: 'active'
   });
+  const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [readingCompleted, setReadingCompleted] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [returnSuccess, setReturnSuccess] = useState<string | null>(null);
+  const [returnError, setReturnError] = useState<string | null>(null);
   
   const { currentUser } = useAuth();
 
@@ -293,6 +302,67 @@ const StudentLoans = () => {
 
   const currentLoans = filtersApplied ? filteredLoans : loans;
 
+  const handleReturnBook = (loan: Loan) => {
+    setSelectedLoan(loan);
+    setReadingCompleted(false);
+    setReadingProgress(0);
+    setShowReturnDialog(true);
+  };
+
+  const handleReadingProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    setReadingProgress(value);
+    
+    // Se o slider for colocado em 100%, considerar como leitura concluída
+    if (value === 100) {
+      setReadingCompleted(true);
+    } else {
+      setReadingCompleted(false);
+    }
+  };
+
+  const processReturn = async () => {
+    if (!currentUser || !selectedLoan) return;
+    
+    try {
+      setLoading(true);
+      
+      const loanRef = doc(db, `users/${currentUser.uid}/loans/${selectedLoan.id}`);
+      
+      // Atualizar o empréstimo com as informações de devolução
+      await updateDoc(loanRef, {
+        status: 'returned',
+        returnDate: serverTimestamp(),
+        completed: readingCompleted,
+        readingProgress: readingProgress,
+        updatedAt: serverTimestamp()
+      });
+      
+      // Atualizar a interface
+      setReturnSuccess(`"${selectedLoan.bookTitle}" devolvido com sucesso!`);
+      setShowReturnDialog(false);
+      setSelectedLoan(null);
+      
+      // Atualizar a lista de empréstimos
+      fetchLoans();
+      
+      // Limpar a mensagem de sucesso após alguns segundos
+      setTimeout(() => {
+        setReturnSuccess(null);
+      }, 5000);
+    } catch (error) {
+      console.error('Erro ao processar devolução:', error);
+      setReturnError('Erro ao processar devolução. Tente novamente.');
+      
+      // Limpar a mensagem de erro após alguns segundos
+      setTimeout(() => {
+        setReturnError(null);
+      }, 5000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -317,12 +387,27 @@ const StudentLoans = () => {
         </div>
       </div>
 
-      {showMessage && message && (
+      {(showMessage && message) || returnSuccess ? (
         <div className={styles.successMessage}>
-          <p>{message}</p>
+          <p>{returnSuccess || message}</p>
           <button 
             className={styles.closeButton}
-            onClick={() => setShowMessage(false)}
+            onClick={() => {
+              setShowMessage(false);
+              setReturnSuccess(null);
+            }}
+          >
+            <XMarkIcon className={styles.smallIcon} />
+          </button>
+        </div>
+      ) : null}
+
+      {returnError && (
+        <div className={styles.errorMessage}>
+          <p>{returnError}</p>
+          <button 
+            className={styles.closeButton}
+            onClick={() => setReturnError(null)}
           >
             <XMarkIcon className={styles.smallIcon} />
           </button>
@@ -421,6 +506,7 @@ const StudentLoans = () => {
                       <th>Data de Retirada</th>
                       <th>Data de Devolução</th>
                       <th>Status</th>
+                      <th>Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -438,6 +524,16 @@ const StudentLoans = () => {
                             {getStatusText(loan)}
                           </span>
                         </td>
+                        <td>
+                          {loan.status === 'active' && (
+                            <button 
+                              className={styles.returnButton}
+                              onClick={() => handleReturnBook(loan)}
+                            >
+                              Devolver
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -447,6 +543,68 @@ const StudentLoans = () => {
           </div>
         )}
       </div>
+
+      {showReturnDialog && selectedLoan && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Confirmar Devolução</h3>
+            <p>Livro: <strong>{selectedLoan.bookTitle}</strong></p>
+            <p>Aluno: <strong>{selectedLoan.studentName}</strong></p>
+            
+            <div className={styles.readingInfo}>
+              <h4>Informações de Leitura</h4>
+              
+              <div className={styles.readingCompletedField}>
+                <label>
+                  <input 
+                    type="checkbox" 
+                    checked={readingCompleted}
+                    onChange={(e) => {
+                      setReadingCompleted(e.target.checked);
+                      if (e.target.checked) {
+                        setReadingProgress(100);
+                      }
+                    }}
+                  />
+                  Leitura concluída
+                </label>
+              </div>
+              
+              <div className={styles.progressField}>
+                <label>Progresso da leitura: {readingProgress}%</label>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={readingProgress}
+                  onChange={handleReadingProgressChange}
+                  className={styles.progressSlider}
+                />
+                <div className={styles.progressLabels}>
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.cancelButton}
+                onClick={() => setShowReturnDialog(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                className={styles.confirmButton}
+                onClick={processReturn}
+              >
+                Confirmar Devolução
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

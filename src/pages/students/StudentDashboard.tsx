@@ -57,6 +57,7 @@ interface Loan {
   status: 'active' | 'returned';
   genres?: string[];
   createdAt: Date;
+  completed: boolean;
 }
 
 interface Book {
@@ -79,7 +80,15 @@ const StudentDashboard = () => {
   
   // Dados processados para gráficos
   const [genresData, setGenresData] = useState<{labels: string[], data: number[]}>({ labels: [], data: [] });
-  const [monthlyLoansData, setMonthlyLoansData] = useState<{labels: string[], data: number[]}>({ labels: [], data: [] });
+  const [monthlyLoansData, setMonthlyLoansData] = useState<{
+    labels: string[], 
+    borrowed: number[],
+    completed: number[]
+  }>({ 
+    labels: [], 
+    borrowed: [],
+    completed: [] 
+  });
   const [quarterlyData, setQuarterlyData] = useState<{labels: string[], data: number[]}>({ labels: [], data: [] });
   
   // Métricas calculadas
@@ -220,19 +229,37 @@ const StudentDashboard = () => {
     }).reverse();
     
     const monthlyLoans = lastSixMonths.map(month => {
-      const count = loansData.filter(loan => 
+      // Todos os empréstimos realizados no mês
+      const borrowedCount = loansData.filter(loan => 
         isWithinInterval(loan.borrowDate, {
           start: month.startDate,
           end: month.endDate
         })
       ).length;
       
-      return { label: month.label, count };
+      // Livros devolvidos e marcados como concluídos no mês
+      // (considerando que agora temos o campo 'completed' nos empréstimos devolvidos)
+      const completedCount = loansData.filter(loan => 
+        loan.status === 'returned' && 
+        loan.completed === true && 
+        loan.returnDate && 
+        isWithinInterval(loan.returnDate, {
+          start: month.startDate,
+          end: month.endDate
+        })
+      ).length;
+      
+      return { 
+        label: month.label, 
+        borrowed: borrowedCount,
+        completed: completedCount 
+      };
     });
     
     setMonthlyLoansData({
       labels: monthlyLoans.map(m => m.label),
-      data: monthlyLoans.map(m => m.count)
+      borrowed: monthlyLoans.map(m => m.borrowed),
+      completed: monthlyLoans.map(m => m.completed)
     });
     
     // Determinar em qual trimestre o estudante leu mais
@@ -370,9 +397,16 @@ const StudentDashboard = () => {
                       datasets: [
                         {
                           label: 'Livros retirados por mês',
-                          data: monthlyLoansData.data,
+                          data: monthlyLoansData.borrowed,
                           borderColor: '#4a90e2',
                           backgroundColor: 'rgba(74, 144, 226, 0.5)',
+                          tension: 0.3
+                        },
+                        {
+                          label: 'Livros lidos por mês',
+                          data: monthlyLoansData.completed,
+                          borderColor: '#50c878',
+                          backgroundColor: 'rgba(80, 200, 120, 0.5)',
                           tension: 0.3
                         }
                       ]
@@ -385,6 +419,29 @@ const StudentDashboard = () => {
                         },
                         title: {
                           display: false
+                        },
+                        tooltip: {
+                          callbacks: {
+                            title: function(context) {
+                              return context[0].label;
+                            },
+                            afterTitle: function(context) {
+                              const datasetIndex = context[0].datasetIndex;
+                              const index = context[0].dataIndex;
+                              const value = context[0].parsed.y;
+                              
+                              if (datasetIndex === 1) { // Livros lidos
+                                const otherDataset = context[0].chart.data.datasets[0];
+                                const borrowedValue = otherDataset.data[index];
+                                
+                                if (typeof borrowedValue === 'number' && typeof value === 'number' && borrowedValue > 0) {
+                                  const percentage = Math.round((value / borrowedValue) * 100);
+                                  return `Taxa de conclusão: ${percentage}%`;
+                                }
+                              }
+                              return '';
+                            }
+                          }
                         }
                       }
                     }}

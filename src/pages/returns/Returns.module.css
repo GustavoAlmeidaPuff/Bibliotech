@@ -1,1 +1,270 @@
 @import '../../styles/PageStyles.module.css'; 
+
+.container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-height: 400px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+}
+
+.emptyState h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tableHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.tableHeader p {
+  color: #666;
+}
+
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.loansTable {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  min-width: 850px;
+}
+
+.loansTable th,
+.loansTable td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.loansTable th {
+  font-weight: 600;
+  color: #555;
+  background-color: #f9f9f9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.loansTable tr:last-child td {
+  border-bottom: none;
+}
+
+.loansTable tr:hover td {
+  background-color: #f5f8ff;
+}
+
+.overdue td {
+  background-color: #fff5f5;
+}
+
+.overdue:hover td {
+  background-color: #ffe8e8;
+}
+
+.status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.activeStatus {
+  background-color: #e6f7ff;
+  color: #0070f3;
+}
+
+.overdueStatus {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.returnButton {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.returnButton:hover {
+  background-color: #2171cd;
+}
+
+/* Estilos para alertas */
+.successAlert,
+.errorAlert {
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.successAlert {
+  background-color: #e6fffa;
+  color: #047857;
+  border-left: 4px solid #047857;
+}
+
+.errorAlert {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #b91c1c;
+}
+
+/* Modal de confirmação */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.readingInfo {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.readingInfo h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.readingCompletedField {
+  margin-bottom: 1.5rem;
+}
+
+.readingCompletedField label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.progressField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressField label {
+  font-weight: 500;
+  color: #333;
+}
+
+.progressSlider {
+  width: 100%;
+  accent-color: #4a90e2;
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton,
+.confirmButton {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancelButton:hover {
+  background-color: #e5e7eb;
+}
+
+.confirmButton {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.confirmButton:hover {
+  background-color: #2171cd;
+} 
