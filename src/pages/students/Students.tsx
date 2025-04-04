@@ -90,6 +90,10 @@ const Students = () => {
     }
   };
 
+  const handleRowClick = (studentId: string) => {
+    navigate(`/students/${studentId}`);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -180,7 +184,11 @@ const Students = () => {
               </thead>
               <tbody>
                 {students.map(student => (
-                  <tr key={student.id} className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}>
+                  <tr 
+                    key={student.id} 
+                    className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}
+                    onClick={() => handleRowClick(student.id)}
+                  >
                     <td className={styles.checkboxColumn}>
                       <div 
                         className={styles.checkbox}

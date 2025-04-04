@@ -9,6 +9,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import Layout from './components/layout/Layout';
 import Students from './pages/students/Students';
 import RegisterStudent from './pages/students/RegisterStudent';
+import EditStudent from './pages/students/EditStudent';
 import Staff from './pages/staff/Staff';
 import Books from './pages/books/Books';
 import RegisterBook from './pages/books/RegisterBook';
@@ -35,6 +36,7 @@ const App = () => {
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/students" element={<Students />} />
                   <Route path="/students/register" element={<RegisterStudent />} />
+                  <Route path="/students/:studentId" element={<EditStudent />} />
                   <Route path="/staff" element={<Staff />} />
                   <Route path="/books" element={<Books />} />
                   <Route path="/books/register" element={<RegisterBook />} />
