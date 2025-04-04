@@ -9,6 +9,7 @@ interface Student {
   id: string;
   name: string;
   classroom: string;
+  shift: string;
   contact: string;
   address: string;
   number: string;
@@ -21,6 +22,7 @@ interface Student {
 interface Filters {
   name: string;
   classroom: string;
+  shift: string;
 }
 
 const Students = () => {
@@ -33,7 +35,8 @@ const Students = () => {
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     name: '',
-    classroom: ''
+    classroom: '',
+    shift: ''
   });
   
   const { currentUser } = useAuth();
@@ -103,7 +106,7 @@ const Students = () => {
       await fetchStudents();
       setSelectedStudents([]);
       setFiltersApplied(false);
-      setFilters({ name: '', classroom: '' });
+      setFilters({ name: '', classroom: '', shift: '' });
     } catch (error) {
       console.error('Erro ao excluir alunos:', error);
       alert('Erro ao excluir alunos. Tente novamente.');
@@ -137,8 +140,9 @@ const Students = () => {
   const applyFilters = () => {
     const nameFilter = filters.name.toLowerCase().trim();
     const classroomFilter = filters.classroom.toLowerCase().trim();
+    const shiftFilter = filters.shift.toLowerCase().trim();
     
-    if (!nameFilter && !classroomFilter) {
+    if (!nameFilter && !classroomFilter && !shiftFilter) {
       setFiltersApplied(false);
       setFilteredStudents(students);
       return;
@@ -147,7 +151,8 @@ const Students = () => {
     const filtered = students.filter(student => {
       const matchesName = !nameFilter || student.name.toLowerCase().includes(nameFilter);
       const matchesClassroom = !classroomFilter || student.classroom.toLowerCase().includes(classroomFilter);
-      return matchesName && matchesClassroom;
+      const matchesShift = !shiftFilter || student.shift.toLowerCase().includes(shiftFilter);
+      return matchesName && matchesClassroom && matchesShift;
     });
     
     setFilteredStudents(filtered);
@@ -155,7 +160,7 @@ const Students = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ name: '', classroom: '' });
+    setFilters({ name: '', classroom: '', shift: '' });
     setFiltersApplied(false);
     setFilteredStudents(students);
   };
@@ -233,6 +238,21 @@ const Students = () => {
                 placeholder="Filtrar por turma..."
               />
             </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="shift">Turno</label>
+              <select
+                id="shift"
+                value={filters.shift}
+                onChange={(e) => handleFilterChange('shift', e.target.value)}
+                className={styles.selectField}
+              >
+                <option value="">Todos</option>
+                <option value="manhã">Manhã</option>
+                <option value="tarde">Tarde</option>
+                <option value="noite">Noite</option>
+              </select>
+            </div>
           </form>
 
           <div className={styles.filterActions}>
@@ -294,11 +314,8 @@ const Students = () => {
                     </th>
                     <th>Nome</th>
                     <th>Turma</th>
+                    <th>Turno</th>
                     <th>Contato</th>
-                    <th>Endereço</th>
-                    <th>Número</th>
-                    <th>Bairro</th>
-                    <th>Complemento</th>
                     <th>Observações</th>
                   </tr>
                 </thead>
@@ -330,11 +347,8 @@ const Students = () => {
                       </td>
                       <td>{student.name}</td>
                       <td>{student.classroom}</td>
+                      <td>{student.shift || '-'}</td>
                       <td>{student.contact || '-'}</td>
-                      <td>{student.address || '-'}</td>
-                      <td>{student.number || '-'}</td>
-                      <td>{student.neighborhood || '-'}</td>
-                      <td>{student.complement || '-'}</td>
                       <td>
                         <div className={styles.actions}>
                           {student.notes || '-'}

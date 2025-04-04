@@ -8,6 +8,7 @@ import styles from './RegisterStudent.module.css'; // Reutilizando os estilos do
 interface StudentForm {
   name: string;
   classroom: string;
+  shift: string;
   contact: string;
   address: string;
   number: string;
@@ -21,6 +22,7 @@ const EditStudent = () => {
   const [formData, setFormData] = useState<StudentForm>({
     name: '',
     classroom: '',
+    shift: '',
     contact: '',
     address: '',
     number: '',
@@ -60,7 +62,7 @@ const EditStudent = () => {
     fetchStudent();
   }, [currentUser, studentId, navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -148,6 +150,22 @@ const EditStudent = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="shift">Turno *</label>
+              <select
+                id="shift"
+                value={formData.shift}
+                onChange={handleChange}
+                required
+                className={styles.selectField}
+              >
+                <option value="" disabled>Selecione o turno</option>
+                <option value="manhã">Manhã</option>
+                <option value="tarde">Tarde</option>
+                <option value="noite">Noite</option>
+              </select>
             </div>
 
             <div className={styles.formGroup}>

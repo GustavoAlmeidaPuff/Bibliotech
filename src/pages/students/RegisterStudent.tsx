@@ -14,6 +14,7 @@ interface StudentForm {
   neighborhood: string;
   complement: string;
   notes: string;
+  shift: string;
 }
 
 const RegisterStudent = () => {
@@ -25,7 +26,8 @@ const RegisterStudent = () => {
     number: '',
     neighborhood: '',
     complement: '',
-    notes: ''
+    notes: '',
+    shift: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ const RegisterStudent = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -193,6 +195,25 @@ const RegisterStudent = () => {
               onChange={handleChange}
               rows={4}
             />
+          </div>
+        </div>
+
+        <div className={styles.formSection}>
+          <h3>Informações Básicas</h3>
+          <div className={styles.formGroup}>
+            <label htmlFor="shift">Turno *</label>
+            <select
+              id="shift"
+              value={formData.shift}
+              onChange={handleChange}
+              className={styles.selectField}
+              required
+            >
+              <option value="" disabled>Selecione o turno</option>
+              <option value="manhã">Manhã</option>
+              <option value="tarde">Tarde</option>
+              <option value="noite">Noite</option>
+            </select>
           </div>
         </div>
 
