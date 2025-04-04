@@ -18,12 +18,24 @@ interface Student {
   createdAt: any;
 }
 
+interface Filters {
+  name: string;
+  classroom: string;
+}
+
 const Students = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [deleting, setDeleting] = useState(false);
+  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [filters, setFilters] = useState<Filters>({
+    name: '',
+    classroom: ''
+  });
+  
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -46,6 +58,7 @@ const Students = () => {
       })) as Student[];
       
       setStudents(fetchedStudents);
+      setFilteredStudents(fetchedStudents);
     } catch (error) {
       console.error('Erro ao buscar alunos:', error);
     } finally {
@@ -62,12 +75,13 @@ const Students = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedStudents.length === students.length) {
+    const currentList = filtersApplied ? filteredStudents : students;
+    if (selectedStudents.length === currentList.length) {
       // Se todos já estão selecionados, desmarca todos
       setSelectedStudents([]);
     } else {
       // Seleciona todos
-      setSelectedStudents(students.map(student => student.id));
+      setSelectedStudents(currentList.map(student => student.id));
     }
   };
 
@@ -82,6 +96,8 @@ const Students = () => {
       }
       await fetchStudents();
       setSelectedStudents([]);
+      setFiltersApplied(false);
+      setFilters({ name: '', classroom: '' });
     } catch (error) {
       console.error('Erro ao excluir alunos:', error);
       alert('Erro ao excluir alunos. Tente novamente.');
@@ -94,6 +110,52 @@ const Students = () => {
     navigate(`/students/${studentId}`);
   };
 
+  const handleFilterChange = (field: keyof Filters, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    applyFilters();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      applyFilters();
+    }
+  };
+
+  const applyFilters = () => {
+    const nameFilter = filters.name.toLowerCase().trim();
+    const classroomFilter = filters.classroom.toLowerCase().trim();
+    
+    if (!nameFilter && !classroomFilter) {
+      setFiltersApplied(false);
+      setFilteredStudents(students);
+      return;
+    }
+    
+    const filtered = students.filter(student => {
+      const matchesName = !nameFilter || student.name.toLowerCase().includes(nameFilter);
+      const matchesClassroom = !classroomFilter || student.classroom.toLowerCase().includes(classroomFilter);
+      return matchesName && matchesClassroom;
+    });
+    
+    setFilteredStudents(filtered);
+    setFiltersApplied(true);
+  };
+
+  const clearFilters = () => {
+    setFilters({ name: '', classroom: '' });
+    setFiltersApplied(false);
+    setFilteredStudents(students);
+  };
+
+  const currentStudents = filtersApplied ? filteredStudents : students;
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -105,7 +167,9 @@ const Students = () => {
                 className={styles.selectAllButton}
                 onClick={handleSelectAll}
               >
-                {selectedStudents.length === students.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                {selectedStudents.length === currentStudents.length && currentStudents.length > 0 
+                  ? 'Desmarcar Todos' 
+                  : 'Selecionar Todos'}
               </button>
               <button
                 className={styles.deleteButton}
@@ -126,7 +190,7 @@ const Students = () => {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.buttonIcon}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z" />
             </svg>
-            Mostrar Filtros
+            {filtersApplied ? 'Filtros Aplicados' : 'Mostrar Filtros'}
           </button>
           <Link to="/students/register" className={styles.registerButton}>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.buttonIcon}>
@@ -139,8 +203,47 @@ const Students = () => {
 
       {showFilters && (
         <div className={styles.filters}>
-          {/* Filtros serão implementados posteriormente */}
-          <p>Filtros em desenvolvimento...</p>
+          <form onSubmit={handleSubmit} className={styles.filterGrid}>
+            <div className={styles.filterGroup}>
+              <label htmlFor="name">Nome</label>
+              <input
+                type="text"
+                id="name"
+                value={filters.name}
+                onChange={(e) => handleFilterChange('name', e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Filtrar por nome..."
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="classroom">Turma</label>
+              <input
+                type="text"
+                id="classroom"
+                value={filters.classroom}
+                onChange={(e) => handleFilterChange('classroom', e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Filtrar por turma..."
+              />
+            </div>
+          </form>
+
+          <div className={styles.filterActions}>
+            <button
+              className={styles.applyFiltersButton}
+              onClick={applyFilters}
+            >
+              Aplicar Filtros
+            </button>
+            <button
+              className={styles.clearFiltersButton}
+              onClick={clearFilters}
+              disabled={!filtersApplied}
+            >
+              Limpar Filtros
+            </button>
+          </div>
         </div>
       )}
 
@@ -160,63 +263,75 @@ const Students = () => {
           </div>
         ) : (
           <div className={styles.tableContainer}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.checkboxColumn}>
-                    <div className={styles.checkbox}>
-                      <input
-                        type="checkbox"
-                        checked={selectedStudents.length === students.length && students.length > 0}
-                        onChange={handleSelectAll}
-                      />
-                    </div>
-                  </th>
-                  <th>Nome</th>
-                  <th>Turma</th>
-                  <th>Contato</th>
-                  <th>Endereço</th>
-                  <th>Número</th>
-                  <th>Bairro</th>
-                  <th>Complemento</th>
-                  <th>Observações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map(student => (
-                  <tr 
-                    key={student.id} 
-                    className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}
-                    onClick={() => handleRowClick(student.id)}
-                  >
-                    <td className={styles.checkboxColumn}>
-                      <div 
-                        className={styles.checkbox}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStudentSelection(student.id);
-                        }}
-                      >
+            {filtersApplied && filteredStudents.length === 0 ? (
+              <div className={styles.noResults}>
+                <p>Nenhum aluno encontrado com os filtros aplicados.</p>
+                <button
+                  className={styles.clearFiltersButton}
+                  onClick={clearFilters}
+                >
+                  Limpar Filtros
+                </button>
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th className={styles.checkboxColumn}>
+                      <div className={styles.checkbox}>
                         <input
                           type="checkbox"
-                          checked={selectedStudents.includes(student.id)}
-                          onChange={() => {}}
-                          onClick={(e) => e.stopPropagation()}
+                          checked={selectedStudents.length === currentStudents.length && currentStudents.length > 0}
+                          onChange={handleSelectAll}
                         />
                       </div>
-                    </td>
-                    <td>{student.name}</td>
-                    <td>{student.classroom}</td>
-                    <td>{student.contact || '-'}</td>
-                    <td>{student.address || '-'}</td>
-                    <td>{student.number || '-'}</td>
-                    <td>{student.neighborhood || '-'}</td>
-                    <td>{student.complement || '-'}</td>
-                    <td>{student.notes || '-'}</td>
+                    </th>
+                    <th>Nome</th>
+                    <th>Turma</th>
+                    <th>Contato</th>
+                    <th>Endereço</th>
+                    <th>Número</th>
+                    <th>Bairro</th>
+                    <th>Complemento</th>
+                    <th>Observações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {currentStudents.map(student => (
+                    <tr 
+                      key={student.id} 
+                      className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}
+                      onClick={() => handleRowClick(student.id)}
+                    >
+                      <td className={styles.checkboxColumn}>
+                        <div 
+                          className={styles.checkbox}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStudentSelection(student.id);
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedStudents.includes(student.id)}
+                            onChange={() => {}}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                      </td>
+                      <td>{student.name}</td>
+                      <td>{student.classroom}</td>
+                      <td>{student.contact || '-'}</td>
+                      <td>{student.address || '-'}</td>
+                      <td>{student.number || '-'}</td>
+                      <td>{student.neighborhood || '-'}</td>
+                      <td>{student.complement || '-'}</td>
+                      <td>{student.notes || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
       </div>

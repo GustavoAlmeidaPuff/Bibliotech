@@ -17,7 +17,7 @@
   gap: 1rem;
 }
 
-.filterButton, .registerButton, .selectAllButton, .deleteButton {
+.filterButton, .registerButton, .selectAllButton, .deleteButton, .applyFiltersButton, .clearFiltersButton {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -71,6 +71,29 @@
   cursor: not-allowed;
 }
 
+.applyFiltersButton {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.applyFiltersButton:hover {
+  background-color: var(--primary-dark);
+}
+
+.clearFiltersButton {
+  background-color: white;
+  color: var(--text-primary);
+}
+
+.clearFiltersButton:hover {
+  background-color: var(--bg-primary);
+}
+
+.clearFiltersButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .buttonIcon {
   width: 20px;
   height: 20px;
@@ -82,6 +105,52 @@
   padding: 1rem;
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-color);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filterGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.filterGroup input {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.filterGroup input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .content {
@@ -207,4 +276,19 @@
 
 .emptyState .registerButton {
   margin-top: 1rem;
+}
+
+.noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.noResults p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
 } 
