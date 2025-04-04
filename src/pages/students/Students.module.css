@@ -204,15 +204,49 @@
 /* Para linhas com clique */
 .studentRow {
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 .studentRow:hover {
-  background-color: var(--bg-hover);
+  background-color: #f5f8ff;
 }
 
-.studentRow.selected td {
-  background-color: rgba(74, 144, 226, 0.1);
+.selected {
+  background-color: #e6f0ff;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5e6c84;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.editButton:hover {
+  background-color: #e6f0ff;
+  color: #0052cc;
+}
+
+.actionIcon {
+  width: 16px;
+  height: 16px;
 }
 
 .checkboxColumn {

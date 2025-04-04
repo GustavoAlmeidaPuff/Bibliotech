@@ -1,0 +1,226 @@
+.container {
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.header h2 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.classroom {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.backButton {
+  align-self: flex-start;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: #e4e4e4;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.error p {
+  margin-bottom: 1rem;
+  color: #e74c3c;
+  font-size: 1.2rem;
+}
+
+.error button {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.emptyState h3 {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.emptyState p {
+  color: #888;
+  max-width: 500px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+}
+
+.statCard h3 {
+  margin: 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4a90e2;
+  margin: 0.5rem 0;
+}
+
+.statCard p {
+  margin: 0;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.chartCard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartCard h3 {
+  margin: 0 0 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.chart {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.noData {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  border-radius: 4px;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.loansList {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.loansTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.loansTable th,
+.loansTable td {
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.loansTable th {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.active {
+  color: #4a90e2;
+}
+
+.returned {
+  color: #50c878;
+}
+
+.moreLoans {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+@media (max-width: 1200px) {
+  .chartGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .value {
+    font-size: 1.5rem;
+  }
+
+  .chartCard {
+    min-height: 250px;
+  }
+} 
