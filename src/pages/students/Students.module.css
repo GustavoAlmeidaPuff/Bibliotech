@@ -1,1 +1,113 @@
 @import '../../styles/PageStyles.module.css'; 
+
+.container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.filterButton, .registerButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.filterButton {
+  background-color: white;
+  color: var(--text-primary);
+}
+
+.filterButton:hover {
+  background-color: var(--bg-primary);
+}
+
+.registerButton {
+  background-color: var(--primary-color);
+  color: white;
+  text-decoration: none;
+}
+
+.registerButton:hover {
+  background-color: var(--primary-dark);
+}
+
+.buttonIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.filters {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-height: 400px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Estilos para quando tivermos a tabela de alunos */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-primary);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background-color: var(--bg-primary);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  color: var(--text-tertiary);
+} 
