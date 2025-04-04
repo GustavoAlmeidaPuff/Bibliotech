@@ -570,9 +570,9 @@ const Dashboard = () => {
               />
             </div>
           ) : (
-            <div className={styles.chartPlaceholder}>
+          <div className={styles.chartPlaceholder}>
               Nenhum dado disponível
-            </div>
+          </div>
           )}
         </div>
         
@@ -776,9 +776,9 @@ const Dashboard = () => {
               />
             </div>
           ) : (
-            <div className={styles.chartPlaceholder}>
+          <div className={styles.chartPlaceholder}>
               Nenhum dado disponível
-            </div>
+          </div>
           )}
         </div>
       </div>

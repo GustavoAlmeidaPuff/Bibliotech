@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, updateDoc, getFirestore } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 
+export type ThemeColor = 'blue' | 'red' | 'green' | 'purple' | 'orange' | 'brown';
+
 export interface LibrarySettings {
   schoolName: string;
   loanDuration: number;
@@ -9,6 +11,7 @@ export interface LibrarySettings {
   enableNotifications: boolean;
   showOverdueWarnings: boolean;
   allowDashboard: boolean;
+  themeColor: ThemeColor;
 }
 
 interface SettingsContextType {
@@ -24,7 +27,8 @@ const defaultSettings: LibrarySettings = {
   maxBooksPerStudent: 3,
   enableNotifications: true,
   showOverdueWarnings: true,
-  allowDashboard: true
+  allowDashboard: true,
+  themeColor: 'blue'
 };
 
 const SettingsContext = createContext<SettingsContextType | null>(null);

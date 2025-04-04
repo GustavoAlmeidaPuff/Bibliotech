@@ -6,7 +6,7 @@
 }
 
 .header {
-  background-color: #4a90e2;
+  background-color: var(--primary-color, #4a90e2);
   color: white;
   width: 100%;
 }
@@ -104,7 +104,7 @@
 }
 
 .nav {
-  background-color: #4a90e2;
+  background-color: var(--primary-color, #4a90e2);
   width: 100%;
   padding: 1rem;
   transition: all 0.3s ease;
