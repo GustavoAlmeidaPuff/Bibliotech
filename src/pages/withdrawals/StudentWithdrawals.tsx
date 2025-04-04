@@ -3,6 +3,7 @@ import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { BookOpenIcon } from '@heroicons/react/24/outline';
+import { useNavigate } from 'react-router-dom';
 import styles from './Withdrawals.module.css';
 
 interface Student {
@@ -29,6 +30,7 @@ const StudentWithdrawals = () => {
   });
   
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStudents();
@@ -104,8 +106,9 @@ const StudentWithdrawals = () => {
   };
 
   const handleWithdraw = (studentId: string, studentName: string) => {
-    // Aqui será implementada a lógica para registrar uma retirada
-    alert(`Registrar retirada para: ${studentName}`);
+    navigate(`/student-withdrawals/${studentId}`, { 
+      state: { studentName } 
+    });
   };
 
   const currentStudents = filtersApplied ? filteredStudents : students;

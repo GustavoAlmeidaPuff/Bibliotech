@@ -1,1 +1,298 @@
-@import '../../styles/PageStyles.module.css'; 
+@import '../../styles/PageStyles.module.css';
+
+.container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.headerActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.filterButton, .applyFiltersButton, .clearFiltersButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.filterButton {
+  background-color: white;
+  color: var(--text-primary);
+}
+
+.filterButton:hover {
+  background-color: var(--bg-primary);
+}
+
+.applyFiltersButton {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.applyFiltersButton:hover {
+  background-color: var(--primary-dark);
+}
+
+.clearFiltersButton {
+  background-color: white;
+  color: var(--text-primary);
+}
+
+.clearFiltersButton:hover {
+  background-color: var(--bg-primary);
+}
+
+.clearFiltersButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.buttonIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.smallIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.filters {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filterGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.filterGroup input, .filterGroup select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.filterGroup input:focus, .filterGroup select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-height: 400px;
+  box-shadow: var(--shadow-sm);
+}
+
+.successMessage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #d1fae5;
+  border: 1px solid #34d399;
+  color: #065f46;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #065f46;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(6, 95, 70, 0.1);
+}
+
+/* Estilos para tabela de locações */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+  min-width: 1000px; /* Para garantir rolagem horizontal em telas menores */
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background-color: var(--bg-hover);
+}
+
+.loanRow {
+  transition: all 0.2s ease;
+}
+
+.loanRow:hover {
+  background-color: var(--bg-hover);
+}
+
+.returnedRow {
+  color: var(--text-secondary);
+  background-color: #f8f8f8;
+}
+
+.statusTag {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.statusActive {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.statusWarning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.statusOverdue {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.statusReturned {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 2rem;
+}
+
+.emptyIcon {
+  width: 60px;
+  height: 60px;
+  color: var(--text-tertiary);
+  margin-bottom: 1rem;
+}
+
+.emptyState h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.emptyState p {
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+.noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  text-align: center;
+  padding: 2rem;
+}
+
+.noResults p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+} 

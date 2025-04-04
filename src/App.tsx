@@ -18,6 +18,8 @@ import StudentLoans from './pages/loans/StudentLoans';
 import StaffLoans from './pages/loans/StaffLoans';
 import StudentReturns from './pages/returns/StudentReturns';
 import StudentWithdrawals from './pages/withdrawals/StudentWithdrawals';
+import BookSelection from './pages/withdrawals/BookSelection';
+import WithdrawalConfirmation from './pages/withdrawals/WithdrawalConfirmation';
 import StaffReturns from './pages/returns/StaffReturns';
 import Settings from './pages/settings/Settings';
 
@@ -42,10 +44,12 @@ const App = () => {
                   <Route path="/books" element={<Books />} />
                   <Route path="/books/register" element={<RegisterBook />} />
                   <Route path="/books/:bookId" element={<EditBook />} />
-                  <Route path="/student-loans" element={<StudentLoans />} />
+                  <Route path="/student-loans" element={<StudentLoans key="student-loans" />} />
                   <Route path="/staff-loans" element={<StaffLoans />} />
                   <Route path="/student-returns" element={<StudentReturns />} />
                   <Route path="/student-withdrawals" element={<StudentWithdrawals />} />
+                  <Route path="/student-withdrawals/:studentId" element={<BookSelection />} />
+                  <Route path="/student-withdrawals/:studentId/confirm/:bookId" element={<WithdrawalConfirmation />} />
                   <Route path="/staff-returns" element={<StaffReturns />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
