@@ -108,6 +108,7 @@ const Dashboard = () => {
   const [overdueLoansCount, setOverdueLoansCount] = useState(0);
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [activeReadersCount, setActiveReadersCount] = useState(0);
+  const [totalBooksRead, setTotalBooksRead] = useState(0);
   
   // Estados para gráficos e insights
   const [genreData, setGenreData] = useState<GenreData[]>([]);
@@ -216,6 +217,20 @@ const Dashboard = () => {
     );
     
     setActiveReadersCount(activeReaderIds.size);
+    
+    // Calcular total de livros lidos (considerando leituras parciais)
+    let totalReadCounter = 0;
+    loans.forEach(loan => {
+      if (loan.status === 'returned') {
+        if (loan.completed) {
+          totalReadCounter += 1;
+        } else if (loan.readingProgress !== undefined) {
+          totalReadCounter += loan.readingProgress / 100;
+        }
+      }
+    });
+    
+    setTotalBooksRead(Math.round(totalReadCounter * 10) / 10); // Arredonda para 1 casa decimal
   };
 
   const processGenreData = (loans: Loan[], books: Book[]) => {
@@ -271,7 +286,7 @@ const Dashboard = () => {
   };
 
   const processTopStudents = (loans: Loan[], students: Student[]) => {
-    // Contar livros lidos por aluno
+    // Contar livros lidos por aluno, considerando progresso parcial
     const studentReadCounts: Record<string, { id: string, name: string, classroom: string, count: number }> = {};
     
     // Inicializar todos os alunos com contagem 0
@@ -284,11 +299,18 @@ const Dashboard = () => {
       };
     });
     
-    // Contar apenas livros marcados como concluídos
+    // Calcular pontuação baseada no progresso de leitura
     loans.forEach(loan => {
-      if (loan.status === 'returned' && loan.completed) {
-        if (studentReadCounts[loan.studentId]) {
-          studentReadCounts[loan.studentId].count++;
+      if (loan.status === 'returned' && studentReadCounts[loan.studentId]) {
+        // Se o livro foi marcado como concluído, soma 1 ponto
+        if (loan.completed) {
+          studentReadCounts[loan.studentId].count += 1;
+        } 
+        // Se não foi concluído mas tem progresso de leitura, soma pontuação proporcional
+        else if (loan.readingProgress !== undefined) {
+          // Converte porcentagem para decimal (ex: 50% = 0.5 pontos)
+          const progressPoints = loan.readingProgress / 100;
+          studentReadCounts[loan.studentId].count += progressPoints;
         }
       }
     });
@@ -338,15 +360,20 @@ const Dashboard = () => {
       if (student) {
         const classroom = student.classroom || 'Sem Turma';
         
-        // Contar livros lidos
-        if (loan.status === 'returned' && loan.completed) {
-          classroomStats[classroom].totalRead++;
-        }
-        
-        // Somar taxas de progresso
-        if (loan.status === 'returned' && typeof loan.readingProgress === 'number') {
-          classroomStats[classroom].completionSum += loan.readingProgress;
-          classroomStats[classroom].completionCount++;
+        // Contar livros lidos (incluindo parcialmente)
+        if (loan.status === 'returned') {
+          if (loan.completed) {
+            classroomStats[classroom].totalRead += 1;
+          } else if (loan.readingProgress !== undefined) {
+            // Adiciona pontuação proporcional para leituras parciais
+            classroomStats[classroom].totalRead += loan.readingProgress / 100;
+          }
+          
+          // Somar taxas de progresso
+          if (typeof loan.readingProgress === 'number') {
+            classroomStats[classroom].completionSum += loan.readingProgress;
+            classroomStats[classroom].completionCount++;
+          }
         }
       }
     });
@@ -355,7 +382,7 @@ const Dashboard = () => {
     const performanceData = Object.entries(classroomStats)
       .map(([classroom, stats]) => ({
         classroom,
-        booksRead: stats.totalRead,
+        booksRead: Math.round(stats.totalRead * 10) / 10, // Arredonda para 1 casa decimal
         averageCompletion: stats.completionCount > 0 
           ? Math.round(stats.completionSum / stats.completionCount) 
           : 0
@@ -465,6 +492,11 @@ const Dashboard = () => {
       title: 'Leitores Ativos',
       value: activeReadersCount,
       description: 'Alunos com leituras no trimestre'
+    },
+    {
+      title: 'Total de Leituras',
+      value: totalBooksRead,
+      description: 'Inclui leituras parciais como pontuação'
     }
   ];
 
@@ -674,7 +706,7 @@ const Dashboard = () => {
                   <tr>
                     <th>Aluno</th>
                     <th>Turma</th>
-                    <th>Livros Lidos</th>
+                    <th>Pontos de Leitura</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -682,7 +714,7 @@ const Dashboard = () => {
                     <tr key={student.id} className={index === 0 ? styles.topRanked : ''}>
                       <td>{student.name}</td>
                       <td>{student.classroom}</td>
-                      <td>{student.booksRead}</td>
+                      <td>{student.booksRead.toFixed(1)}</td>
                     </tr>
                   ))}
                 </tbody>
