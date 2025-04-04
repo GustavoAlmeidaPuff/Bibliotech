@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { useScrollPosition } from '../../hooks/useScrollPosition';
 import {
   UserGroupIcon,
@@ -17,6 +18,7 @@ import styles from './Layout.module.css';
 const Layout = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { logout } = useAuth();
+  const { settings } = useSettings();
   const navigate = useNavigate();
   const { isSticky } = useScrollPosition();
 
@@ -35,7 +37,7 @@ const Layout = () => {
         <div className={styles.headerContent}>
           <Link to="/dashboard" className={styles.logoLink}>
             <BookOpenIcon className={styles.logoIcon} />
-            <h1>School Library System</h1>
+            <h1>{settings.schoolName}</h1>
           </Link>
           <button
             className={`${styles.menuButton} ${isMenuOpen ? styles.open : ''}`}

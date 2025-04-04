@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { 
   doc, 
   collection, 
@@ -14,25 +15,11 @@ import {
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import styles from './Settings.module.css';
 
-interface LibrarySettings {
-  loanDuration: number;
-  maxBooksPerStudent: number;
-  enableNotifications: boolean;
-  showOverdueWarnings: boolean;
-  allowDashboard: boolean;
-}
-
 const Settings = () => {
   const { currentUser } = useAuth();
+  const { settings, updateSettings, saveSettings } = useSettings();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', isError: false });
-  const [settings, setSettings] = useState<LibrarySettings>({
-    loanDuration: 14,
-    maxBooksPerStudent: 3,
-    enableNotifications: true,
-    showOverdueWarnings: true,
-    allowDashboard: true
-  });
   
   // Estado para restauração
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
@@ -61,56 +48,17 @@ const Settings = () => {
     }
   };
   
-  // Carregar configurações
-  useEffect(() => {
-    const loadSettings = async () => {
-      if (!currentUser) return;
-      
-      try {
-        const db = getFirestore();
-        const settingsRef = doc(db, `users/${currentUser.uid}/settings/library`);
-        const settingsDoc = await getDoc(settingsRef);
-        
-        if (settingsDoc.exists()) {
-          const data = settingsDoc.data() as LibrarySettings;
-          setSettings(data);
-        } else {
-          // Criar documento de configurações padrão se não existir
-          await setDoc(settingsRef, {
-            ...settings,
-            createdAt: new Date()
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao carregar configurações:', error);
-      }
-    };
-    
-    loadSettings();
-  }, [currentUser]);
-  
   // Funções para gerenciar as configurações
-  const handleSettingChange = (setting: keyof LibrarySettings, value: any) => {
-    setSettings(prev => ({
-      ...prev,
-      [setting]: value
-    }));
+  const handleSettingChange = (setting: string, value: any) => {
+    updateSettings({ [setting]: value });
   };
   
-  const saveSettings = async () => {
-    if (!currentUser) return;
-    
+  const handleSaveSettings = async () => {
     try {
       setLoading(true);
       setMessage({ text: '', isError: false });
       
-      const db = getFirestore();
-      const settingsRef = doc(db, `users/${currentUser.uid}/settings/library`);
-      
-      await updateDoc(settingsRef, {
-        ...settings,
-        updatedAt: new Date()
-      });
+      await saveSettings();
       
       setMessage({ text: 'Configurações salvas com sucesso!', isError: false });
     } catch (error) {
@@ -195,6 +143,18 @@ const Settings = () => {
           <h3>Configurações Gerais</h3>
           
           <div className={styles.settingGroup}>
+            <label htmlFor="schoolName">Nome da Escola/Biblioteca</label>
+            <input
+              type="text"
+              id="schoolName"
+              value={settings.schoolName}
+              onChange={(e) => handleSettingChange('schoolName', e.target.value)}
+              className={styles.textInput}
+              placeholder="Nome que aparecerá no cabeçalho"
+            />
+          </div>
+          
+          <div className={styles.settingGroup}>
             <label htmlFor="loanDuration">Duração padrão do empréstimo (dias)</label>
             <input
               type="number"
@@ -254,7 +214,7 @@ const Settings = () => {
           <div className={styles.buttonContainer}>
             <button 
               className={styles.saveButton}
-              onClick={saveSettings}
+              onClick={handleSaveSettings}
               disabled={loading}
             >
               {loading ? 'Salvando...' : 'Salvar Configurações'}
