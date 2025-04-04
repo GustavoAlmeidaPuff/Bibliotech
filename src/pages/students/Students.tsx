@@ -66,12 +66,18 @@ const Students = () => {
     }
   };
 
-  const toggleStudentSelection = (studentId: string) => {
-    setSelectedStudents(prev => 
-      prev.includes(studentId)
-        ? prev.filter(id => id !== studentId)
-        : [...prev, studentId]
-    );
+  const toggleStudentSelection = (studentId: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    setSelectedStudents(prev => {
+      if (prev.includes(studentId)) {
+        return prev.filter(id => id !== studentId);
+      } else {
+        return [...prev, studentId];
+      }
+    });
   };
 
   const handleSelectAll = () => {
@@ -303,19 +309,22 @@ const Students = () => {
                       className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}
                       onClick={() => handleRowClick(student.id)}
                     >
-                      <td className={styles.checkboxColumn}>
-                        <div 
-                          className={styles.checkbox}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleStudentSelection(student.id);
-                          }}
-                        >
+                      <td 
+                        className={styles.checkboxColumn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStudentSelection(student.id);
+                        }}
+                      >
+                        <div className={styles.checkbox}>
                           <input
                             type="checkbox"
                             checked={selectedStudents.includes(student.id)}
-                            onChange={() => {}}
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStudentSelection(student.id, e);
+                            }}
+                            readOnly
                           />
                         </div>
                       </td>
