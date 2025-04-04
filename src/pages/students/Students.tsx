@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Students.module.css';
@@ -22,39 +22,99 @@ const Students = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (!currentUser) return;
-      
-      try {
-        const studentsRef = collection(db, `users/${currentUser.uid}/students`);
-        const q = query(studentsRef);
-        const querySnapshot = await getDocs(q);
-        
-        const fetchedStudents = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Student[];
-        
-        setStudents(fetchedStudents);
-      } catch (error) {
-        console.error('Erro ao buscar alunos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStudents();
   }, [currentUser]);
+
+  const fetchStudents = async () => {
+    if (!currentUser) return;
+    
+    try {
+      setLoading(true);
+      const studentsRef = collection(db, `users/${currentUser.uid}/students`);
+      const q = query(studentsRef);
+      const querySnapshot = await getDocs(q);
+      
+      const fetchedStudents = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Student[];
+      
+      setStudents(fetchedStudents);
+    } catch (error) {
+      console.error('Erro ao buscar alunos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleStudentSelection = (studentId: string) => {
+    setSelectedStudents(prev => 
+      prev.includes(studentId)
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedStudents.length === students.length) {
+      // Se todos já estão selecionados, desmarca todos
+      setSelectedStudents([]);
+    } else {
+      // Seleciona todos
+      setSelectedStudents(students.map(student => student.id));
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!currentUser || !window.confirm('Tem certeza que deseja excluir os alunos selecionados?')) return;
+
+    try {
+      setDeleting(true);
+      for (const studentId of selectedStudents) {
+        const studentRef = doc(db, `users/${currentUser.uid}/students/${studentId}`);
+        await deleteDoc(studentRef);
+      }
+      await fetchStudents();
+      setSelectedStudents([]);
+    } catch (error) {
+      console.error('Erro ao excluir alunos:', error);
+      alert('Erro ao excluir alunos. Tente novamente.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>Cadastro de Alunos</h2>
         <div className={styles.headerActions}>
+          {selectedStudents.length > 0 && (
+            <>
+              <button
+                className={styles.selectAllButton}
+                onClick={handleSelectAll}
+              >
+                {selectedStudents.length === students.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+              </button>
+              <button
+                className={styles.deleteButton}
+                onClick={handleDeleteSelected}
+                disabled={deleting}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.buttonIcon}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                </svg>
+                {deleting ? 'Excluindo...' : 'Excluir Selecionados'}
+              </button>
+            </>
+          )}
           <button
             className={styles.filterButton}
             onClick={() => setShowFilters(!showFilters)}
@@ -99,6 +159,15 @@ const Students = () => {
             <table className={styles.table}>
               <thead>
                 <tr>
+                  <th className={styles.checkboxColumn}>
+                    <div className={styles.checkbox}>
+                      <input
+                        type="checkbox"
+                        checked={selectedStudents.length === students.length && students.length > 0}
+                        onChange={handleSelectAll}
+                      />
+                    </div>
+                  </th>
                   <th>Nome</th>
                   <th>Turma</th>
                   <th>Contato</th>
@@ -111,7 +180,23 @@ const Students = () => {
               </thead>
               <tbody>
                 {students.map(student => (
-                  <tr key={student.id} className={styles.studentRow}>
+                  <tr key={student.id} className={`${styles.studentRow} ${selectedStudents.includes(student.id) ? styles.selected : ''}`}>
+                    <td className={styles.checkboxColumn}>
+                      <div 
+                        className={styles.checkbox}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleStudentSelection(student.id);
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedStudents.includes(student.id)}
+                          onChange={() => {}}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      </div>
+                    </td>
                     <td>{student.name}</td>
                     <td>{student.classroom}</td>
                     <td>{student.contact || '-'}</td>
