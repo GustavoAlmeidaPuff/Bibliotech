@@ -169,7 +169,7 @@ const Books = () => {
       <div className={styles.header}>
         <h2>Acervo da Biblioteca</h2>
         <div className={styles.headerActions}>
-          {selectedBooks.length > 0 ? (
+          {selectedBooks.length > 0 && (
             <>
               <button
                 className={styles.selectAllButton}
@@ -186,7 +186,8 @@ const Books = () => {
                 {deleting ? 'Excluindo...' : 'Excluir Selecionados'}
               </button>
             </>
-          ) : (
+          )}
+          {selectedBooks.length === 0 && (
             <>
               <button
                 className={styles.filterButton}
@@ -296,16 +297,13 @@ const Books = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        toggleBookSelection(book.id);
                       }}
                     >
                       <input
                         type="checkbox"
                         checked={selectedBooks.includes(book.id)}
-                        onChange={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleBookSelection(book.id);
-                        }}
+                        onChange={() => {}}
                       />
                     </div>
                     <h3>{book.title}</h3>
