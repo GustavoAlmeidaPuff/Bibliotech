@@ -17,6 +17,7 @@ import EditBook from './pages/books/EditBook';
 import StudentLoans from './pages/loans/StudentLoans';
 import StaffLoans from './pages/loans/StaffLoans';
 import StudentReturns from './pages/returns/StudentReturns';
+import StudentWithdrawals from './pages/withdrawals/StudentWithdrawals';
 import StaffReturns from './pages/returns/StaffReturns';
 import Settings from './pages/settings/Settings';
 
@@ -44,6 +45,7 @@ const App = () => {
                   <Route path="/student-loans" element={<StudentLoans />} />
                   <Route path="/staff-loans" element={<StaffLoans />} />
                   <Route path="/student-returns" element={<StudentReturns />} />
+                  <Route path="/student-withdrawals" element={<StudentWithdrawals />} />
                   <Route path="/staff-returns" element={<StaffReturns />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>

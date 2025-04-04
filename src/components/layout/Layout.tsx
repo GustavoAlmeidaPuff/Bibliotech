@@ -86,9 +86,9 @@ const Layout = () => {
           <div className={styles.navSection}>
             <h2>
               <ArrowPathIcon className={styles.navIcon} />
-              Retiradas e Devoluções
+              Retiradas
             </h2>
-            <Link to="/student-returns">
+            <Link to="/student-withdrawals">
               <AcademicCapIcon className={styles.linkIcon} />
               Alunos
             </Link>

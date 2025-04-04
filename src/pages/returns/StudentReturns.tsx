@@ -4,7 +4,7 @@ import styles from './Returns.module.css';
 const StudentReturns = () => {
   return (
     <div className={styles.container}>
-      <h2>Devoluções de Alunos</h2>
+      <h2>Retiradas de Alunos</h2>
       <div className={styles.content}>
         {/* Conteúdo será implementado posteriormente */}
         <p>Página em construção...</p>
