@@ -109,6 +109,7 @@ const Dashboard = () => {
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [activeReadersCount, setActiveReadersCount] = useState(0);
   const [totalBooksRead, setTotalBooksRead] = useState(0);
+  const [totalReadersCount, setTotalReadersCount] = useState(0);
   
   // Estados para gráficos e insights
   const [genreData, setGenreData] = useState<GenreData[]>([]);
@@ -176,6 +177,9 @@ const Dashboard = () => {
         id: doc.id,
         ...doc.data()
       })) as Student[];
+      
+      // Total de leitores registrados
+      setTotalReadersCount(students.length);
       
       // 4. Calcular estatísticas principais
       processMainStats(loans, students);
@@ -487,6 +491,11 @@ const Dashboard = () => {
       title: 'Livros no Acervo',
       value: totalBooksCount,
       description: 'Total de livros disponíveis'
+    },
+    {
+      title: 'Leitores Registrados',
+      value: totalReadersCount,
+      description: 'Total de alunos cadastrados'
     },
     {
       title: 'Leitores Ativos',
