@@ -68,10 +68,19 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Estilos para quando tivermos a tabela de alunos */
+/* Estilos para tabela de alunos */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
+  white-space: nowrap;
+  min-width: 1000px; /* Para garantir rolagem horizontal em telas menores */
 }
 
 .table th,
@@ -85,6 +94,10 @@
   font-weight: 600;
   color: var(--text-secondary);
   background-color: var(--bg-primary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
 }
 
 .table tr:last-child td {
@@ -92,7 +105,26 @@
 }
 
 .table tr:hover td {
-  background-color: var(--bg-primary);
+  background-color: var(--bg-hover);
+}
+
+/* Para linhas com clique */
+.studentRow {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.studentRow:hover {
+  background-color: var(--bg-hover);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
 }
 
 .emptyState {
@@ -110,4 +142,19 @@
   height: 64px;
   margin-bottom: 1rem;
   color: var(--text-tertiary);
+}
+
+.emptyState h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.emptyState p {
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+.emptyState .registerButton {
+  margin-top: 1rem;
 } 
