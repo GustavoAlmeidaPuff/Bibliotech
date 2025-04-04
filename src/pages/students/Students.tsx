@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, getDocs, doc, deleteDoc, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Students.module.css';
@@ -49,7 +49,7 @@ const Students = () => {
     try {
       setLoading(true);
       const studentsRef = collection(db, `users/${currentUser.uid}/students`);
-      const q = query(studentsRef);
+      const q = query(studentsRef, orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       
       const fetchedStudents = querySnapshot.docs.map(doc => ({
