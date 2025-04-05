@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings, ThemeColor } from '../../contexts/SettingsContext';
 import { 
@@ -37,6 +37,146 @@ const Settings = () => {
   const [confirmPhrase, setConfirmPhrase] = useState('');
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [restoreError, setRestoreError] = useState('');
+  
+  // Referência para input de upload de arquivo
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [restoreFromFileLoading, setRestoreFromFileLoading] = useState(false);
+  
+  // Função para obter todos os dados
+  const getAllData = async () => {
+    if (!currentUser) return null;
+    
+    const db = getFirestore();
+    const collections = ['books', 'students', 'loans'];
+    const allData: Record<string, any[]> = {};
+    
+    for (const collectionName of collections) {
+      const collectionRef = collection(db, `users/${currentUser.uid}/${collectionName}`);
+      const querySnapshot = await getDocs(query(collectionRef));
+      
+      allData[collectionName] = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    }
+    
+    return allData;
+  };
+  
+  // Função para exportar os dados como um arquivo JSON
+  const handleBackupData = async () => {
+    try {
+      setBackupLoading(true);
+      setMessage({ text: '', isError: false });
+      
+      const data = await getAllData();
+      if (!data) {
+        throw new Error('Não foi possível obter os dados para backup');
+      }
+      
+      // Adicionar metadados ao arquivo de backup
+      const backupData = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        userId: currentUser?.uid,
+        data
+      };
+      
+      // Converter para JSON e criar um blob
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      
+      // Criar um link para download e clicar nele
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `biblioteca_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setMessage({ 
+        text: 'Backup realizado com sucesso! O arquivo foi baixado.', 
+        isError: false 
+      });
+    } catch (error) {
+      console.error('Erro ao fazer backup dos dados:', error);
+      setMessage({ 
+        text: 'Erro ao fazer backup dos dados. Tente novamente.', 
+        isError: true 
+      });
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+  
+  // Função para restaurar dados a partir de um arquivo de backup
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentUser) {
+      return;
+    }
+    
+    try {
+      setRestoreFromFileLoading(true);
+      setMessage({ text: '', isError: false });
+      
+      // Ler o arquivo como texto
+      const text = await file.text();
+      const backupData = JSON.parse(text);
+      
+      // Validar o formato do arquivo de backup
+      if (!backupData.data || !backupData.version) {
+        throw new Error('Formato de arquivo de backup inválido');
+      }
+      
+      // Proceder com a restauração
+      const db = getFirestore();
+      const collections = ['books', 'students', 'loans'];
+      
+      // Limpar todas as coleções primeiro
+      await restoreAllData();
+      
+      // Restaurar dados do backup
+      for (const collectionName of collections) {
+        if (Array.isArray(backupData.data[collectionName])) {
+          const collectionData = backupData.data[collectionName];
+          
+          for (const item of collectionData) {
+            const { id, ...data } = item;
+            await setDoc(
+              doc(db, `users/${currentUser.uid}/${collectionName}/${id}`),
+              data
+            );
+          }
+        }
+      }
+      
+      setMessage({ 
+        text: 'Dados restaurados com sucesso a partir do arquivo de backup!', 
+        isError: false 
+      });
+    } catch (error) {
+      console.error('Erro ao restaurar dados do arquivo:', error);
+      setMessage({ 
+        text: 'Erro ao restaurar dados do arquivo. Verifique se o arquivo é válido.', 
+        isError: true 
+      });
+    } finally {
+      setRestoreFromFileLoading(false);
+      // Limpar o input de arquivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+  
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   
   // Função para restaurar todos os dados
   const restoreAllData = async () => {
@@ -260,6 +400,44 @@ const Settings = () => {
         
         <div className={styles.settingsSection}>
           <h3>Backup e Restauração</h3>
+          
+          <div className={styles.backupSection}>
+            <h4>Backup de Dados</h4>
+            <p>
+              Faça o backup de todos os dados da sua biblioteca. O arquivo pode ser usado
+              para restaurar os dados posteriormente.
+            </p>
+            
+            <button 
+              className={styles.actionButton}
+              onClick={handleBackupData}
+              disabled={backupLoading}
+            >
+              {backupLoading ? 'Gerando backup...' : 'Fazer Backup dos Dados'}
+            </button>
+            
+            <h4>Restaurar a partir de Backup</h4>
+            <p>
+              Restaure os dados da biblioteca a partir de um arquivo de backup.
+              Seus dados atuais serão substituídos.
+            </p>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              style={{ display: 'none' }}
+            />
+            
+            <button 
+              className={styles.actionButton}
+              onClick={triggerFileInput}
+              disabled={restoreFromFileLoading}
+            >
+              {restoreFromFileLoading ? 'Restaurando...' : 'Carregar Arquivo de Backup'}
+            </button>
+          </div>
           
           <div className={styles.dangerZone}>
             <h4>Zona de Perigo</h4>

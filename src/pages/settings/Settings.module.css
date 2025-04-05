@@ -280,4 +280,47 @@
 .confirmDangerButton:disabled {
   background-color: #ffcdd2;
   cursor: not-allowed;
+}
+
+.backupSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #f0f8ff;
+  border: 1px solid #d0e0f0;
+}
+
+.backupSection h4 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  color: #2c3e50;
+}
+
+.backupSection p {
+  margin-bottom: 1.2rem;
+  color: #5d6975;
+}
+
+.actionButton {
+  padding: 0.7rem 1.2rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-bottom: 1.5rem;
+  display: block;
+  width: 100%;
+  max-width: 300px;
+}
+
+.actionButton:hover {
+  background-color: #3a7bc8;
+}
+
+.actionButton:disabled {
+  background-color: #b8c6d6;
+  cursor: not-allowed;
 } 
