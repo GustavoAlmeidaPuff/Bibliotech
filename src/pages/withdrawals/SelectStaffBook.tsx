@@ -52,11 +52,6 @@ const SelectStaffBook = () => {
     author: ''
   });
   const [error, setError] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{show: boolean, bookId: string, bookTitle: string}>({
-    show: false,
-    bookId: '',
-    bookTitle: ''
-  });
   
   const { currentUser } = useAuth();
 
@@ -159,56 +154,13 @@ const SelectStaffBook = () => {
   };
 
   const handleSelectBook = (bookId: string, bookTitle: string) => {
-    setConfirmModal({
-      show: true,
-      bookId,
-      bookTitle
+    navigate(`/staff-withdrawals/${staffId}/confirm/${bookId}`, { 
+      state: { 
+        staffName,
+        bookTitle,
+        bookId
+      } 
     });
-  };
-
-  const confirmLoan = async () => {
-    if (!currentUser || !staffId || !confirmModal.bookId) return;
-    
-    try {
-      setLoading(true);
-      
-      // 1. Atualizar o livro para não disponível
-      const bookRef = doc(db, `users/${currentUser.uid}/books/${confirmModal.bookId}`);
-      await updateDoc(bookRef, { available: false });
-      
-      // 2. Buscar detalhes do funcionário
-      const staffRef = doc(db, `users/${currentUser.uid}/staff/${staffId}`);
-      const staffDoc = await getDoc(staffRef);
-      
-      if (!staffDoc.exists()) {
-        throw new Error('Funcionário não encontrado');
-      }
-      
-      // 3. Registrar o empréstimo
-      const staffLoansRef = collection(db, `users/${currentUser.uid}/staffLoans`);
-      await addDoc(staffLoansRef, {
-        staffId,
-        bookId: confirmModal.bookId,
-        loanDate: serverTimestamp(),
-        createdAt: serverTimestamp()
-      });
-      
-      // 4. Redirecionar para a página principal
-      navigate('/staff-withdrawals', { 
-        state: { 
-          success: true, 
-          message: `Livro "${confirmModal.bookTitle}" emprestado com sucesso para ${staffName}` 
-        } 
-      });
-    } catch (error) {
-      console.error('Erro ao confirmar empréstimo:', error);
-      setError('Erro ao processar empréstimo. Tente novamente.');
-      setLoading(false);
-    }
-  };
-
-  const cancelLoan = () => {
-    setConfirmModal({ show: false, bookId: '', bookTitle: '' });
   };
 
   const currentBooks = filtersApplied ? filteredBooks : books;
@@ -376,29 +328,6 @@ const SelectStaffBook = () => {
           </div>
         )}
       </div>
-
-      {confirmModal.show && (
-        <div className={styles.confirmDialog}>
-          <div className={styles.dialogContent}>
-            <h3>Confirmar Empréstimo</h3>
-            <p>Confirma a retirada do livro "{confirmModal.bookTitle}" para {staffName}?</p>
-            <div className={styles.dialogActions}>
-              <button 
-                className={styles.cancelButton}
-                onClick={cancelLoan}
-              >
-                Cancelar
-              </button>
-              <button 
-                className={styles.confirmButton}
-                onClick={confirmLoan}
-              >
-                Confirmar Retirada
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

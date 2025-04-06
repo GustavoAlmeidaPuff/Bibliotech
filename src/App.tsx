@@ -27,6 +27,7 @@ import StudentWithdrawals from './pages/withdrawals/StudentWithdrawals';
 import StaffWithdrawals from './pages/withdrawals/StaffWithdrawals';
 import BookSelection from './pages/withdrawals/BookSelection';
 import WithdrawalConfirmation from './pages/withdrawals/WithdrawalConfirmation';
+import StaffWithdrawalConfirmation from './pages/withdrawals/StaffWithdrawalConfirmation';
 import SelectStaffBook from './pages/withdrawals/SelectStaffBook';
 import StaffReturns from './pages/returns/StaffReturns';
 import Settings from './pages/settings/Settings';
@@ -66,6 +67,7 @@ const App = () => {
                       <Route path="/student-withdrawals/:studentId/confirm/:bookId" element={<WithdrawalConfirmation />} />
                       <Route path="/staff-withdrawals" element={<StaffWithdrawals />} />
                       <Route path="/staff-withdrawals/:staffId" element={<SelectStaffBook />} />
+                      <Route path="/staff-withdrawals/:staffId/confirm/:bookId" element={<StaffWithdrawalConfirmation />} />
                       <Route path="/staff-returns" element={<StaffReturns />} />
                       <Route path="/settings" element={<Settings />} />
                     </Route>
