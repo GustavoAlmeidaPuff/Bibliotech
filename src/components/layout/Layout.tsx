@@ -94,7 +94,7 @@ const Layout = () => {
               <AcademicCapIcon className={styles.linkIcon} />
               Alunos
             </Link>
-            <Link to="/staff-returns">
+            <Link to="/staff-withdrawals">
               <UserGroupIcon className={styles.linkIcon} />
               Professores e Funcionários
             </Link>

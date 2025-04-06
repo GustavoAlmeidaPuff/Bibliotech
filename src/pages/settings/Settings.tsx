@@ -48,7 +48,7 @@ const Settings = () => {
     if (!currentUser) return null;
     
     const db = getFirestore();
-    const collections = ['books', 'students', 'loans'];
+    const collections = ['books', 'students', 'loans', 'staff', 'staffLoans'];
     const allData: Record<string, any[]> = {};
     
     for (const collectionName of collections) {
@@ -133,7 +133,7 @@ const Settings = () => {
       
       // Proceder com a restauração
       const db = getFirestore();
-      const collections = ['books', 'students', 'loans'];
+      const collections = ['books', 'students', 'loans', 'staff', 'staffLoans'];
       
       // Limpar todas as coleções primeiro
       await restoreAllData();
@@ -183,7 +183,7 @@ const Settings = () => {
     if (!currentUser) return;
     
     const db = getFirestore();
-    const collections = ['books', 'students', 'loans'];
+    const collections = ['books', 'students', 'loans', 'staff', 'staffLoans'];
     
     for (const collectionName of collections) {
       const collectionRef = collection(db, `users/${currentUser.uid}/${collectionName}`);
