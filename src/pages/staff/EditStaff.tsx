@@ -7,7 +7,7 @@ import styles from './Staff.module.css';
 
 interface StaffForm {
   name: string;
-  position: string;
+  role: string;
   contact: string;
   notes: string;
 }
@@ -15,7 +15,7 @@ interface StaffForm {
 const EditStaff = () => {
   const [formData, setFormData] = useState<StaffForm>({
     name: '',
-    position: '',
+    role: '',
     contact: '',
     notes: '',
   });
@@ -40,20 +40,20 @@ const EditStaff = () => {
       const staffDoc = await getDoc(staffRef);
       
       if (staffDoc.exists()) {
-        const data = staffDoc.data() as StaffForm;
+        const data = staffDoc.data();
         setFormData({
           name: data.name || '',
-          position: data.position || '',
+          role: data.role || data.position || '', // Para compatibilidade com registros antigos
           contact: data.contact || '',
           notes: data.notes || '',
         });
       } else {
-        setError('Funcionário não encontrado');
+        setError('Professor/Funcionário não encontrado');
         navigate('/staff');
       }
     } catch (error) {
-      console.error('Erro ao buscar dados do funcionário:', error);
-      setError('Erro ao buscar dados do funcionário');
+      console.error('Erro ao buscar dados do professor/funcionário:', error);
+      setError('Erro ao buscar dados do professor/funcionário');
     } finally {
       setFetchLoading(false);
     }
@@ -70,13 +70,13 @@ const EditStaff = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.position) {
+    if (!formData.name || !formData.role) {
       setError('Nome e cargo são campos obrigatórios');
       return;
     }
 
     if (!currentUser || !id) {
-      setError('Você precisa estar logado para editar funcionários');
+      setError('Você precisa estar logado para editar professores/funcionários');
       return;
     }
 
@@ -99,11 +99,11 @@ const EditStaff = () => {
       // Redireciona para a lista de funcionários
       navigate('/staff');
     } catch (err) {
-      console.error('Erro ao atualizar funcionário:', err);
+      console.error('Erro ao atualizar professor/funcionário:', err);
       if (err instanceof Error) {
-        setError(`Erro ao atualizar funcionário: ${err.message}`);
+        setError(`Erro ao atualizar professor/funcionário: ${err.message}`);
       } else {
-        setError('Erro ao atualizar funcionário. Verifique sua conexão e tente novamente.');
+        setError('Erro ao atualizar professor/funcionário. Verifique sua conexão e tente novamente.');
       }
     } finally {
       setLoading(false);
@@ -113,7 +113,7 @@ const EditStaff = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Editar Funcionário</h2>
+        <h2>Editar Professor/Funcionário</h2>
         <button 
           className={styles.cancelButton}
           onClick={() => navigate('/staff')}
@@ -123,7 +123,7 @@ const EditStaff = () => {
       </div>
 
       {fetchLoading ? (
-        <div className={styles.loading}>Carregando dados do funcionário...</div>
+        <div className={styles.loading}>Carregando dados do professor/funcionário...</div>
       ) : (
         <form onSubmit={handleSubmit} className={styles.form}>
           {error && <div className={styles.error}>{error}</div>}
@@ -143,11 +143,11 @@ const EditStaff = () => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="position">Cargo *</label>
+                <label htmlFor="role">Cargo *</label>
                 <input
                   type="text"
-                  id="position"
-                  value={formData.position}
+                  id="role"
+                  value={formData.role}
                   onChange={handleChange}
                   required
                 />

@@ -7,7 +7,7 @@ import styles from './Staff.module.css';
 
 interface StaffForm {
   name: string;
-  position: string;
+  role: string;
   contact: string;
   notes: string;
 }
@@ -15,7 +15,7 @@ interface StaffForm {
 const RegisterStaff = () => {
   const [formData, setFormData] = useState<StaffForm>({
     name: '',
-    position: '',
+    role: '',
     contact: '',
     notes: '',
   });
@@ -36,13 +36,13 @@ const RegisterStaff = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.position) {
+    if (!formData.name || !formData.role) {
       setError('Nome e cargo são campos obrigatórios');
       return;
     }
 
     if (!currentUser) {
-      setError('Você precisa estar logado para registrar funcionários');
+      setError('Você precisa estar logado para registrar professores/funcionários');
       return;
     }
 
@@ -50,7 +50,7 @@ const RegisterStaff = () => {
       setLoading(true);
       setError('');
 
-      // Prepara os dados do funcionário
+      // Prepara os dados do professor/funcionário
       const staffData = {
         ...formData,
         createdAt: serverTimestamp(),
@@ -58,20 +58,20 @@ const RegisterStaff = () => {
         userId: currentUser.uid,
       };
 
-      // Referência à coleção de funcionários do usuário
+      // Referência à coleção de professores/funcionários do usuário
       const staffRef = collection(db, `users/${currentUser.uid}/staff`);
       
       // Adiciona o documento
       await addDoc(staffRef, staffData);
       
-      // Redireciona para a lista de funcionários
+      // Redireciona para a lista de professores/funcionários
       navigate('/staff');
     } catch (err) {
-      console.error('Error adding staff member:', err);
+      console.error('Erro ao adicionar professor/funcionário:', err);
       if (err instanceof Error) {
-        setError(`Erro ao registrar funcionário: ${err.message}`);
+        setError(`Erro ao registrar professor/funcionário: ${err.message}`);
       } else {
-        setError('Erro ao registrar funcionário. Verifique sua conexão e tente novamente.');
+        setError('Erro ao registrar professor/funcionário. Verifique sua conexão e tente novamente.');
       }
     } finally {
       setLoading(false);
@@ -81,7 +81,7 @@ const RegisterStaff = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Registrar Novo Funcionário</h2>
+        <h2>Registrar Novo Professor/Funcionário</h2>
         <button 
           className={styles.cancelButton}
           onClick={() => navigate('/staff')}
@@ -108,11 +108,11 @@ const RegisterStaff = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="position">Cargo *</label>
+              <label htmlFor="role">Cargo *</label>
               <input
                 type="text"
-                id="position"
-                value={formData.position}
+                id="role"
+                value={formData.role}
                 onChange={handleChange}
                 required
               />
@@ -149,7 +149,7 @@ const RegisterStaff = () => {
             className={styles.submitButton}
             disabled={loading}
           >
-            {loading ? 'Registrando...' : 'Registrar Funcionário'}
+            {loading ? 'Registrando...' : 'Registrar Professor/Funcionário'}
           </button>
         </div>
       </form>

@@ -126,10 +126,15 @@
   display: flex;
   gap: 12px;
   align-items: flex-end;
+  margin-top: 1.5rem;
+  justify-content: flex-end;
 }
 
-.applyButton {
-  padding: 0.75rem 1.5rem;
+.applyFiltersButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
   background: var(--primary-color, #4a90e2);
   color: white;
   border: none;
@@ -137,14 +142,21 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.applyButton:hover {
+.applyFiltersButton:hover {
   background: var(--primary-color-hover, #357abd);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
-.clearButton {
-  padding: 0.75rem 1.5rem;
+.clearFiltersButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
   background: white;
   color: #64748b;
   border: 1px solid #e2e8f0;
@@ -152,10 +164,18 @@
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
-.clearButton:hover {
+.clearFiltersButton:hover {
   background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.clearFiltersButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Tabela */
@@ -194,6 +214,19 @@
   background-color: #f8fafc;
 }
 
+.staffRow {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.staffRow:hover {
+  background-color: #f8fafc;
+}
+
+.selected {
+  background-color: #e0e7ff;
+}
+
 .checkboxColumn {
   width: 50px;
   text-align: center;
@@ -207,9 +240,10 @@
 
 .actionsColumn {
   width: 100px;
+  text-align: center;
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
 }
 
 .editButton, 
@@ -396,4 +430,9 @@
 
 .cancelButton:hover {
   background-color: #f8fafc;
+}
+
+/* Remover os estilos antigos */
+.applyButton, .clearButton {
+  display: none;
 } 
