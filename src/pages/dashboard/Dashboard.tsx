@@ -132,6 +132,22 @@ const Dashboard = () => {
     }
   }, [currentUser]);
 
+  // Atualizar dados a cada 30 segundos enquanto o dashboard estiver aberto
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    // Buscar dados imediatamente
+    fetchDashboardData();
+    
+    // Configurar atualização periódica
+    const intervalId = setInterval(() => {
+      fetchDashboardData();
+    }, 30000); // 30 segundos
+    
+    // Limpar o intervalo quando o componente for desmontado
+    return () => clearInterval(intervalId);
+  }, [currentUser]); // Apenas re-executar quando o usuário mudar
+
   const fetchDashboardData = async () => {
     if (!currentUser) return;
 
@@ -154,11 +170,31 @@ const Dashboard = () => {
       const loans = loansSnapshot.docs.map(doc => {
         const data = doc.data();
         
-        // Converter timestamps para Date
-        const borrowDate = data.borrowDate?.toDate ? data.borrowDate.toDate() : new Date();
-        const dueDate = data.dueDate?.toDate ? data.dueDate.toDate() : new Date();
-        const returnDate = data.returnDate?.toDate ? data.returnDate.toDate() : undefined;
-        const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
+        // Converter timestamps para Date de forma mais robusta
+        const convertTimestampToDate = (timestamp: any): Date => {
+          if (!timestamp) return new Date();
+          
+          if (timestamp instanceof Timestamp) {
+            return timestamp.toDate();
+          } else if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+            return timestamp.toDate();
+          } else if (timestamp.seconds) {
+            // Para o formato { seconds: number, nanoseconds: number }
+            return new Date(timestamp.seconds * 1000);
+          } else if (timestamp instanceof Date) {
+            return timestamp;
+          } else if (typeof timestamp === 'string') {
+            return new Date(timestamp);
+          }
+          
+          return new Date();
+        };
+        
+        // Converter todas as datas usando a nova função
+        const borrowDate = convertTimestampToDate(data.borrowDate);
+        const dueDate = convertTimestampToDate(data.dueDate);
+        const returnDate = data.returnDate ? convertTimestampToDate(data.returnDate) : undefined;
+        const createdAt = convertTimestampToDate(data.createdAt);
         
         return {
           id: doc.id,
@@ -422,6 +458,22 @@ const Dashboard = () => {
         loan.returnDate <= month.endDate
       ).length;
       
+      // Para debugging - mostrar no console
+      console.log(`Mês: ${month.label}, Empréstimos: ${borrowed}, Devoluções: ${returned}`);
+      console.log(`Intervalo: ${month.startDate.toISOString()} - ${month.endDate.toISOString()}`);
+      
+      // Mostrar informações dos empréstimos devolvidos neste mês
+      const returnedLoansInMonth = loans.filter(loan => 
+        loan.status === 'returned' && 
+        loan.returnDate && 
+        loan.returnDate >= month.startDate && 
+        loan.returnDate <= month.endDate
+      );
+      
+      if (returnedLoansInMonth.length > 0) {
+        console.log('Empréstimos devolvidos neste mês:', returnedLoansInMonth);
+      }
+      
       return {
         label: month.label,
         borrowed,
@@ -633,14 +685,18 @@ const Dashboard = () => {
                       data: monthlyLoanData.borrowed,
                       borderColor: '#4a90e2',
                       backgroundColor: 'rgba(74, 144, 226, 0.5)',
-                      tension: 0.3
+                      tension: 0.3,
+                      pointRadius: 5,
+                      pointHoverRadius: 7
                     },
                     {
                       label: 'Devoluções',
                       data: monthlyLoanData.returned,
                       borderColor: '#50c878',
                       backgroundColor: 'rgba(80, 200, 120, 0.5)',
-                      tension: 0.3
+                      tension: 0.3,
+                      pointRadius: 5,
+                      pointHoverRadius: 7
                     }
                   ]
                 }}
@@ -649,6 +705,18 @@ const Dashboard = () => {
                   plugins: {
                     legend: {
                       position: 'top'
+                    },
+                    tooltip: {
+                      callbacks: {
+                        title: function(tooltipItems) {
+                          return tooltipItems[0].label;
+                        },
+                        label: function(context) {
+                          const value = context.raw as number;
+                          const label = context.dataset.label || '';
+                          return `${label}: ${value} livros`;
+                        }
+                      }
                     }
                   },
                   scales: {
@@ -656,6 +724,10 @@ const Dashboard = () => {
                       beginAtZero: true,
                       ticks: {
                         precision: 0
+                      },
+                      title: {
+                        display: true,
+                        text: 'Quantidade de livros'
                       }
                     }
                   }
