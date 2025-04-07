@@ -43,6 +43,11 @@ interface Student {
   neighborhood?: string;
   complement?: string;
   notes?: string;
+  shift?: string;
+  email?: string;
+  username?: string;
+  tempPassword?: string;
+  hasCredentials?: boolean;
 }
 
 interface Loan {
@@ -339,6 +344,20 @@ const StudentDashboard = () => {
       window.open(`https://wa.me/55${formattedNumber}`, '_blank');
     }
   };
+
+  // Função para copiar credenciais para o clipboard
+  const copyCredentials = () => {
+    if (!student?.username || !student?.tempPassword) return;
+    
+    const text = `Usuário: ${student.username}\nSenha: ${student.tempPassword}`;
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        alert('Credenciais copiadas para a área de transferência');
+      })
+      .catch(err => {
+        console.error('Erro ao copiar credenciais:', err);
+      });
+  };
   
   if (loading) {
     return <div className={styles.loading}>Carregando...</div>;
@@ -385,6 +404,31 @@ const StudentDashboard = () => {
           )}
         </div>
       </div>
+      
+      {/* Credenciais do Aluno */}
+      {student.hasCredentials && (
+        <div className={styles.credentialsSection}>
+          <h3>Credenciais de Acesso</h3>
+          <div className={styles.credentialsCard}>
+            <div className={styles.credentialItem}>
+              <strong>Usuário:</strong> {student.username}
+            </div>
+            <div className={styles.credentialItem}>
+              <strong>Senha:</strong> {student.tempPassword}
+            </div>
+            <button 
+              className={styles.copyButton}
+              onClick={copyCredentials}
+            >
+              Copiar Credenciais
+            </button>
+            <p className={styles.credentialsHelp}>
+              Estas são as credenciais para o aluno acessar suas estatísticas. 
+              O aluno deve ser orientado a trocar sua senha no primeiro acesso.
+            </p>
+          </div>
+        </div>
+      )}
       
       {loans.length === 0 ? (
         <div className={styles.emptyState}>

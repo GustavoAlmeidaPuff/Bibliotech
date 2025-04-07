@@ -8,6 +8,8 @@ import ThemeProvider from './components/theme/ThemeProvider';
 import PrivateRoute from './components/auth/PrivateRoute';
 import Login from './pages/auth/Login';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import StudentLogin from './pages/auth/StudentLogin';
+import StudentDashboardPage from './pages/student/StudentDashboard';
 import Dashboard from './pages/dashboard/Dashboard';
 import Layout from './components/layout/Layout';
 import Students from './pages/students/Students';
@@ -44,6 +46,8 @@ const App = () => {
                   {/* Public routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/student-login" element={<StudentLogin />} />
+                  <Route path="/student-dashboard" element={<StudentDashboardPage />} />
                   
                   {/* Protected routes */}
                   <Route element={<PrivateRoute />}>
@@ -75,7 +79,7 @@ const App = () => {
                   </Route>
                   
                   {/* Default redirect */}
-                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="*" element={<Navigate to="/login" />} />
                 </Routes>
               </Router>
             </ThemeProvider>
