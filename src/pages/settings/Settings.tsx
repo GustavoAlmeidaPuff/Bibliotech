@@ -10,7 +10,8 @@ import {
   getFirestore, 
   getDoc, 
   updateDoc,
-  setDoc
+  setDoc,
+  where
 } from 'firebase/firestore';
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import styles from './Settings.module.css';
@@ -37,6 +38,12 @@ const Settings = () => {
   const [confirmPhrase, setConfirmPhrase] = useState('');
   const [restoreLoading, setRestoreLoading] = useState(false);
   const [restoreError, setRestoreError] = useState('');
+  
+  // Estado para apagar empréstimos devolvidos
+  const [showDeleteReturnedConfirm, setShowDeleteReturnedConfirm] = useState(false);
+  const [deleteReturnedPassword, setDeleteReturnedPassword] = useState('');
+  const [deleteReturnedLoading, setDeleteReturnedLoading] = useState(false);
+  const [deleteReturnedError, setDeleteReturnedError] = useState('');
   
   // Referência para input de upload de arquivo
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -278,6 +285,89 @@ const Settings = () => {
     }
   };
 
+  // Funções para apagar empréstimos devolvidos
+  const handleDeleteReturnedLoansClick = () => {
+    setShowDeleteReturnedConfirm(true);
+    setDeleteReturnedPassword('');
+    setDeleteReturnedError('');
+  };
+  
+  const cancelDeleteReturned = () => {
+    setShowDeleteReturnedConfirm(false);
+    setDeleteReturnedPassword('');
+    setDeleteReturnedError('');
+  };
+  
+  const handleDeleteReturnedConfirm = async () => {
+    if (!currentUser || !currentUser.email) {
+      setDeleteReturnedError('Usuário não autenticado.');
+      return;
+    }
+    
+    try {
+      setDeleteReturnedLoading(true);
+      setDeleteReturnedError('');
+      
+      // Reautenticar o usuário com a senha fornecida
+      const credential = EmailAuthProvider.credential(currentUser.email, deleteReturnedPassword);
+      await reauthenticateWithCredential(currentUser, credential);
+      
+      // Proceder com a exclusão de empréstimos devolvidos
+      await deleteReturnedLoans();
+      
+      setShowDeleteReturnedConfirm(false);
+      setMessage({ 
+        text: 'Todos os registros de empréstimos devolvidos foram excluídos com sucesso!', 
+        isError: false 
+      });
+    } catch (error) {
+      console.error('Erro ao excluir empréstimos devolvidos:', error);
+      
+      if (error instanceof Error) {
+        // Verificar se é erro de autenticação
+        if (error.message.includes('auth')) {
+          setDeleteReturnedError('Senha incorreta. Por favor, verifique e tente novamente.');
+        } else {
+          setDeleteReturnedError(`Erro ao excluir empréstimos devolvidos: ${error.message}`);
+        }
+      } else {
+        setDeleteReturnedError('Erro desconhecido ao excluir empréstimos devolvidos.');
+      }
+    } finally {
+      setDeleteReturnedLoading(false);
+    }
+  };
+  
+  // Função para apagar os empréstimos devolvidos
+  const deleteReturnedLoans = async () => {
+    if (!currentUser) return;
+    
+    const db = getFirestore();
+    
+    // Obter e excluir empréstimos devolvidos na coleção loans
+    const loansRef = collection(db, `users/${currentUser.uid}/loans`);
+    const returnedLoansQuery = query(loansRef, where('status', '==', 'returned'));
+    const returnedSnapshot = await getDocs(returnedLoansQuery);
+    
+    // Deletar todos os empréstimos devolvidos
+    const deletePromises = returnedSnapshot.docs.map(docSnapshot => 
+      deleteDoc(doc(db, `users/${currentUser.uid}/loans/${docSnapshot.id}`))
+    );
+    
+    await Promise.all(deletePromises);
+    
+    // Também excluir empréstimos devolvidos dos funcionários, se houver
+    const staffLoansRef = collection(db, `users/${currentUser.uid}/staffLoans`);
+    const returnedStaffLoansQuery = query(staffLoansRef, where('status', '==', 'returned'));
+    const returnedStaffSnapshot = await getDocs(returnedStaffLoansQuery);
+    
+    const deleteStaffPromises = returnedStaffSnapshot.docs.map(docSnapshot => 
+      deleteDoc(doc(db, `users/${currentUser.uid}/staffLoans/${docSnapshot.id}`))
+    );
+    
+    await Promise.all(deleteStaffPromises);
+  };
+
   return (
     <div className={styles.container}>
       <h2>Configurações da Biblioteca</h2>
@@ -447,6 +537,16 @@ const Settings = () => {
             
             <button 
               className={styles.dangerButton}
+              onClick={handleDeleteReturnedLoansClick}
+            >
+              Apagar Empréstimos Devolvidos
+            </button>
+            <p className={styles.helpText}>
+              Esta ação apagará permanentemente todos os registros de empréstimos já devolvidos.
+            </p>
+            
+            <button 
+              className={styles.dangerButton}
               onClick={handleRestoreDataClick}
             >
               Restaurar Todos os Dados
@@ -514,6 +614,53 @@ const Settings = () => {
                 disabled={!password || !confirmPhrase || restoreLoading}
               >
                 {restoreLoading ? 'Restaurando...' : 'Confirmar Restauração'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {showDeleteReturnedConfirm && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Confirmar Exclusão de Empréstimos Devolvidos</h3>
+            
+            <p className={styles.warningText}>
+              <strong>Atenção:</strong> Esta ação apagará <strong>permanentemente</strong> todos os
+              registros de empréstimos já devolvidos do sistema. Esta ação é irreversível!
+            </p>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="deleteReturnedPassword">Digite sua senha para confirmar:</label>
+              <input
+                type="password"
+                id="deleteReturnedPassword"
+                value={deleteReturnedPassword}
+                onChange={(e) => setDeleteReturnedPassword(e.target.value)}
+                placeholder="Sua senha"
+              />
+            </div>
+            
+            {deleteReturnedError && (
+              <div className={styles.errorMessage}>
+                {deleteReturnedError}
+              </div>
+            )}
+            
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.cancelButton}
+                onClick={cancelDeleteReturned}
+                disabled={deleteReturnedLoading}
+              >
+                Cancelar
+              </button>
+              <button 
+                className={styles.confirmDangerButton}
+                onClick={handleDeleteReturnedConfirm}
+                disabled={!deleteReturnedPassword || deleteReturnedLoading}
+              >
+                {deleteReturnedLoading ? 'Excluindo...' : 'Confirmar Exclusão'}
               </button>
             </div>
           </div>
