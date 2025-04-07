@@ -19,6 +19,7 @@ import {
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import styles from './StudentDashboard.module.css';
+import { storeStudentCredentials } from '../../contexts/AuthContext';
 
 // Registrando os componentes necessários do Chart.js
 ChartJS.register(

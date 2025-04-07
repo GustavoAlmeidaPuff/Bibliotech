@@ -516,7 +516,7 @@ const StudentLoans = () => {
                         className={`${styles.loanRow} ${loan.status === 'returned' ? styles.returnedRow : ''}`}
                       >
                         <td>{loan.studentName}</td>
-                        <td>{loan.bookTitle}</td>
+                        <td className={styles.bookTitleCell}>{loan.bookTitle}</td>
                         <td>{formatDate(loan.borrowDate)}</td>
                         <td>{formatDate(loan.dueDate)}</td>
                         <td>
