@@ -314,6 +314,19 @@ const StudentDashboard = () => {
     navigate('/students');
   };
   
+  // Função para abrir o WhatsApp
+  const openWhatsApp = () => {
+    // Verificar se existe número de telefone no campo contact ou number
+    const phoneNumber = student?.contact || student?.number;
+    
+    if (phoneNumber) {
+      // Remover caracteres não numéricos
+      const formattedNumber = phoneNumber.replace(/\D/g, '');
+      // Abrir WhatsApp com o número
+      window.open(`https://wa.me/55${formattedNumber}`, '_blank');
+    }
+  };
+  
   if (loading) {
     return <div className={styles.loading}>Carregando...</div>;
   }
@@ -341,12 +354,23 @@ const StudentDashboard = () => {
       <div className={styles.header}>
         <h2>Dashboard do Aluno: {student.name}</h2>
         <p className={styles.classroom}>Turma: {student.classroom}</p>
-        <button 
-          className={styles.backButton}
-          onClick={navigateBack}
-        >
-          Voltar para a Lista de Alunos
-        </button>
+        <div className={styles.headerButtons}>
+          <button 
+            className={styles.backButton}
+            onClick={navigateBack}
+          >
+            Voltar para a Lista de Alunos
+          </button>
+          
+          {(student.contact || student.number) && (
+            <button 
+              className={styles.whatsappButton}
+              onClick={openWhatsApp}
+            >
+              Chamar no WhatsApp
+            </button>
+          )}
+        </div>
       </div>
       
       {loans.length === 0 ? (
