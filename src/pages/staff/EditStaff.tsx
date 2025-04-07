@@ -43,7 +43,7 @@ const EditStaff = () => {
         const data = staffDoc.data();
         setFormData({
           name: data.name || '',
-          role: data.role || data.position || '', // Para compatibilidade com registros antigos
+          role: data.role || data.position || '', 
           contact: data.contact || '',
           notes: data.notes || '',
         });
