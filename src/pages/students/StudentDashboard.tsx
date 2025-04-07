@@ -58,6 +58,7 @@ interface Loan {
   genres?: string[];
   createdAt: Date;
   completed: boolean;
+  readPercentage?: number; // Percentual lido do livro
 }
 
 interface Book {
@@ -237,17 +238,29 @@ const StudentDashboard = () => {
         })
       ).length;
       
-      // Livros devolvidos e marcados como concluídos no mês
-      // (considerando que agora temos o campo 'completed' nos empréstimos devolvidos)
-      const completedCount = loansData.filter(loan => 
-        loan.status === 'returned' && 
-        loan.completed === true && 
-        loan.returnDate && 
-        isWithinInterval(loan.returnDate, {
-          start: month.startDate,
-          end: month.endDate
-        })
-      ).length;
+      // Calculando livros lidos no mês
+      // Se um livro tem readPercentage, usa esse valor, senão verifica se completed
+      let completedCount = 0;
+      
+      loansData.forEach(loan => {
+        if (loan.status === 'returned' && 
+            loan.returnDate && 
+            isWithinInterval(loan.returnDate, {
+              start: month.startDate,
+              end: month.endDate
+            })) {
+          if (loan.readPercentage !== undefined) {
+            // Se tiver percentual de leitura, soma o valor proporcional
+            completedCount += (loan.readPercentage / 100);
+          } else if (loan.completed) {
+            // Se não tiver percentual mas estiver marcado como completo, soma 1
+            completedCount += 1;
+          } else {
+            // Padrão: se foi devolvido mas sem indicação, considera 50%
+            completedCount += 0.5;
+          }
+        }
+      });
       
       return { 
         label: month.label, 
