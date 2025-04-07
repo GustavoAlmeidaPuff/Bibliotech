@@ -456,16 +456,26 @@ const Dashboard = () => {
         loan.returnDate <= month.endDate
       );
       
-      // Calcular taxa média de conclusão
-      let completionRate = 0;
+      // Calcular média do progresso de leitura
+      let averageProgress = 0;
       if (returnedLoans.length > 0) {
-        const completedCount = returnedLoans.filter(loan => loan.completed).length;
-        completionRate = Math.round((completedCount / returnedLoans.length) * 100);
+        // Soma todos os progressos (considerando 100% para livros marcados como concluídos)
+        const totalProgress = returnedLoans.reduce((sum, loan) => {
+          if (loan.completed) {
+            return sum + 100;
+          } else if (typeof loan.readingProgress === 'number') {
+            return sum + loan.readingProgress;
+          }
+          return sum;
+        }, 0);
+        
+        // Calcula a média
+        averageProgress = Math.round(totalProgress / returnedLoans.length);
       }
       
       return {
         label: month.label,
-        rate: completionRate
+        rate: averageProgress
       };
     });
     
@@ -661,7 +671,7 @@ const Dashboard = () => {
         
         {/* Taxa de Conclusão de Leitura */}
         <div className={styles.chartCard}>
-          <h3>Taxa de Conclusão de Leitura</h3>
+          <h3>Média de Progresso de Leitura</h3>
           {completionRateData.labels.length > 0 ? (
             <div className={styles.chartContainer}>
               <Bar
@@ -669,7 +679,7 @@ const Dashboard = () => {
                   labels: completionRateData.labels,
                   datasets: [
                     {
-                      label: 'Taxa de Conclusão (%)',
+                      label: 'Progresso Médio (%)',
                       data: completionRateData.rates,
                       backgroundColor: '#778beb'
                     }
@@ -680,6 +690,13 @@ const Dashboard = () => {
                   plugins: {
                     legend: {
                       display: false
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          return `Média: ${context.raw}%`;
+                        }
+                      }
                     }
                   },
                   scales: {
@@ -749,11 +766,6 @@ const Dashboard = () => {
                       label: 'Livros Lidos',
                       data: classroomPerformance.map(c => c.booksRead),
                       backgroundColor: '#4a90e2'
-                    },
-                    {
-                      label: 'Taxa Média de Conclusão (%)',
-                      data: classroomPerformance.map(c => c.averageCompletion),
-                      backgroundColor: '#f78fb3'
                     }
                   ]
                 }}
@@ -762,13 +774,21 @@ const Dashboard = () => {
                   plugins: {
                     legend: {
                       position: 'top'
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          return `Livros: ${context.raw} livros`;
+                        }
+                      }
                     }
                   },
                   scales: {
                     y: {
                       beginAtZero: true,
-                      ticks: {
-                        precision: 0
+                      title: {
+                        display: true,
+                        text: 'Quantidade de livros lidos'
                       }
                     }
                   }
