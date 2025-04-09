@@ -15,8 +15,6 @@ interface StudentForm {
   complement: string;
   notes: string;
   shift: string;
-  email: string;
-  generateCredentials: boolean;
 }
 
 const RegisterStudent = () => {
@@ -29,9 +27,7 @@ const RegisterStudent = () => {
     neighborhood: '',
     complement: '',
     notes: '',
-    shift: '',
-    email: '',
-    generateCredentials: false
+    shift: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -66,25 +62,9 @@ const RegisterStudent = () => {
       setLoading(true);
       setError('');
 
-      // Gera nome de usuário e senha se a opção estiver marcada
-      let studentCredentials = {};
-      if (formData.generateCredentials) {
-        // Gera um nome de usuário baseado no nome do aluno (sem espaços, minúsculo)
-        const username = formData.name.toLowerCase().replace(/\s+/g, '.');
-        // Gera uma senha temporária (primeiras 3 letras do nome + últimos 4 dígitos da data atual)
-        const tempPassword = `${username.substring(0, 3)}${Date.now().toString().slice(-4)}`;
-        
-        studentCredentials = {
-          username,
-          tempPassword,
-          hasCredentials: true
-        };
-      }
-
       // Prepara os dados do aluno
       const studentData = {
         ...formData,
-        ...studentCredentials,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         userId: currentUser.uid, // Adiciona referência ao usuário
@@ -159,34 +139,21 @@ const RegisterStudent = () => {
                 onChange={handleChange}
               />
             </div>
-          </div>
-        </div>
 
-        <div className={styles.formSection}>
-          <h3>Acesso do Aluno</h3>
-          <div className={styles.formGroup}>
-            <label htmlFor="email">Email (opcional)</label>
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                id="generateCredentials"
-                checked={formData.generateCredentials}
+            <div className={styles.formGroup}>
+              <label htmlFor="shift">Turno</label>
+              <select
+                id="shift"
+                value={formData.shift}
                 onChange={handleChange}
-              />
-              Gerar credenciais de acesso para o aluno
-            </label>
-            <p className={styles.helpText}>
-              Se marcado, um nome de usuário e senha serão gerados automaticamente para que o aluno possa acessar suas estatísticas.
-            </p>
+                className={styles.selectField}
+              >
+                <option value="">Selecione o turno</option>
+                <option value="manhã">Manhã</option>
+                <option value="tarde">Tarde</option>
+                <option value="noite">Noite</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -245,25 +212,6 @@ const RegisterStudent = () => {
               onChange={handleChange}
               rows={4}
             />
-          </div>
-        </div>
-
-        <div className={styles.formSection}>
-          <h3>Informações Básicas</h3>
-          <div className={styles.formGroup}>
-            <label htmlFor="shift">Turno *</label>
-            <select
-              id="shift"
-              value={formData.shift}
-              onChange={handleChange}
-              className={styles.selectField}
-              required
-            >
-              <option value="" disabled>Selecione o turno</option>
-              <option value="manhã">Manhã</option>
-              <option value="tarde">Tarde</option>
-              <option value="noite">Noite</option>
-            </select>
           </div>
         </div>
 
