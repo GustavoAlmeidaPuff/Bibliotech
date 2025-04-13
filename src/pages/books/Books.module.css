@@ -312,6 +312,45 @@
   color: var(--primary-color);
 }
 
+.sortOptions {
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+.sortSelect {
+  appearance: none;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sortSelect:hover {
+  background-color: var(--bg-primary);
+  border-color: var(--text-secondary);
+}
+
+.sortSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.sortIcon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
 .booksList {
   width: 100%;
   overflow-x: auto;

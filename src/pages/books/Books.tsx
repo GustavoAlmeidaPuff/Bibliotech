@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import styles from './Books.module.css';
 
 interface Book {
@@ -17,6 +17,7 @@ interface Book {
   shelf?: string;
   collection?: string;
   quantity?: number;
+  createdAt?: number;
 }
 
 interface Filters {
@@ -24,6 +25,8 @@ interface Filters {
   code: string;
   author: string;
 }
+
+type SortOption = 'alphabetical' | 'dateAdded';
 
 const Books = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -34,6 +37,7 @@ const Books = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [sortBy, setSortBy] = useState<SortOption>('dateAdded');
   const [filters, setFilters] = useState<Filters>({
     title: '',
     code: '',
@@ -67,6 +71,28 @@ const Books = () => {
   useEffect(() => {
     fetchBooks();
   }, [currentUser]);
+
+  const sortBooks = (booksToSort: Book[]) => {
+    const booksCopy = [...booksToSort];
+
+    if (sortBy === 'alphabetical') {
+      return booksCopy.sort((a, b) => a.title.localeCompare(b.title));
+    } else {
+      // Sort by date added (createdAt timestamp) or by ID if createdAt is not available
+      return booksCopy.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt - a.createdAt; // newest first
+        } else {
+          return a.id.localeCompare(b.id); // fallback to id
+        }
+      });
+    }
+  };
+
+  const booksToDisplay = () => {
+    const booksToSort = filtersApplied ? filteredBooks : books;
+    return sortBooks(booksToSort);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,6 +232,17 @@ const Books = () => {
                   <Squares2X2Icon className={styles.buttonIcon} />
                 </button>
               </div>
+              <div className={styles.sortOptions}>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className={styles.sortSelect}
+                >
+                  <option value="dateAdded">Ordem de Registro</option>
+                  <option value="alphabetical">Ordem Alfabética (A-Z)</option>
+                </select>
+                <ArrowsUpDownIcon className={styles.sortIcon} />
+              </div>
               <button
                 className={styles.filterButton}
                 onClick={() => setShowFilters(!showFilters)}
@@ -303,7 +340,7 @@ const Books = () => {
           <>
             {viewMode === 'grid' ? (
               <div className={styles.booksGrid}>
-                {(filtersApplied ? filteredBooks : books).map(book => (
+                {booksToDisplay().map(book => (
                   <Link
                     key={book.id}
                     to={`/books/${book.id}`}
@@ -357,7 +394,7 @@ const Books = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {(filtersApplied ? filteredBooks : books).map(book => (
+                    {booksToDisplay().map(book => (
                       <tr 
                         key={book.id} 
                         className={selectedBooks.includes(book.id) ? styles.selected : ''}
