@@ -341,16 +341,14 @@ const Books = () => {
             {viewMode === 'grid' ? (
               <div className={styles.booksGrid}>
                 {booksToDisplay().map(book => (
-                  <Link
+                  <div
                     key={book.id}
-                    to={`/books/${book.id}`}
                     className={`${styles.bookCard} ${selectedBooks.includes(book.id) ? styles.selected : ''}`}
                   >
                     <div className={styles.bookHeader}>
                       <div
                         className={styles.checkbox}
                         onClick={(e) => {
-                          e.preventDefault();
                           e.stopPropagation();
                           toggleBookSelection(book.id);
                         }}
@@ -358,27 +356,35 @@ const Books = () => {
                         <input
                           type="checkbox"
                           checked={selectedBooks.includes(book.id)}
-                          onChange={() => {}}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className={styles.checkboxInput}
                         />
                       </div>
                       <h3>{book.title}</h3>
                     </div>
-                    <p className={styles.bookCode}>Código: {book.code}</p>
-                    {book.authors && (
-                      <p className={styles.bookAuthors}>
-                        {book.authors.join(', ')}
-                      </p>
-                    )}
-                    {book.genres && (
-                      <div className={styles.genreTags}>
-                        {book.genres.map(genre => (
-                          <span key={genre} className={styles.tag}>
-                            {genre}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </Link>
+                    <Link
+                      to={`/books/${book.id}`}
+                      className={styles.bookLink}
+                    >
+                      <p className={styles.bookCode}>Código: {book.code}</p>
+                      {book.authors && (
+                        <p className={styles.bookAuthors}>
+                          {book.authors.join(', ')}
+                        </p>
+                      )}
+                      {book.genres && (
+                        <div className={styles.genreTags}>
+                          {book.genres.map(genre => (
+                            <span key={genre} className={styles.tag}>
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </Link>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -398,13 +404,11 @@ const Books = () => {
                       <tr 
                         key={book.id} 
                         className={selectedBooks.includes(book.id) ? styles.selected : ''}
-                        onClick={() => navigate(`/books/${book.id}`)}
                       >
                         <td>
                           <div
                             className={styles.checkbox}
                             onClick={(e) => {
-                              e.preventDefault();
                               e.stopPropagation();
                               toggleBookSelection(book.id);
                             }}
@@ -412,14 +416,17 @@ const Books = () => {
                             <input
                               type="checkbox"
                               checked={selectedBooks.includes(book.id)}
-                              onChange={() => {}}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                              }}
+                              className={styles.checkboxInput}
                             />
                           </div>
                         </td>
-                        <td>{book.title}</td>
-                        <td>{book.code}</td>
-                        <td>{book.authors?.join(', ') || '-'}</td>
-                        <td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.title}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.code}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.authors?.join(', ') || '-'}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
                           {book.genres?.map(genre => (
                             <span key={genre} className={styles.tag}>
                               {genre}

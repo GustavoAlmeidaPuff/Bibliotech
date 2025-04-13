@@ -438,4 +438,15 @@
 .selectedFilter .removeTag:hover {
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bookLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  margin-top: 0.5rem;
+}
+
+.bookLink:hover {
+  color: var(--primary-color);
 } 
