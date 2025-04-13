@@ -53,21 +53,6 @@ const Layout = () => {
         <div className={styles.navContent}>
           <div className={styles.navSection}>
             <h2>
-              <UserGroupIcon className={styles.navIcon} />
-              Cadastros
-            </h2>
-            <Link to="/students">
-              <AcademicCapIcon className={styles.linkIcon} />
-              Alunos
-            </Link>
-            <Link to="/staff">
-              <UserGroupIcon className={styles.linkIcon} />
-              Professores e Funcionários
-            </Link>
-          </div>
-
-          <div className={styles.navSection}>
-            <h2>
               <BookOpenIcon className={styles.navIcon} />
               Livros
             </h2>
@@ -82,6 +67,21 @@ const Layout = () => {
             <Link to="/staff-loans">
               <ArrowPathIcon className={styles.linkIcon} />
               Locações Professores
+            </Link>
+          </div>
+
+          <div className={styles.navSection}>
+            <h2>
+              <UserGroupIcon className={styles.navIcon} />
+              Cadastros
+            </h2>
+            <Link to="/students">
+              <AcademicCapIcon className={styles.linkIcon} />
+              Alunos
+            </Link>
+            <Link to="/staff">
+              <UserGroupIcon className={styles.linkIcon} />
+              Professores e Funcionários
             </Link>
           </div>
 
