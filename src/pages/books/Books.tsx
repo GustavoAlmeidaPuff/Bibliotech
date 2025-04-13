@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import styles from './Books.module.css';
 
 interface Book {
@@ -33,6 +33,7 @@ const Books = () => {
   const [deleting, setDeleting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [filtersApplied, setFiltersApplied] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [filters, setFilters] = useState<Filters>({
     title: '',
     code: '',
@@ -189,6 +190,22 @@ const Books = () => {
           )}
           {selectedBooks.length === 0 && (
             <>
+              <div className={styles.viewOptions}>
+                <button
+                  className={`${styles.viewButton} ${viewMode === 'list' ? styles.active : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="Visualização em Lista"
+                >
+                  <ListBulletIcon className={styles.buttonIcon} />
+                </button>
+                <button
+                  className={`${styles.viewButton} ${viewMode === 'grid' ? styles.active : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="Visualização em Grade"
+                >
+                  <Squares2X2Icon className={styles.buttonIcon} />
+                </button>
+              </div>
               <button
                 className={styles.filterButton}
                 onClick={() => setShowFilters(!showFilters)}
@@ -284,48 +301,100 @@ const Books = () => {
           </div>
         ) : (
           <>
-            <div className={styles.booksGrid}>
-              {(filtersApplied ? filteredBooks : books).map(book => (
-                <Link
-                  key={book.id}
-                  to={`/books/${book.id}`}
-                  className={`${styles.bookCard} ${selectedBooks.includes(book.id) ? styles.selected : ''}`}
-                >
-                  <div className={styles.bookHeader}>
-                    <div
-                      className={styles.checkbox}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleBookSelection(book.id);
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedBooks.includes(book.id)}
-                        onChange={() => {}}
-                      />
+            {viewMode === 'grid' ? (
+              <div className={styles.booksGrid}>
+                {(filtersApplied ? filteredBooks : books).map(book => (
+                  <Link
+                    key={book.id}
+                    to={`/books/${book.id}`}
+                    className={`${styles.bookCard} ${selectedBooks.includes(book.id) ? styles.selected : ''}`}
+                  >
+                    <div className={styles.bookHeader}>
+                      <div
+                        className={styles.checkbox}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleBookSelection(book.id);
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedBooks.includes(book.id)}
+                          onChange={() => {}}
+                        />
+                      </div>
+                      <h3>{book.title}</h3>
                     </div>
-                    <h3>{book.title}</h3>
-                  </div>
-                  <p className={styles.bookCode}>Código: {book.code}</p>
-                  {book.authors && (
-                    <p className={styles.bookAuthors}>
-                      {book.authors.join(', ')}
-                    </p>
-                  )}
-                  {book.genres && (
-                    <div className={styles.genreTags}>
-                      {book.genres.map(genre => (
-                        <span key={genre} className={styles.tag}>
-                          {genre}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </Link>
-              ))}
-            </div>
+                    <p className={styles.bookCode}>Código: {book.code}</p>
+                    {book.authors && (
+                      <p className={styles.bookAuthors}>
+                        {book.authors.join(', ')}
+                      </p>
+                    )}
+                    {book.genres && (
+                      <div className={styles.genreTags}>
+                        {book.genres.map(genre => (
+                          <span key={genre} className={styles.tag}>
+                            {genre}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.booksList}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Título</th>
+                      <th>Código</th>
+                      <th>Autor</th>
+                      <th>Gêneros</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(filtersApplied ? filteredBooks : books).map(book => (
+                      <tr 
+                        key={book.id} 
+                        className={selectedBooks.includes(book.id) ? styles.selected : ''}
+                        onClick={() => navigate(`/books/${book.id}`)}
+                      >
+                        <td>
+                          <div
+                            className={styles.checkbox}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleBookSelection(book.id);
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedBooks.includes(book.id)}
+                              onChange={() => {}}
+                            />
+                          </div>
+                        </td>
+                        <td>{book.title}</td>
+                        <td>{book.code}</td>
+                        <td>{book.authors?.join(', ') || '-'}</td>
+                        <td>
+                          {book.genres?.map(genre => (
+                            <span key={genre} className={styles.tag}>
+                              {genre}
+                            </span>
+                          ))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
             {!loading && filteredBooks.length === 0 && filtersApplied && (
               <div className={styles.noResults}>
                 <p>Nenhum livro encontrado com os filtros aplicados.</p>

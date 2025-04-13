@@ -1,4 +1,4 @@
-# School Library System
+# EN: School Library System
 
 A comprehensive web application for managing school libraries, allowing librarians to efficiently track books, students, and loans in an educational environment.
 
@@ -74,7 +74,7 @@ The system will be expanded to include:
 
 ---
 
-# Sistema de Biblioteca Escolar
+# PT: Sistema de Biblioteca Escolar
 
 Uma aplicação web abrangente para gerenciamento de bibliotecas escolares, permitindo que bibliotecários rastreiem eficientemente livros, alunos e empréstimos em um ambiente educacional.
 
