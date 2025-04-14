@@ -138,6 +138,13 @@
 
 .checkbox {
   padding-top: 0.25rem;
+  width: 18px;
+  height: 18px;
+}
+
+.checkboxInput {
+  width: 18px;
+  height: 18px;
 }
 
 .bookHeader h3 {

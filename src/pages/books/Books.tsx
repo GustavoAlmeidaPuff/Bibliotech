@@ -359,7 +359,7 @@ const Books = () => {
                           onChange={(e) => {
                             e.stopPropagation();
                           }}
-                          className={styles.checkboxInput}
+                          className='checkboxInput'
                         />
                       </div>
                       <h3>{book.title}</h3>
