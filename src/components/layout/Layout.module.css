@@ -201,6 +201,32 @@
   transform: translateX(4px);
 }
 
+/* Estilo para o link da página atual */
+.activeLink {
+  background: rgba(255, 255, 255, 0.2) !important;
+  opacity: 1 !important;
+  transform: translateX(4px);
+  position: relative;
+  font-weight: 500;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.activeLink::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  background: white;
+  border-radius: 2px;
+}
+
+.activeLink .linkIcon {
+  opacity: 1;
+}
+
 .logoutButton {
   background: none;
   border: none;

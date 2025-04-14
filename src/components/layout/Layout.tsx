@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useScrollPosition } from '../../hooks/useScrollPosition';
@@ -21,6 +21,7 @@ const Layout = () => {
   const { settings } = useSettings();
   const navigate = useNavigate();
   const { isSticky } = useScrollPosition();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -29,6 +30,11 @@ const Layout = () => {
     } catch (error) {
       console.error('Failed to log out:', error);
     }
+  };
+
+  // Função para verificar se o link atual corresponde à página atual
+  const isActiveLink = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -56,15 +62,15 @@ const Layout = () => {
               <BookOpenIcon className={styles.navIcon} />
               Livros
             </h2>
-            <Link to="/books">
+            <Link to="/books" className={isActiveLink('/books') ? styles.activeLink : ''}>
               <ClipboardDocumentListIcon className={styles.linkIcon} />
               Acervo
             </Link>
-            <Link to="/student-loans">
+            <Link to="/student-loans" className={isActiveLink('/student-loans') ? styles.activeLink : ''}>
               <ArrowPathIcon className={styles.linkIcon} />
               Locações Alunos
             </Link>
-            <Link to="/staff-loans">
+            <Link to="/staff-loans" className={isActiveLink('/staff-loans') ? styles.activeLink : ''}>
               <ArrowPathIcon className={styles.linkIcon} />
               Locações Professores
             </Link>
@@ -75,11 +81,11 @@ const Layout = () => {
               <UserGroupIcon className={styles.navIcon} />
               Cadastros
             </h2>
-            <Link to="/students">
+            <Link to="/students" className={isActiveLink('/students') ? styles.activeLink : ''}>
               <AcademicCapIcon className={styles.linkIcon} />
               Alunos
             </Link>
-            <Link to="/staff">
+            <Link to="/staff" className={isActiveLink('/staff') ? styles.activeLink : ''}>
               <UserGroupIcon className={styles.linkIcon} />
               Professores e Funcionários
             </Link>
@@ -90,11 +96,11 @@ const Layout = () => {
               <ArrowPathIcon className={styles.navIcon} />
               Retiradas
             </h2>
-            <Link to="/student-withdrawals">
+            <Link to="/student-withdrawals" className={isActiveLink('/student-withdrawals') ? styles.activeLink : ''}>
               <AcademicCapIcon className={styles.linkIcon} />
               Alunos
             </Link>
-            <Link to="/staff-withdrawals">
+            <Link to="/staff-withdrawals" className={isActiveLink('/staff-withdrawals') ? styles.activeLink : ''}>
               <UserGroupIcon className={styles.linkIcon} />
               Professores e Funcionários
             </Link>
@@ -105,11 +111,11 @@ const Layout = () => {
               <Cog6ToothIcon className={styles.navIcon} />
               Configurações
             </h2>
-            <Link to="/dashboard">
+            <Link to="/dashboard" className={isActiveLink('/dashboard') ? styles.activeLink : ''}>
               <ChartBarIcon className={styles.linkIcon} />
               Dashboard
             </Link>
-            <Link to="/settings">
+            <Link to="/settings" className={isActiveLink('/settings') ? styles.activeLink : ''}>
               <Cog6ToothIcon className={styles.linkIcon} />
               Configurações da Biblioteca
             </Link>
