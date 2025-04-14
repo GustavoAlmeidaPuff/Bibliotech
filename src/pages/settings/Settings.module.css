@@ -321,6 +321,24 @@
 }
 
 .actionButton:disabled {
-  background-color: #b8c6d6;
+  background-color: #cccccc;
   cursor: not-allowed;
+}
+
+.supportButton {
+  display: inline-block;
+  background-color: #25D366;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.supportButton:hover {
+  background-color: #128C7E;
+  color: white;
 } 

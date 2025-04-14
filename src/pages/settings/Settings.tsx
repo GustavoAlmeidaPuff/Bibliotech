@@ -450,6 +450,21 @@ const Settings = () => {
               Habilitar dashboard de estatísticas
             </label>
           </div>
+          
+          <div className={styles.settingGroup}>
+            <label>Suporte</label>
+            <p className={styles.helpText}>
+              Precisa de ajuda? Entre em contato com o suporte:
+            </p>
+            <a 
+              href="https://wa.me/5551997188572" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.supportButton}
+            >
+              Contatar Suporte via WhatsApp
+            </a>
+          </div>
 
           <div className={styles.settingsSection}>
             <h3>Aparência</h3>
