@@ -3,6 +3,8 @@
 .container {
   padding: 1.5rem;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .header {
@@ -10,11 +12,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .headerActions {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .filterButton, .registerButton, .selectAllButton, .deleteButton, .applyFiltersButton, .clearFiltersButton {
@@ -27,6 +32,7 @@
   transition: all 0.2s ease;
   border: 1px solid var(--border-color);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .filterButton {
@@ -187,13 +193,14 @@
   overflow-x: auto;
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   white-space: nowrap;
-  min-width: 700px; /* Reduzido devido à remoção de colunas de endereço */
+  min-width: 700px;
 }
 
 .table th,
@@ -345,4 +352,97 @@
 .noResults p {
   margin-bottom: 1.5rem;
   font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+
+  .filterButton, .registerButton, .selectAllButton, .deleteButton, .applyFiltersButton, .clearFiltersButton {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .buttonIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .filters {
+    padding: 1rem;
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .filterActions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filterActions button {
+    width: 100%;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .headerActions > * {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filters {
+    padding: 0.75rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  .actionIcon {
+    width: 14px;
+    height: 14px;
+  }
 } 
