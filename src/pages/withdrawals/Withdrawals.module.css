@@ -1,8 +1,10 @@
 @import '../../styles/PageStyles.module.css'; 
 
 .container {
-  padding: 1.5rem;
+  padding: 1rem;
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .header {
@@ -10,11 +12,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .headerActions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .filterButton, .applyFiltersButton, .clearFiltersButton {
@@ -27,6 +32,7 @@
   transition: all 0.2s ease;
   border: 1px solid var(--border-color);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .filterButton {
@@ -62,8 +68,8 @@
 }
 
 .buttonIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .filters {
@@ -123,8 +129,8 @@
 .content {
   background-color: white;
   border-radius: 8px;
-  padding: 1.5rem;
-  min-height: 400px;
+  padding: 1rem;
+  min-height: 300px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -132,20 +138,23 @@
 .tableContainer {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   white-space: nowrap;
-  min-width: 1000px; /* Para garantir rolagem horizontal em telas menores */
+  min-width: 600px; /* Valor reduzido para melhor responsividade */
 }
 
 .table th,
 .table td {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0.75rem;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
 }
@@ -195,6 +204,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
+  width: auto;
 }
 
 .withdrawButton:hover {
@@ -215,15 +225,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 300px;
+  height: 250px;
   text-align: center;
   color: var(--text-secondary);
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .emptyIcon {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   color: var(--text-tertiary);
   margin-bottom: 1rem;
 }
@@ -245,9 +255,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 300px;
+  height: 250px;
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .noResults p {
@@ -262,32 +272,43 @@
 }
 
 .bookListContainer {
+  overflow-x: hidden;
   width: 100%;
-  overflow-x: auto;
 }
 
 .bookList {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
-  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .bookList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bookList {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .bookItem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
   border: 1px solid var(--border-color);
   border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   background-color: white;
   transition: all 0.2s ease;
+  height: 100%;
 }
 
 .bookItem:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border-color: var(--primary-color);
-  transform: translateY(-2px);
 }
 
 .bookInfo {
@@ -298,13 +319,14 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 
 .bookCode, .bookAuthors, .bookPublisher, .bookShelf, .bookCollection, .bookQuantity {
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
   color: var(--text-secondary);
-  margin-bottom: 0.3rem;
 }
 
 .bookGenres {
@@ -317,16 +339,15 @@
 .genreTag {
   background-color: var(--bg-primary);
   color: var(--text-secondary);
-  padding: 0.25rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
 }
 
 .bookActions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-left: 1rem;
+  justify-content: flex-end;
 }
 
 .selectButton {
@@ -334,8 +355,8 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.6rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -343,11 +364,12 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .selectButton:hover:not(:disabled) {
   background-color: var(--primary-dark);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .selectButton:disabled {
@@ -361,26 +383,27 @@
   margin: 0 auto;
   background-color: white;
   border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .confirmationHeader {
-  background-color: var(--bg-primary);
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
 }
 
 .confirmationIcon {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
 
 .confirmationHeader h3 {
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
@@ -391,24 +414,23 @@
 }
 
 .confirmationDetails {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1.5rem;
-  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 @media (min-width: 768px) {
   .confirmationDetails {
-    flex-direction: row;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .detailSection {
-  flex: 1;
-  padding: 1rem;
-  background-color: var(--bg-primary);
-  border-radius: 8px;
   border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  background-color: var(--bg-primary);
 }
 
 .detailSection h4 {
@@ -416,55 +438,92 @@
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 1rem;
-  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .detailItem {
-  margin-bottom: 0.8rem;
   display: flex;
   flex-direction: column;
+  margin-bottom: 0.75rem;
 }
 
 @media (min-width: 576px) {
   .detailItem {
     flex-direction: row;
+    gap: 0.5rem;
   }
 }
 
 .detailLabel {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary);
-  width: 150px;
-  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
+  min-width: 100px;
 }
 
 .detailValue {
-  font-weight: 500;
   color: var(--text-primary);
+  font-size: 0.95rem;
   flex: 1;
 }
 
 .confirmationActions {
   display: flex;
-  justify-content: space-between;
-  padding: 1.5rem;
-  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
   gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .confirmationActions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .confirmationContainer {
+    padding: 1rem;
+  }
+  
+  .detailSection {
+    padding: 1rem;
+  }
+  
+  .confirmationIcon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .confirmationHeader h3 {
+    font-size: 1.25rem;
+  }
+  
+  .confirmationHeader {
+    margin-bottom: 1.5rem;
+  }
 }
 
 .cancelButton, .confirmButton, .backButton {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  font-size: 0.95rem;
   font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.95rem;
+  cursor: pointer;
+  justify-content: center;
   border: none;
+}
+
+@media (max-width: 480px) {
+  .cancelButton, .confirmButton, .backButton {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
 }
 
 .cancelButton {
@@ -524,9 +583,96 @@
 .backButton {
   background-color: var(--primary-color);
   color: white;
-  padding: 0.75rem 1.5rem;
 }
 
 .backButton:hover {
   background-color: var(--primary-dark);
+}
+
+/* Media queries para responsividade */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0.75rem;
+  }
+  
+  .content {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .headerActions {
+    width: 100%;
+  }
+  
+  .content {
+    padding: 0.75rem;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .headerActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filterButton, 
+  .applyFiltersButton, 
+  .clearFiltersButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .buttonIcon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .content {
+    padding: 0.5rem;
+  }
+  
+  .table {
+    min-width: 500px;
+  }
+  
+  .table th,
+  .table td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .filterActions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .applyFiltersButton,
+  .clearFiltersButton {
+    width: 100%;
+  }
 } 

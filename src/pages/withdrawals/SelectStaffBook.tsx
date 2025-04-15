@@ -168,7 +168,7 @@ const SelectStaffBook = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2>Retirada de livro para <span className={styles.highlightName}>{staffName}</span></h2>
+        <h2>Retirada para <span className={styles.highlightName}>{staffName}</span></h2>
         <div className={styles.headerActions}>
           <button
             className={styles.filterButton}
@@ -177,12 +177,12 @@ const SelectStaffBook = () => {
             {showFilters ? (
               <>
                 <XMarkIcon className={styles.buttonIcon} />
-                Ocultar Filtros
+                Ocultar
               </>
             ) : (
               <>
                 <FunnelIcon className={styles.buttonIcon} />
-                {filtersApplied ? 'Filtros Aplicados' : 'Filtrar Livros'}
+                {filtersApplied ? 'Filtros' : 'Filtrar'}
               </>
             )}
           </button>
@@ -261,14 +261,12 @@ const SelectStaffBook = () => {
 
       <div className={styles.content}>
         {loading ? (
-          <div className={styles.loading}>Carregando...</div>
+          <div className={styles.loading}>Carregando livros...</div>
         ) : books.length === 0 ? (
           <div className={styles.emptyState}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={styles.emptyIcon}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-            </svg>
-            <h3>Nenhum livro disponível</h3>
-            <p>Não há livros disponíveis para empréstimo no momento.</p>
+            <HandRaisedIcon className={styles.emptyIcon} />
+            <h3>Não há livros disponíveis</h3>
+            <p>Não existem livros disponíveis para empréstimo no momento.</p>
           </div>
         ) : (
           <div className={styles.bookListContainer}>
@@ -288,37 +286,33 @@ const SelectStaffBook = () => {
                   <div key={book.id} className={styles.bookItem}>
                     <div className={styles.bookInfo}>
                       <h3 className={styles.bookTitle}>{book.title}</h3>
-                      <p className={styles.bookCode}>Código: {book.code || '-'}</p>
+                      {book.code && <p className={styles.bookCode}>Código: {book.code}</p>}
                       {book.authors && book.authors.length > 0 && (
-                        <p className={styles.bookAuthors}>Autores: {book.authors.join(', ')}</p>
+                        <p className={styles.bookAuthors}>
+                          Autores: {book.authors.join(', ')}
+                        </p>
                       )}
                       {book.publisher && (
-                        <p className={styles.bookPublisher}>Editora: {book.publisher}</p>
-                      )}
-                      {book.shelf && (
-                        <p className={styles.bookShelf}>Estante: {book.shelf}</p>
-                      )}
-                      {book.collection && (
-                        <p className={styles.bookCollection}>Coleção: {book.collection}</p>
-                      )}
-                      {book.quantity !== undefined && (
-                        <p className={styles.bookQuantity}>Quantidade disponível: {book.quantity}</p>
+                        <p className={styles.bookPublisher}>
+                          Editora: {book.publisher}
+                        </p>
                       )}
                       {book.genres && book.genres.length > 0 && (
                         <div className={styles.bookGenres}>
                           {book.genres.map((genre, index) => (
-                            <span key={index} className={styles.genreTag}>{genre}</span>
+                            <span key={index} className={styles.genreTag}>
+                              {genre}
+                            </span>
                           ))}
                         </div>
                       )}
                     </div>
                     <div className={styles.bookActions}>
-                      <button 
+                      <button
                         className={styles.selectButton}
                         onClick={() => handleSelectBook(book.id, book.title)}
                       >
-                        <HandRaisedIcon className={styles.buttonIcon} />
-                        Escolher
+                        Selecionar
                       </button>
                     </div>
                   </div>

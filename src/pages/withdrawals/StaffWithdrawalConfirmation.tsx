@@ -229,6 +229,12 @@ const StaffWithdrawalConfirmation = () => {
                   <span className={styles.detailValue}>{book.authors.join(', ')}</span>
                 </div>
               )}
+              {book?.publisher && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Editora:</span>
+                  <span className={styles.detailValue}>{book.publisher}</span>
+                </div>
+              )}
             </div>
           </div>
           
@@ -238,16 +244,20 @@ const StaffWithdrawalConfirmation = () => {
               onClick={handleCancel}
               disabled={processing}
             >
-              <XMarkIcon className={styles.buttonIcon} />
+              <XMarkIcon width={20} height={20} />
               Cancelar
             </button>
             <button 
               className={styles.confirmButton}
               onClick={handleConfirm}
-              disabled={processing || book?.available === false}
+              disabled={processing}
             >
-              <CheckIcon className={styles.buttonIcon} />
-              {processing ? 'Processando...' : 'Confirmar Retirada'}
+              {processing ? 'Processando...' : (
+                <>
+                  <CheckIcon width={20} height={20} />
+                  Confirmar Retirada
+                </>
+              )}
             </button>
           </div>
         </div>
