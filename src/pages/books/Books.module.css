@@ -2,6 +2,8 @@
 
 .container {
   padding: 2rem;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .header {
@@ -9,6 +11,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .header h2 {
@@ -20,6 +24,7 @@
 .headerActions {
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .buttonIcon {
@@ -207,7 +212,7 @@
 
 .filterGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -361,10 +366,12 @@
 .booksList {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .booksList table {
   width: 100%;
+  min-width: 800px;
   border-collapse: collapse;
 }
 
@@ -456,4 +463,46 @@
 
 .bookLink:hover {
   color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .booksGrid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .booksGrid {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+
+  .headerActions button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
 } 
