@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, orderBy, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -33,6 +33,7 @@ interface LocationState {
 
 const StudentLoans = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const state = location.state as LocationState;
   const message = state?.message;
 
@@ -514,6 +515,8 @@ const StudentLoans = () => {
                       <tr 
                         key={loan.id} 
                         className={`${styles.loanRow} ${loan.status === 'returned' ? styles.returnedRow : ''}`}
+                        onClick={() => navigate(`/student-loan-detail/${loan.id}`)}
+                        style={{ cursor: 'pointer' }}
                       >
                         <td>{loan.studentName}</td>
                         <td className={styles.bookTitleCell}>{loan.bookTitle}</td>
@@ -524,7 +527,7 @@ const StudentLoans = () => {
                             {getStatusText(loan)}
                           </span>
                         </td>
-                        <td>
+                        <td onClick={(e) => e.stopPropagation()}>
                           {loan.status === 'active' && (
                             <button 
                               className={styles.returnButton}

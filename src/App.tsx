@@ -23,6 +23,7 @@ import Books from './pages/books/Books';
 import RegisterBook from './pages/books/RegisterBook';
 import EditBook from './pages/books/EditBook';
 import StudentLoans from './pages/loans/StudentLoans';
+import StudentLoanDetail from './pages/loans/StudentLoanDetail';
 import StaffLoans from './pages/loans/StaffLoans';
 import StudentReturns from './pages/returns/StudentReturns';
 import StudentWithdrawals from './pages/withdrawals/StudentWithdrawals';
@@ -65,6 +66,7 @@ const App = () => {
                       <Route path="/books/register" element={<RegisterBook />} />
                       <Route path="/books/:bookId" element={<EditBook />} />
                       <Route path="/student-loans" element={<StudentLoans key="student-loans" />} />
+                      <Route path="/student-loan-detail/:loanId" element={<StudentLoanDetail />} />
                       <Route path="/staff-loans" element={<StaffLoans />} />
                       <Route path="/student-returns" element={<StudentReturns />} />
                       <Route path="/student-withdrawals" element={<StudentWithdrawals />} />
