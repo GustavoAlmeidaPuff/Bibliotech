@@ -34,6 +34,7 @@ import StaffWithdrawalConfirmation from './pages/withdrawals/StaffWithdrawalConf
 import SelectStaffBook from './pages/withdrawals/SelectStaffBook';
 import StaffReturns from './pages/returns/StaffReturns';
 import Settings from './pages/settings/Settings';
+import Home from './pages/Home';
 
 const App = () => {
   return (
@@ -45,6 +46,8 @@ const App = () => {
               <Router>
                 <Routes>
                   {/* Public routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/home" element={<Home />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/student-login" element={<StudentLogin />} />
@@ -81,7 +84,7 @@ const App = () => {
                   </Route>
                   
                   {/* Default redirect */}
-                  <Route path="*" element={<Navigate to="/login" />} />
+                  <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Router>
             </ThemeProvider>
