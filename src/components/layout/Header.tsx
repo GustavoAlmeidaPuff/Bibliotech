@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
-const HeaderContainer = styled.header`
+const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background: #0078d4;
+  background: ${props => props.isTransparent 
+    ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent)' 
+    : '#0078d4'};
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: ${props => props.isTransparent ? 'none' : '0 2px 10px rgba(0, 0, 0, 0.1)'};
   z-index: 1000;
+  transition: all 0.3s ease;
 `;
 
 const LogoContainer = styled.div`
@@ -157,7 +160,22 @@ const DesktopNav = styled.div`
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isTransparent, setIsTransparent] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsTransparent(scrollPosition < 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Verifica a posição inicial
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const goToHome = () => {
     navigate('/');
@@ -180,7 +198,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <HeaderContainer>
+    <HeaderContainer isTransparent={isTransparent}>
       <LogoContainer onClick={goToHome}>
         <LogoWrapper>
           <Logo src="/images/home/logo.png" alt="Bibliotech Logo" />

@@ -7,7 +7,6 @@ const HomeContainer = styled.div`
   width: 100%;
   min-height: 100vh;
   position: relative;
-  padding-top: 70px; // Espaço para o header fixo
 `;
 
 const ProgressBar = styled(motion.div)`
@@ -30,6 +29,7 @@ const ParallaxSection = styled(motion.section)`
   text-align: center;
   position: relative;
   overflow: hidden;
+  margin-top: 0;
   
   &::before {
     content: '';
