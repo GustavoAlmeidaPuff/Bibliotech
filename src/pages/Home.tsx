@@ -288,6 +288,32 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
   `}
 `;
 
+const WhatsAppButton = styled(motion.a)`
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  img {
+    width: 35px;
+    height: 35px;
+  }
+`;
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -373,7 +399,7 @@ const Home: React.FC = () => {
         />
         
         <ParallaxSection
-          id="produto"
+          id="inicio"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -415,7 +441,7 @@ const Home: React.FC = () => {
         </ParallaxSection>
 
         <Section
-          id="sobre"
+          id="produto"
           isSecond
           initial="hidden"
           whileInView="visible"
@@ -423,10 +449,10 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <Title variants={fadeInUp}>
-            Sobre nós
+            Produto
           </Title>
           <Subtitle variants={fadeInUp}>
-            Transformando a gestão de bibliotecas com tecnologia e inovação
+            Conheça as funcionalidades que vão transformar sua biblioteca
           </Subtitle>
         </Section>
 
@@ -446,6 +472,21 @@ const Home: React.FC = () => {
         </Section>
 
         <Section
+          id="sobre"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <Title variants={fadeInUp}>
+            Sobre nós
+          </Title>
+          <Subtitle variants={fadeInUp}>
+            Transformando a gestão de bibliotecas com tecnologia e inovação
+          </Subtitle>
+        </Section>
+
+        <Section
           id="contato"
           initial="hidden"
           whileInView="visible"
@@ -459,6 +500,17 @@ const Home: React.FC = () => {
             Estamos aqui para ajudar você a transformar sua biblioteca
           </Subtitle>
         </Section>
+
+        <WhatsAppButton
+          href="https://wa.me/5551997188572?text=Olá,%20Gustavo!%20Referente%20à%20Bibliotech;"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
+        >
+          <img src="/images/home/icone/wpp.png" alt="WhatsApp" />
+        </WhatsAppButton>
       </HomeContainer>
     </>
   );

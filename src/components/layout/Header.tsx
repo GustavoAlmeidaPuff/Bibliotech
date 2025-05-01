@@ -276,15 +276,15 @@ const Header: React.FC = () => {
             </NavItem>
             <NavItem
               whileHover={{ scale: 1.05 }}
-              onClick={() => scrollToSection('sobre')}
-            >
-              Sobre nós
-            </NavItem>
-            <NavItem
-              whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('precos')}
             >
               Preços
+            </NavItem>
+            <NavItem
+              whileHover={{ scale: 1.05 }}
+              onClick={() => scrollToSection('sobre')}
+            >
+              Sobre nós
             </NavItem>
             <NavItem
               whileHover={{ scale: 1.05 }}
