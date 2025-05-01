@@ -104,6 +104,7 @@ const ImageContent = styled(motion.div)`
     height: auto;
     max-height: 500px;
     object-fit: contain;
+    transition: transform 0.15s ease;
   }
 
   @media (max-width: 768px) {
@@ -289,10 +290,13 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
+              whileHover={{ scale: 1.05 }}
             >
-              <img 
+              <motion.img 
                 src="/images/home/celular com site (sem fundo).png" 
                 alt="Dashboard do Bibliotech em um celular"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.15 }}
               />
             </ImageContent>
           </ContentWrapper>
