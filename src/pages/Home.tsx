@@ -92,7 +92,7 @@ const Home: React.FC = () => {
             Bem-vindo à Bibliotech
           </Title>
           <Subtitle variants={fadeInUp}>
-            bibliotecas escolar, com foco no <span style={{ color: '#0078d4' }}>aluno</span>.
+            bibliotecas escolares com foco no <span style={{ color: '#0078d4' }}>aluno</span>.
           </Subtitle>
         </Section>
 
