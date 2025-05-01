@@ -109,13 +109,31 @@ const NavList = styled.ul`
   }
 `;
 
-const NavItem = styled(motion.li)`
+const NavItem = styled(motion.li)<{ isActive: boolean }>`
   color: white;
   cursor: pointer;
   font-weight: 500;
+  position: relative;
+  padding: 0.5rem 1rem;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: white;
+    transform: scaleX(${props => props.isActive ? 1 : 0});
+    transition: transform 0.3s ease;
+  }
   
   &:hover {
     opacity: 0.8;
+    
+    &:after {
+      transform: scaleX(1);
+    }
   }
 `;
 
@@ -173,26 +191,35 @@ const DesktopNav = styled.div`
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransparent, setIsTransparent] = useState(true);
+  const [activeSection, setActiveSection] = useState('inicio');
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsTransparent(scrollPosition < 50);
+
+      // Identificar a seção atual baseado na posição do scroll
+      const sections = ['inicio', 'produto', 'precos', 'sobre', 'contato'];
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Verifica a posição inicial
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const goToHome = () => {
-    navigate('/');
-    setIsMenuOpen(false);
-  };
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -207,6 +234,7 @@ const Header: React.FC = () => {
       });
     }
     setIsMenuOpen(false);
+    setActiveSection(sectionId);
   };
 
   const menuVariants = {
@@ -246,7 +274,7 @@ const Header: React.FC = () => {
 
   return (
     <HeaderContainer isTransparent={isTransparent}>
-      <LogoContainer onClick={goToHome}>
+      <LogoContainer onClick={() => scrollToSection('inicio')}>
         <LogoWrapper>
           <Logo src="/images/home/logo.png" alt="Bibliotech Logo" />
         </LogoWrapper>
@@ -269,24 +297,28 @@ const Header: React.FC = () => {
         <Nav isOpen={false}>
           <NavList>
             <NavItem
+              isActive={activeSection === 'produto'}
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('produto')}
             >
               Produto
             </NavItem>
             <NavItem
+              isActive={activeSection === 'precos'}
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('precos')}
             >
               Preços
             </NavItem>
             <NavItem
+              isActive={activeSection === 'sobre'}
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('sobre')}
             >
               Sobre nós
             </NavItem>
             <NavItem
+              isActive={activeSection === 'contato'}
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('contato')}
             >
@@ -313,9 +345,10 @@ const Header: React.FC = () => {
         variants={menuVariants}
       >
         <NavList>
-          {['produto', 'sobre', 'precos', 'contato'].map((section, index) => (
+          {['produto', 'precos', 'sobre', 'contato'].map((section, index) => (
             <NavItem 
               key={section}
+              isActive={activeSection === section}
               custom={index}
               variants={navItemVariants}
               onClick={() => scrollToSection(section)}
