@@ -89,9 +89,11 @@ const TextContent = styled(motion.div)`
   @media (max-width: 768px) {
     text-align: center;
     align-items: center;
-    margin-top: -130px;
+    margin-top: -50px;
     position: relative;
     z-index: 3;
+    width: 100%;
+    padding: 0 1rem;
   }
 `;
 
@@ -245,9 +247,12 @@ const Title = styled(motion.h1)<{ isLight?: boolean }>`
   user-select: none;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 3rem;
     justify-content: center;
     flex-wrap: wrap;
+    white-space: normal;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
   }
 `;
 
@@ -259,7 +264,9 @@ const Subtitle = styled(motion.p)<{ isLight?: boolean }>`
   text-shadow: ${props => props.isLight ? '1px 1px 2px rgba(0, 0, 0, 0.3)' : 'none'};
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
+    line-height: 1.4;
+    padding: 0 1rem;
   }
 
   span {
@@ -314,13 +321,13 @@ const Home: React.FC = () => {
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
 
   // Configuração do spring para movimento suave
-  const springConfig = { damping: 15, stiffness: 100 };
+  const springConfig = { damping: 25, stiffness: 80, mass: 1.2 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
   // Transform o movimento do mouse em movimento do background
-  const backgroundX = useTransform(x, [-500, 500], [100, -100]);
-  const backgroundY = useTransform(y, [-500, 500], [100, -100]);
+  const backgroundX = useTransform(x, [-500, 500], [60, -60]);
+  const backgroundY = useTransform(y, [-500, 500], [60, -60]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -329,13 +336,11 @@ const Home: React.FC = () => {
       setScrollProgress(currentProgress);
 
       if (isMobile) {
-        // Aumentar o efeito de parallax no scroll mobile
         const scrollY = window.scrollY;
-        const parallaxY = scrollY * 0.5; // Aumentado de 0.15 para 0.5
+        const parallaxY = scrollY * 0.5;
         mouseY.set(parallaxY);
         
-        // Adicionar movimento horizontal suave baseado no scroll
-        const parallaxX = Math.sin(scrollY * 0.002) * 100; // Novo efeito de movimento horizontal
+        const parallaxX = Math.sin(scrollY * 0.002) * 100;
         mouseX.set(parallaxX);
       }
     };
@@ -346,8 +351,12 @@ const Home: React.FC = () => {
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isMobile) {
-        mouseX.set(e.clientX - window.innerWidth / 2);
-        mouseY.set(e.clientY - window.innerHeight / 2);
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const moveX = (e.clientX - centerX) * 0.8;
+        const moveY = (e.clientY - centerY) * 0.8;
+        mouseX.set(moveX);
+        mouseY.set(moveY);
       }
     };
 
