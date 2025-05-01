@@ -205,10 +205,18 @@ const Home: React.FC = () => {
           />
           <ContentWrapper variants={fadeInUp}>
             <Title variants={fadeInUp}>
-              Bem-vindo à Bibliotech
+              Bem-vindo à <span style={{ 
+                color: '#4db5ff',
+                textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
+                animation: 'glow 2s ease-in-out infinite alternate'
+              }}>BIBLIOTECH</span>
             </Title>
             <Subtitle variants={fadeInUp}>
-              bibliotecas escolares com foco no <span>aluno</span>.
+              Bibliotecas escolares com foco no <span style={{ 
+                color: '#4db5ff',
+                textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
+                animation: 'glow 2s ease-in-out infinite alternate'
+              }}>aluno!</span>
             </Subtitle>
           </ContentWrapper>
         </ParallaxSection>
