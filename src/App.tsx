@@ -39,7 +39,7 @@ import Home from './pages/Home';
 // Componente para redirecionar com base no estado de autenticação
 const RedirectBasedOnAuth = () => {
   const { currentUser } = useAuth();
-  return currentUser ? <Navigate to="/dashboard" /> : <Navigate to="/" />;
+  return currentUser ? <Navigate to="/dashboard" /> : <Navigate to="/login" />;
 };
 
 const App = () => {
@@ -61,36 +61,33 @@ const App = () => {
                   
                   {/* Protected routes */}
                   <Route element={<PrivateRoute />}>
-                    <Route element={<Layout />}>
-                      <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/students" element={<Students />} />
-                      <Route path="/students/register" element={<RegisterStudent />} />
-                      <Route path="/students/:studentId/edit" element={<EditStudent />} />
-                      <Route path="/students/:studentId" element={<StudentDashboard />} />
-                      <Route path="/staff" element={<Staff />} />
-                      <Route path="/staff/register" element={<RegisterStaff />} />
-                      <Route path="/staff/:id" element={<EditStaff />} />
-                      <Route path="/staff/:id/edit" element={<EditStaff />} />
-                      <Route path="/books" element={<Books />} />
-                      <Route path="/books/register" element={<RegisterBook />} />
-                      <Route path="/books/:bookId" element={<EditBook />} />
-                      <Route path="/student-loans" element={<StudentLoans key="student-loans" />} />
-                      <Route path="/student-loan-detail/:loanId" element={<StudentLoanDetail />} />
-                      <Route path="/staff-loans" element={<StaffLoans />} />
-                      <Route path="/student-returns" element={<StudentReturns />} />
-                      <Route path="/student-withdrawals" element={<StudentWithdrawals />} />
-                      <Route path="/student-withdrawals/:studentId" element={<BookSelection />} />
-                      <Route path="/student-withdrawals/:studentId/confirm/:bookId" element={<WithdrawalConfirmation />} />
-                      <Route path="/staff-withdrawals" element={<StaffWithdrawals />} />
-                      <Route path="/staff-withdrawals/:staffId" element={<SelectStaffBook />} />
-                      <Route path="/staff-withdrawals/:staffId/confirm/:bookId" element={<StaffWithdrawalConfirmation />} />
-                      <Route path="/staff-returns" element={<StaffReturns />} />
-                      <Route path="/settings" element={<Settings />} />
-                    </Route>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/students" element={<Students />} />
+                    <Route path="/students/register" element={<RegisterStudent />} />
+                    <Route path="/students/:studentId/edit" element={<EditStudent />} />
+                    <Route path="/students/:studentId" element={<StudentDashboard />} />
+                    <Route path="/staff" element={<Staff />} />
+                    <Route path="/staff/register" element={<RegisterStaff />} />
+                    <Route path="/staff/:id" element={<EditStaff />} />
+                    <Route path="/staff/:id/edit" element={<EditStaff />} />
+                    <Route path="/books" element={<Books />} />
+                    <Route path="/books/register" element={<RegisterBook />} />
+                    <Route path="/books/:bookId" element={<EditBook />} />
+                    <Route path="/student-loans" element={<StudentLoans key="student-loans" />} />
+                    <Route path="/student-loan-detail/:loanId" element={<StudentLoanDetail />} />
+                    <Route path="/staff-loans" element={<StaffLoans />} />
+                    <Route path="/student-returns" element={<StudentReturns />} />
+                    <Route path="/student-withdrawals" element={<StudentWithdrawals />} />
+                    <Route path="/student-withdrawals/:studentId" element={<BookSelection />} />
+                    <Route path="/student-withdrawals/:studentId/confirm/:bookId" element={<WithdrawalConfirmation />} />
+                    <Route path="/staff-withdrawals" element={<StaffWithdrawals />} />
+                    <Route path="/staff-withdrawals/:staffId" element={<SelectStaffBook />} />
+                    <Route path="/staff-withdrawals/:staffId/confirm/:bookId" element={<StaffWithdrawalConfirmation />} />
+                    <Route path="/settings" element={<Settings />} />
                   </Route>
                   
                   {/* Default redirect */}
-                  <Route path="*" element={<RedirectBasedOnAuth />} />
+                  <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </Router>
             </ThemeProvider>
