@@ -34,10 +34,21 @@
   transform: scale(1.02);
 }
 
-.logoIcon {
-  width: 32px;
-  height: 32px;
-  color: white;
+.logoWrapper {
+  background: rgb(255, 255, 255);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .headerContent h1 {
