@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 
 const HomeContainer = styled.div`
   width: 100%;
   min-height: 100vh;
+  position: relative;
+`;
+
+const ProgressBar = styled(motion.div)`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 6px;
+  background: #0078d4;
+  z-index: 1000;
+  box-shadow: 0 0 4px rgba(0, 120, 212, 0.3);
 `;
 
 const Section = styled(motion.section)`
@@ -31,6 +42,19 @@ const Subtitle = styled(motion.p)`
 `;
 
 const Home: React.FC = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const currentProgress = (window.scrollY / totalScroll) * 100;
+      setScrollProgress(currentProgress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0 }
@@ -38,6 +62,13 @@ const Home: React.FC = () => {
 
   return (
     <HomeContainer>
+      <ProgressBar
+        style={{ width: `${scrollProgress}%` }}
+        initial={{ width: 0 }}
+        animate={{ width: `${scrollProgress}%` }}
+        transition={{ duration: 0.1 }}
+      />
+      
       <Section
         initial="hidden"
         whileInView="visible"
