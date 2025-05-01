@@ -540,9 +540,9 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              sobre o produto
+              Sobre o <span style={{ color: '#4db5ff' }}>sistema</span>
             </ProductTitle>
-              Oferecemos o controle de métricas que contribuem para o desempenho da biblioteca, assim como para a motivação dos alunos!
+              Oferecemos o <span style={{ color: '#4db5ff' }}>controle de métricas</span> que contribuem para o desempenho da biblioteca, assim como para a <span style={{ color: '#4db5ff' }}>motivação dos alunos!</span>
             </ProductDescription>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
