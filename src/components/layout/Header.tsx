@@ -69,18 +69,20 @@ const Nav = styled.nav<{ isOpen: boolean }>`
   }
 `;
 
-const MobileNav = styled.div<{ isOpen: boolean }>`
+const MobileNav = styled(motion.div)<{ isOpen: boolean }>`
   display: none;
   
   @media (max-width: 768px) {
-    display: ${props => props.isOpen ? 'block' : 'none'};
+    display: block;
     position: fixed;
     top: 70px;
     left: 0;
     right: 0;
-    background: #0078d4;
+    background: rgba(0, 120, 212, 0.85);
+    backdrop-filter: blur(8px);
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform-origin: top;
   }
 `;
 
@@ -197,6 +199,41 @@ const Header: React.FC = () => {
     setIsMenuOpen(false);
   };
 
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      scaleY: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    open: {
+      opacity: 1,
+      scaleY: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
+
+  const navItemVariants = {
+    closed: {
+      opacity: 0,
+      y: -10
+    },
+    open: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    })
+  };
+
   return (
     <HeaderContainer isTransparent={isTransparent}>
       <LogoContainer onClick={goToHome}>
@@ -259,22 +296,28 @@ const Header: React.FC = () => {
       </DesktopNav>
 
       {/* Mobile Navigation */}
-      <MobileNav isOpen={isMenuOpen}>
+      <MobileNav 
+        isOpen={isMenuOpen}
+        initial="closed"
+        animate={isMenuOpen ? "open" : "closed"}
+        variants={menuVariants}
+      >
         <NavList>
-          <NavItem onClick={() => scrollToSection('produto')}>
-            Produto
-          </NavItem>
-          <NavItem onClick={() => scrollToSection('sobre')}>
-            Sobre nós
-          </NavItem>
-          <NavItem onClick={() => scrollToSection('precos')}>
-            Preços
-          </NavItem>
-          <NavItem onClick={() => scrollToSection('contato')}>
-            Contato
-          </NavItem>
+          {['produto', 'sobre', 'precos', 'contato'].map((section, index) => (
+            <NavItem 
+              key={section}
+              custom={index}
+              variants={navItemVariants}
+              onClick={() => scrollToSection(section)}
+            >
+              {section.charAt(0).toUpperCase() + section.slice(1)}
+            </NavItem>
+          ))}
         </NavList>
         <LoginButton
+          initial={{ opacity: 0, y: -10 }}
+          animate={isMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
           onClick={() => {
             navigate('/login');
             setIsMenuOpen(false);
