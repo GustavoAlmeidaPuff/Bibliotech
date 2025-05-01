@@ -89,7 +89,7 @@ const Subtitle = styled(motion.p)`
   }
 `;
 
-const Section = styled(motion.section)`
+const Section = styled(motion.section)<{ isSecond?: boolean }>`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -97,6 +97,32 @@ const Section = styled(motion.section)`
   align-items: center;
   padding: 2rem;
   text-align: center;
+  position: relative;
+  background: ${props => props.isSecond ? '#fff' : 'transparent'};
+  
+  ${props => props.isSecond && `
+    margin-top: -60px;
+    padding-top: 80px;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: #fff;
+      transform: skewY(4deg);
+      transform-origin: top right;
+      z-index: 1;
+    }
+    
+    & > * {
+      position: relative;
+      z-index: 2;
+    }
+  `}
 `;
 
 const Home: React.FC = () => {
@@ -189,6 +215,7 @@ const Home: React.FC = () => {
 
         <Section
           id="sobre"
+          isSecond
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
