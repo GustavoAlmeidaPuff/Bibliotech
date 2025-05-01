@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
+import WhatsAppButton from '../components/shared/WhatsAppButton';
 
 const HomeContainer = styled.div`
   width: 100%;
@@ -217,11 +218,11 @@ const NeonText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-const Title = styled(motion.h1)`
+const Title = styled(motion.h1)<{ isLight?: boolean }>`
   font-size: 3.5rem;
   margin-bottom: 1rem;
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  color: ${props => props.isLight ? '#ffffff' : '#2c3e50'};
+  text-shadow: ${props => props.isLight ? '2px 2px 4px rgba(0, 0, 0, 0.3)' : 'none'};
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -235,19 +236,19 @@ const Title = styled(motion.h1)`
   }
 `;
 
-const Subtitle = styled(motion.p)`
+const Subtitle = styled(motion.p)<{ isLight?: boolean }>`
   font-size: 1.5rem;
-  color: white;
+  color: ${props => props.isLight ? '#ffffff' : '#2c3e50'};
   max-width: 800px;
   margin: 0 auto;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: ${props => props.isLight ? '1px 1px 2px rgba(0, 0, 0, 0.3)' : 'none'};
 
   @media (max-width: 768px) {
     font-size: 1.2rem;
   }
 
   span {
-    color: #4db5ff;
+    color: ${props => props.isLight ? '#4db5ff' : '#0078d4'};
     font-weight: 500;
   }
 `;
@@ -286,32 +287,6 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
       z-index: 2;
     }
   `}
-`;
-
-const WhatsAppButton = styled(motion.a)`
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background-color: #25D366;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  z-index: 1000;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  img {
-    width: 35px;
-    height: 35px;
-  }
 `;
 
 const Home: React.FC = () => {
@@ -417,10 +392,10 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2 }}
             >
-              <Title>
+              <Title isLight>
                 Bem-vindo à&nbsp;<NeonText>BIBLIOTECH</NeonText>
               </Title>
-              <Subtitle>
+              <Subtitle isLight>
                 Bibliotecas escolares com foco no&nbsp;<NeonText>aluno!</NeonText>
               </Subtitle>
             </TextContent>
@@ -501,16 +476,10 @@ const Home: React.FC = () => {
           </Subtitle>
         </Section>
 
-        <WhatsAppButton
-          href="https://wa.me/5551997188572?text=Olá,%20Gustavo!%20Referente%20à%20Bibliotech;"
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
-        >
-          <img src="/images/home/icone/wpp.png" alt="WhatsApp" />
-        </WhatsAppButton>
+        <WhatsAppButton 
+          phoneNumber="5551997188572"
+          message="Olá, Gustavo! Referente à Bibliotech;"
+        />
       </HomeContainer>
     </>
   );
