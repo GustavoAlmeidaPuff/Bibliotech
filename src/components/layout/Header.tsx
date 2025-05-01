@@ -23,6 +23,7 @@ const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  cursor: pointer;
 `;
 
 const LogoWrapper = styled.div`
@@ -158,6 +159,11 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const goToHome = () => {
+    navigate('/');
+    setIsMenuOpen(false);
+  };
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -175,7 +181,7 @@ const Header: React.FC = () => {
 
   return (
     <HeaderContainer>
-      <LogoContainer>
+      <LogoContainer onClick={goToHome}>
         <LogoWrapper>
           <Logo src="/images/home/logo.png" alt="Bibliotech Logo" />
         </LogoWrapper>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { TagsProvider } from './contexts/TagsContext';
 import { AuthorsProvider } from './contexts/AuthorsContext';
 import { SettingsProvider } from './contexts/SettingsContext';
@@ -36,6 +36,12 @@ import StaffReturns from './pages/returns/StaffReturns';
 import Settings from './pages/settings/Settings';
 import Home from './pages/Home';
 
+// Componente para redirecionar com base no estado de autenticação
+const RedirectBasedOnAuth = () => {
+  const { currentUser } = useAuth();
+  return currentUser ? <Navigate to="/dashboard" /> : <Navigate to="/" />;
+};
+
 const App = () => {
   return (
     <AuthProvider>
@@ -47,7 +53,7 @@ const App = () => {
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
-                  <Route path="/home" element={<Home />} />
+                  <Route path="/home" element={<Navigate to="/" />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/student-login" element={<StudentLogin />} />
@@ -84,7 +90,7 @@ const App = () => {
                   </Route>
                   
                   {/* Default redirect */}
-                  <Route path="*" element={<Navigate to="/" />} />
+                  <Route path="*" element={<RedirectBasedOnAuth />} />
                 </Routes>
               </Router>
             </ThemeProvider>
