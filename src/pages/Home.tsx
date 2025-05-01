@@ -327,12 +327,34 @@ const ProductSection = styled(motion.section)`
   text-align: center;
   max-width: 1200px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem;
+    width: 100%;
+  }
 `;
 
 const ProductTitle = styled(motion.h2)`
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  span {
+    white-space: nowrap;
+  }
 `;
 
 const ProductDescription = styled(motion.p)`
@@ -342,6 +364,13 @@ const ProductDescription = styled(motion.p)`
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 768px) {
+    margin-bottom: 2rem;
+    padding: 0;
+    font-size: 1.2rem;
+    width: 90%;
+  }
 `;
 
 const ProductGrid = styled.div`
@@ -350,8 +379,13 @@ const ProductGrid = styled.div`
   gap: 2rem;
   margin-top: 2rem;
   max-width: 1000px;
+  margin: 0 auto;
+  
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0;
+    width: 100%;
   }
 `;
 
@@ -365,6 +399,13 @@ const ProductGraphContainer = styled(motion.div)`
   justify-content: center;
   font-size: 1.2rem;
   color: #ffffff;
+
+  @media (max-width: 768px) {
+    aspect-ratio: 16/9;
+    width: 100%;
+    padding: 2rem 1rem;
+    font-size: 1.4rem;
+  }
 `;
 
 const ProductVideoContainer = styled(motion.div)`
@@ -378,6 +419,13 @@ const ProductVideoContainer = styled(motion.div)`
   font-size: 1.2rem;
   color: #ffffff;
   grid-column: 2 / -1;
+
+  @media (max-width: 768px) {
+    grid-column: 1;
+    width: 100%;
+    padding: 2rem 1rem;
+    font-size: 1.4rem;
+  }
 `;
 
 const Home: React.FC = () => {
@@ -524,26 +572,23 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <ProductSection>
-            
-
             <ProductGrid>
-              
-            <ProductDescription
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <ProductTitle
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
-              Sobre o <span style={{ color: '#4db5ff' }}>sistema</span>
-            </ProductTitle>
-              Oferecemos o <span style={{ color: '#4db5ff' }}>controle de métricas</span> que contribuem para o desempenho da biblioteca, assim como para a <span style={{ color: '#4db5ff' }}>motivação dos alunos!</span>
-            </ProductDescription>
+              <ProductDescription
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <ProductTitle
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  Sobre o <span style={{ color: '#4db5ff' }}>sistema</span>
+                </ProductTitle>
+                Oferecemos um <span style={{ color: '#4db5ff' }}>controle de métricas</span> que contribui para o desempenho da biblioteca, assim como para a <span style={{ color: '#4db5ff' }}>motivação dos alunos!</span>
+              </ProductDescription>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
