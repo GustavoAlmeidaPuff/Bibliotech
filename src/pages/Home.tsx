@@ -46,10 +46,10 @@ const ParallaxSection = styled(motion.section)`
 
 const ParallaxBackground = styled(motion.div)`
   position: absolute;
-  top: -50px; // Extra padding for movement
-  left: -50px; // Extra padding for movement
-  right: -50px; // Extra padding for movement
-  bottom: -50px; // Extra padding for movement
+  top: -100px;
+  left: -100px;
+  right: -100px;
+  bottom: -100px;
   background-image: url('/images/home/fundo/fundo1.jpg');
   background-size: cover;
   background-position: center;
@@ -299,13 +299,13 @@ const Home: React.FC = () => {
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
 
   // Configuração do spring para movimento suave
-  const springConfig = { damping: 25, stiffness: 150 };
+  const springConfig = { damping: 15, stiffness: 100 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
   // Transform o movimento do mouse em movimento do background
-  const backgroundX = useTransform(x, [-500, 500], [50, -50]);
-  const backgroundY = useTransform(y, [-500, 500], [50, -50]);
+  const backgroundX = useTransform(x, [-500, 500], [100, -100]);
+  const backgroundY = useTransform(y, [-500, 500], [100, -100]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -314,7 +314,14 @@ const Home: React.FC = () => {
       setScrollProgress(currentProgress);
 
       if (isMobile) {
-        mouseY.set(window.scrollY);
+        // Aumentar o efeito de parallax no scroll mobile
+        const scrollY = window.scrollY;
+        const parallaxY = scrollY * 0.5; // Aumentado de 0.15 para 0.5
+        mouseY.set(parallaxY);
+        
+        // Adicionar movimento horizontal suave baseado no scroll
+        const parallaxX = Math.sin(scrollY * 0.002) * 100; // Novo efeito de movimento horizontal
+        mouseX.set(parallaxX);
       }
     };
 
