@@ -11,8 +11,10 @@ const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   right: 0;
   height: 70px;
   background: ${props => props.isTransparent 
-    ? 'linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent)' 
-    : '#0078d4'};
+    ? 'linear-gradient(to bottom, rgba(0, 120, 212, 0.4), transparent)' 
+    : 'rgba(0, 120, 212, 0.4)'};
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -80,6 +82,7 @@ const MobileNav = styled(motion.div)<{ isOpen: boolean }>`
     right: 0;
     background: rgba(0, 120, 212, 0.85);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transform-origin: top;

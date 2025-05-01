@@ -89,6 +89,8 @@ const TextContent = styled(motion.div)`
     text-align: center;
     align-items: center;
     margin-top: -130px;
+    position: relative;
+    z-index: 3;
   }
 `;
 
@@ -109,11 +111,38 @@ const ImageContent = styled(motion.div)`
 
   @media (max-width: 768px) {
     justify-content: center;
-    margin-top: 2rem;
+    margin-top: 4rem;
     padding-top: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+    
     img {
-      max-height: 350px;
+      max-height: none;
+      width: 70%;
+      margin-left: -40%;
+      margin-right: -40%;
+      object-fit: contain;
+      transform: scale(2.2);
     }
+  }
+`;
+
+const DeviceMessage = styled.p`
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 768px) {
+    bottom: -40px;
   }
 `;
 
@@ -376,8 +405,8 @@ const Home: React.FC = () => {
               whileHover={{ scale: 1.05 }}
             >
               <motion.img 
-                src="/images/home/celular com site (sem fundo).png" 
-                alt="Dashboard do Bibliotech em um celular"
+                src={isMobile ? "/images/home/notebook com site.png" : "/images/home/celular com site (sem fundo).png"}
+                alt={isMobile ? "Dashboard do Bibliotech em um notebook" : "Dashboard do Bibliotech em um celular"}
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.15 }}
               />
