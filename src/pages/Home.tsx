@@ -58,7 +58,62 @@ const ParallaxBackground = styled(motion.div)`
 const ContentWrapper = styled(motion.div)`
   position: relative;
   z-index: 2;
-  margin-top: -40vh;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
+  padding: 0 2rem;
+  margin: 0 auto;
+  padding-top: 15vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+    padding-top: 10vh;
+  }
+`;
+
+const TextContent = styled(motion.div)`
+  flex: 1;
+  text-align: left;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: -300px;
+
+  @media (max-width: 768px) {
+    text-align: center;
+    align-items: center;
+    margin-top: -130px;
+  }
+`;
+
+const ImageContent = styled(motion.div)`
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-top: 0;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+  }
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 0;
+    img {
+      max-height: 350px;
+    }
+  }
 `;
 
 const Title = styled(motion.h1)`
@@ -66,9 +121,15 @@ const Title = styled(motion.h1)`
   margin-bottom: 1rem;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 `;
 
@@ -203,21 +264,37 @@ const Home: React.FC = () => {
               y: backgroundY,
             }}
           />
-          <ContentWrapper variants={fadeInUp}>
-            <Title variants={fadeInUp}>
-              Bem-vindo à <span style={{ 
-                color: '#4db5ff',
-                textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
-                animation: 'glow 2s ease-in-out infinite alternate'
-              }}>BIBLIOTECH</span>
-            </Title>
-            <Subtitle variants={fadeInUp}>
-              Bibliotecas escolares com foco no <span style={{ 
-                color: '#4db5ff',
-                textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
-                animation: 'glow 2s ease-in-out infinite alternate'
-              }}>aluno!</span>
-            </Subtitle>
+          <ContentWrapper>
+            <TextContent
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+            >
+              <Title>
+                Bem-vindo à&nbsp;<span style={{ 
+                  color: '#4db5ff',
+                  textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
+                  animation: 'glow 2s ease-in-out infinite alternate'
+                }}>BIBLIOTECH</span>
+              </Title>
+              <Subtitle>
+                Bibliotecas escolares com foco no <span style={{ 
+                  color: '#4db5ff',
+                  textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
+                  animation: 'glow 2s ease-in-out infinite alternate'
+                }}>aluno!</span>
+              </Subtitle>
+            </TextContent>
+            <ImageContent
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.4 }}
+            >
+              <img 
+                src="/images/home/celular com site (sem fundo).png" 
+                alt="Dashboard do Bibliotech em um celular"
+              />
+            </ImageContent>
           </ContentWrapper>
         </ParallaxSection>
 
