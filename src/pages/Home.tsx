@@ -452,7 +452,7 @@ const Home: React.FC = () => {
             Produto
           </Title>
           <Subtitle variants={fadeInUp}>
-            Conheça as funcionalidades que vão transformar sua biblioteca
+            Funcionalidades, beneficios, métricas, e apresentação do produto.
           </Subtitle>
         </Section>
 
@@ -467,7 +467,7 @@ const Home: React.FC = () => {
             Planos e Preços
           </Title>
           <Subtitle variants={fadeInUp}>
-            Escolha o plano ideal para sua biblioteca
+            Amostra de planos diferentes, com preços e benefícios distintos.
           </Subtitle>
         </Section>
 
@@ -482,7 +482,7 @@ const Home: React.FC = () => {
             Sobre nós
           </Title>
           <Subtitle variants={fadeInUp}>
-            Transformando a gestão de bibliotecas com tecnologia e inovação
+            falar sobre a empresa, o que fazemos, e como podemos ajudar você. assim como o suporte que temos para o cliente.
           </Subtitle>
         </Section>
 
@@ -497,7 +497,7 @@ const Home: React.FC = () => {
             Entre em Contato
           </Title>
           <Subtitle variants={fadeInUp}>
-            Estamos aqui para ajudar você a transformar sua biblioteca
+            Mostra redes sociais, assim como um formulario de contato, que o usurario coloca a mensagem e vai pro whatsapp da empresa.
           </Subtitle>
         </Section>
 
