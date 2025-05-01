@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
@@ -117,6 +117,77 @@ const ImageContent = styled(motion.div)`
   }
 `;
 
+const NeonTextContainer = styled.span`
+  position: relative;
+  display: inline-block;
+  cursor: default;
+`;
+
+const NeonTextContent = styled.span<{ mouseX: number; mouseY: number; isHovering: boolean }>`
+  position: relative;
+  background: ${props => props.isHovering ? `
+    radial-gradient(
+      circle 250px at ${props.mouseX}px ${props.mouseY}px,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 1) 15%,
+      rgba(77, 181, 255, 1) 35%,
+      #4db5ff 100%
+    )
+  ` : '#4db5ff'};
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+  
+  &::before {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-shadow: 0 0 5px #4db5ff, 0 0 10px #4db5ff;
+    opacity: 0.7;
+    z-index: -1;
+  }
+`;
+
+const NeonText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (textRef.current) {
+      const rect = textRef.current.getBoundingClientRect();
+      setMousePosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+    }
+  };
+
+  return (
+    <NeonTextContainer
+      ref={textRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => {
+        setIsHovering(false);
+        setMousePosition({ x: 0, y: 0 });
+      }}
+    >
+      <NeonTextContent 
+        mouseX={mousePosition.x} 
+        mouseY={mousePosition.y}
+        data-text={children}
+        isHovering={isHovering}
+      >
+        {children}
+      </NeonTextContent>
+    </NeonTextContainer>
+  );
+};
+
 const Title = styled(motion.h1)`
   font-size: 3.5rem;
   margin-bottom: 1rem;
@@ -126,6 +197,7 @@ const Title = styled(motion.h1)`
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
+  user-select: none;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -192,6 +264,9 @@ const Home: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
 
   // Configuração do spring para movimento suave
   const springConfig = { damping: 25, stiffness: 150 };
@@ -236,6 +311,22 @@ const Home: React.FC = () => {
     };
   }, [isMobile, mouseX, mouseY]);
 
+  useEffect(() => {
+    const updateRect = () => {
+      if (titleRef.current) {
+        setTitleRect(titleRef.current.getBoundingClientRect());
+      }
+    };
+
+    updateRect();
+    window.addEventListener('resize', updateRect);
+    return () => window.removeEventListener('resize', updateRect);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 60 },
     visible: { opacity: 1, y: 0 }
@@ -272,18 +363,10 @@ const Home: React.FC = () => {
               transition={{ duration: 1, delay: 0.2 }}
             >
               <Title>
-                Bem-vindo à&nbsp;<span style={{ 
-                  color: '#4db5ff',
-                  textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
-                  animation: 'glow 2s ease-in-out infinite alternate'
-                }}>BIBLIOTECH</span>
+                Bem-vindo à&nbsp;<NeonText>BIBLIOTECH</NeonText>
               </Title>
               <Subtitle>
-                Bibliotecas escolares com foco no <span style={{ 
-                  color: '#4db5ff',
-                  textShadow: '0 0 5px #4db5ff, 0 0 10px #4db5ff',
-                  animation: 'glow 2s ease-in-out infinite alternate'
-                }}>aluno!</span>
+                Bibliotecas escolares com foco no&nbsp;<NeonText>aluno!</NeonText>
               </Subtitle>
             </TextContent>
             <ImageContent
