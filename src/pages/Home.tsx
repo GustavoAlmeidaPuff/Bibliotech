@@ -284,7 +284,6 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
   padding: 2rem;
   text-align: center;
   position: relative;
-  background: ${props => props.isSecond ? '#fff' : 'transparent'};
   
   ${props => props.isSecond && `
     margin-top: -60px;
@@ -298,7 +297,7 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
       left: 0;
       right: 0;
       height: 100%;
-      background: #fff;
+      background: #1a1a1a;
       transform: skewY(4deg);
       transform-origin: top right;
       z-index: 1;
@@ -308,7 +307,77 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
       position: relative;
       z-index: 2;
     }
+
+    ${Title} {
+      color: #ffffff;
+    }
+
+    ${Subtitle} {
+      color: #e0e0e0;
+      
+      span {
+        color: #4db5ff;
+      }
+    }
   `}
+`;
+
+const ProductSection = styled(motion.section)`
+  padding: 4rem 2rem;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const ProductTitle = styled(motion.h2)`
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+`;
+
+const ProductDescription = styled(motion.p)`
+  font-size: 1.2rem;
+  color: #e0e0e0;
+  margin-bottom: 4rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const ProductGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+  max-width: 1000px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ProductGraphContainer = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #ffffff;
+`;
+
+const ProductVideoContainer = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #ffffff;
+  grid-column: 2 / -1;
 `;
 
 const Home: React.FC = () => {
@@ -454,12 +523,61 @@ const Home: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Title variants={fadeInUp}>
-            Produto
-          </Title>
-          <Subtitle variants={fadeInUp}>
-            Funcionalidades, beneficios, métricas, e apresentação do produto.
-          </Subtitle>
+          <ProductSection>
+            
+
+            <ProductGrid>
+              
+            <ProductDescription
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <ProductTitle
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              sobre o produto
+            </ProductTitle>
+              Oferecemos o controle de métricas que contribuem para o desempenho da biblioteca, assim como para a motivação dos alunos!
+            </ProductDescription>
+              <ProductGraphContainer
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+              >
+                graph1
+              </ProductGraphContainer>
+              <ProductGraphContainer
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                graph2.img
+              </ProductGraphContainer>
+              <ProductGraphContainer
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+              >
+                graph3.img
+              </ProductGraphContainer>
+              <ProductVideoContainer
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+              >
+                video1.mp4
+              </ProductVideoContainer>
+            </ProductGrid>
+          </ProductSection>
         </Section>
 
         <Section
