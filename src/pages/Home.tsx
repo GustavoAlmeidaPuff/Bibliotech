@@ -126,6 +126,7 @@ const ImageContent = styled(motion.div)`
       margin-right: -40%;
       object-fit: contain;
       transform: scale(2.2);
+      transition: none;
     }
   }
 `;
@@ -153,9 +154,9 @@ const NeonTextContainer = styled.span`
   cursor: default;
 `;
 
-const NeonTextContent = styled.span<{ mouseX: number; mouseY: number; isHovering: boolean }>`
+const NeonTextContent = styled.span<{ mouseX: number; mouseY: number; isHovering: boolean; isMobile: boolean }>`
   position: relative;
-  background: ${props => props.isHovering ? `
+  background: ${props => !props.isMobile && props.isHovering ? `
     radial-gradient(
       circle 250px at ${props.mouseX}px ${props.mouseY}px,
       rgba(255, 255, 255, 1) 0%,
@@ -184,10 +185,21 @@ const NeonTextContent = styled.span<{ mouseX: number; mouseY: number; isHovering
 const NeonText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const textRef = useRef<HTMLSpanElement>(null);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (textRef.current) {
+    if (!isMobile && textRef.current) {
       const rect = textRef.current.getBoundingClientRect();
       setMousePosition({
         x: e.clientX - rect.left,
@@ -200,10 +212,12 @@ const NeonText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <NeonTextContainer
       ref={textRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovering(true)}
+      onMouseEnter={() => !isMobile && setIsHovering(true)}
       onMouseLeave={() => {
-        setIsHovering(false);
-        setMousePosition({ x: 0, y: 0 });
+        if (!isMobile) {
+          setIsHovering(false);
+          setMousePosition({ x: 0, y: 0 });
+        }
       }}
     >
       <NeonTextContent 
@@ -211,6 +225,7 @@ const NeonText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         mouseY={mousePosition.y}
         data-text={children}
         isHovering={isHovering}
+        isMobile={isMobile}
       >
         {children}
       </NeonTextContent>
@@ -410,12 +425,12 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 1, delay: 0.4 }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={!isMobile ? { scale: 1.05 } : undefined}
             >
               <motion.img 
                 src={isMobile ? "/images/home/notebook com site.png" : "/images/home/celular com site (sem fundo).png"}
                 alt={isMobile ? "Dashboard do Bibliotech em um notebook" : "Dashboard do Bibliotech em um celular"}
-                whileHover={{ scale: 1.05 }}
+                whileHover={!isMobile ? { scale: 1.05 } : undefined}
                 transition={{ duration: 0.15 }}
               />
             </ImageContent>
