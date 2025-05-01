@@ -13,8 +13,8 @@ const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   background: ${props => props.isTransparent 
     ? 'linear-gradient(to bottom, rgba(0, 120, 212, 0.4), transparent)' 
     : 'rgba(0, 120, 212, 0.4)'};
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,6 +22,9 @@ const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   box-shadow: ${props => props.isTransparent ? 'none' : '0 2px 10px rgba(0, 0, 0, 0.1)'};
   z-index: 1000;
   transition: all 0.3s ease;
+  isolation: isolate;
+  transform: translateZ(0);
+  will-change: transform;
 `;
 
 const LogoContainer = styled.div`
@@ -80,12 +83,16 @@ const MobileNav = styled(motion.div)<{ isOpen: boolean }>`
     top: 70px;
     left: 0;
     right: 0;
-    background: rgba(0, 120, 212, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0, 120, 212, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transform-origin: top;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    isolation: isolate;
+    transform: translateZ(0);
+    will-change: transform;
   }
 `;
 
