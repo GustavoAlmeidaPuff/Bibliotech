@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useScroll, useInView } from 'framer-motion';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
 import WhatsAppButton from '../components/shared/WhatsAppButton';
@@ -421,8 +421,10 @@ const ProductImage = styled(motion.img)`
   cursor: pointer;
   transition: transform 0.2s ease;
 
-  &:hover {
-    transform: scale(1.02);
+  @media (min-width: 769px) {
+    &:hover {
+      transform: scale(1.02);
+    }
   }
 `;
 
@@ -614,6 +616,40 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isOpen, onClose }) => {
   );
 };
 
+const ScaleOnScroll: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-40% 0px -40% 0px" });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{
+        width: '100%',
+        height: '100%'
+      }}
+      animate={isMobile ? {
+        scale: isInView ? 1.05 : 1
+      } : {}}
+      transition={{
+        duration: 0.5,
+        ease: "easeOut"
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -783,11 +819,13 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                <ProductImage
-                  src="/images/home/produto/graph1.png"
-                  alt="Gráfico de métricas 1"
-                  onClick={() => setSelectedImage("/images/home/produto/graph1.png")}
-                />
+                <ScaleOnScroll>
+                  <ProductImage
+                    src="/images/home/produto/graph1.png"
+                    alt="Gráfico de métricas 1"
+                    onClick={() => setSelectedImage("/images/home/produto/graph1.png")}
+                  />
+                </ScaleOnScroll>
               </ProductGraphContainer>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -795,11 +833,13 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                <ProductImage
-                  src="/images/home/produto/graph2.png"
-                  alt="Gráfico de métricas 2"
-                  onClick={() => setSelectedImage("/images/home/produto/graph2.png")}
-                />
+                <ScaleOnScroll>
+                  <ProductImage
+                    src="/images/home/produto/graph2.png"
+                    alt="Gráfico de métricas 2"
+                    onClick={() => setSelectedImage("/images/home/produto/graph2.png")}
+                  />
+                </ScaleOnScroll>
               </ProductGraphContainer>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -807,11 +847,13 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                <ProductImage
-                  src="/images/home/produto/graph3.png"
-                  alt="Gráfico de métricas 3"
-                  onClick={() => setSelectedImage("/images/home/produto/graph3.png")}
-                />
+                <ScaleOnScroll>
+                  <ProductImage
+                    src="/images/home/produto/graph3.png"
+                    alt="Gráfico de métricas 3"
+                    onClick={() => setSelectedImage("/images/home/produto/graph3.png")}
+                  />
+                </ScaleOnScroll>
               </ProductGraphContainer>
               <ProductVideoContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -819,23 +861,22 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                <VideoContainer onClick={() => setIsVideoModalOpen(true)}>
-                  <video
-                    src="/images/home/produto/video.mkv"
-                    muted
-                    loop
-                    playsInline
-                    autoPlay
-                  />
-                  <PlayOverlay className="play-overlay">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </PlayOverlay>
-                </VideoContainer>
+                <ScaleOnScroll>
+                  <VideoContainer onClick={() => setIsVideoModalOpen(true)}>
+                    <video
+                      src="/images/home/produto/video.mkv"
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                    />
+                    <PlayOverlay className="play-overlay">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </PlayOverlay>
+                  </VideoContainer>
+                </ScaleOnScroll>
               </ProductVideoContainer>
             </ProductGrid>
           </ProductSection>
