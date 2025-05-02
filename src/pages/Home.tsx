@@ -426,6 +426,111 @@ const ProductImage = styled(motion.img)`
   }
 `;
 
+const VideoContainer = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover .play-overlay {
+    opacity: 1;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const PlayOverlay = styled(motion.div)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  svg {
+    width: 50px;
+    height: 50px;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+`;
+
+const VideoModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+
+  video {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const ProductGraphContainer = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+
+  @media (max-width: 768px) {
+    aspect-ratio: 16/9;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.4rem;
+  }
+`;
+
+const ProductVideoContainer = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  aspect-ratio: 16/9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #ffffff;
+  grid-column: 2 / -1;
+  overflow: hidden;
+  position: relative;
+
+  @media (max-width: 768px) {
+    grid-column: 1;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.4rem;
+  }
+`;
+
 interface ImageModalProps {
   isOpen: boolean;
   imageUrl: string;
@@ -471,46 +576,43 @@ const ImageViewer: React.FC<ImageModalProps> = ({ isOpen, imageUrl, onClose }) =
   );
 };
 
-const ProductGraphContainer = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 1rem;
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #ffffff;
-  overflow: hidden;
-  position: relative;
+interface VideoPlayerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-  @media (max-width: 768px) {
-    aspect-ratio: 16/9;
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.4rem;
-  }
-`;
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ isOpen, onClose }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-const ProductVideoContainer = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 1rem;
-  aspect-ratio: 16/9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #ffffff;
-  grid-column: 2 / -1;
+  useEffect(() => {
+    if (isOpen && videoRef.current) {
+      videoRef.current.play();
+    }
+  }, [isOpen]);
 
-  @media (max-width: 768px) {
-    grid-column: 1;
-    width: 100%;
-    padding: 2rem 1rem;
-    font-size: 1.4rem;
-  }
-`;
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <VideoModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.video
+            ref={videoRef}
+            src="/images/home/produto/video.mkv"
+            controls
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </VideoModal>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -521,6 +623,7 @@ const Home: React.FC = () => {
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   // Configuração do spring para movimento suave
   const springConfig = { damping: 25, stiffness: 80, mass: 1.2 };
@@ -716,7 +819,23 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                video1.mp4
+                <VideoContainer onClick={() => setIsVideoModalOpen(true)}>
+                  <video
+                    src="/images/home/produto/video.mkv"
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                  />
+                  <PlayOverlay className="play-overlay">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </PlayOverlay>
+                </VideoContainer>
               </ProductVideoContainer>
             </ProductGrid>
           </ProductSection>
@@ -772,6 +891,11 @@ const Home: React.FC = () => {
           message="Olá, Gustavo! Referente à Bibliotech;"
         />
       </HomeContainer>
+      
+      <VideoPlayer
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+      />
       
       <ImageViewer
         isOpen={!!selectedImage}
