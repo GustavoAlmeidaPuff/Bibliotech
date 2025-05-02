@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import Header from '../components/layout/Header';
 import WhatsAppButton from '../components/shared/WhatsAppButton';
@@ -389,6 +389,88 @@ const ProductGrid = styled.div`
   }
 `;
 
+const ImageModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  cursor: zoom-out;
+`;
+
+const ModalImage = styled(motion.img)`
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+`;
+
+const ProductImage = styled(motion.img)`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+`;
+
+interface ImageModalProps {
+  isOpen: boolean;
+  imageUrl: string;
+  onClose: () => void;
+}
+
+const ImageViewer: React.FC<ImageModalProps> = ({ isOpen, imageUrl, onClose }) => {
+  const [scale, setScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const newScale = scale + (e.deltaY > 0 ? -0.1 : 0.1);
+    setScale(Math.min(Math.max(0.5, newScale), 3));
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <ImageModal
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          onWheel={handleWheel}
+        >
+          <ModalImage
+            src={imageUrl}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.5, opacity: 0 }}
+            style={{ scale }}
+            onClick={(e) => e.stopPropagation()}
+            drag
+            dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setIsDragging(false)}
+            whileDrag={{ cursor: 'grabbing' }}
+          />
+        </ImageModal>
+      )}
+    </AnimatePresence>
+  );
+};
+
 const ProductGraphContainer = styled(motion.div)`
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
@@ -399,11 +481,13 @@ const ProductGraphContainer = styled(motion.div)`
   justify-content: center;
   font-size: 1.2rem;
   color: #ffffff;
+  overflow: hidden;
+  position: relative;
 
   @media (max-width: 768px) {
     aspect-ratio: 16/9;
     width: 100%;
-    padding: 2rem 1rem;
+    padding: 1rem;
     font-size: 1.4rem;
   }
 `;
@@ -436,6 +520,7 @@ const Home: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Configuração do spring para movimento suave
   const springConfig = { damping: 25, stiffness: 80, mass: 1.2 };
@@ -595,7 +680,11 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
-                graph1
+                <ProductImage
+                  src="/images/home/produto/graph1.png"
+                  alt="Gráfico de métricas 1"
+                  onClick={() => setSelectedImage("/images/home/produto/graph1.png")}
+                />
               </ProductGraphContainer>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -603,7 +692,11 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                graph2.img
+                <ProductImage
+                  src="/images/home/produto/graph2.png"
+                  alt="Gráfico de métricas 2"
+                  onClick={() => setSelectedImage("/images/home/produto/graph2.png")}
+                />
               </ProductGraphContainer>
               <ProductGraphContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -611,7 +704,11 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                graph3.img
+                <ProductImage
+                  src="/images/home/produto/graph3.png"
+                  alt="Gráfico de métricas 3"
+                  onClick={() => setSelectedImage("/images/home/produto/graph3.png")}
+                />
               </ProductGraphContainer>
               <ProductVideoContainer
                 initial={{ opacity: 0, y: 50 }}
@@ -675,6 +772,12 @@ const Home: React.FC = () => {
           message="Olá, Gustavo! Referente à Bibliotech;"
         />
       </HomeContainer>
+      
+      <ImageViewer
+        isOpen={!!selectedImage}
+        imageUrl={selectedImage || ''}
+        onClose={() => setSelectedImage(null)}
+      />
     </>
   );
 };
