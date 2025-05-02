@@ -588,6 +588,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen && videoRef.current) {
+      videoRef.current.muted = true;
       videoRef.current.play();
     }
   }, [isOpen]);
@@ -603,7 +604,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isOpen, onClose }) => {
         >
           <motion.video
             ref={videoRef}
-            src="/images/home/produto/video.mkv"
+            src="/images/home/produto/video.mp4"
+            muted
             controls
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -660,6 +662,7 @@ const Home: React.FC = () => {
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const gridVideoRef = useRef<HTMLVideoElement>(null);
 
   // Configuração do spring para movimento suave
   const springConfig = { damping: 25, stiffness: 80, mass: 1.2 };
@@ -723,6 +726,13 @@ const Home: React.FC = () => {
     updateRect();
     window.addEventListener('resize', updateRect);
     return () => window.removeEventListener('resize', updateRect);
+  }, []);
+
+  useEffect(() => {
+    if (gridVideoRef.current) {
+      gridVideoRef.current.muted = true;
+      gridVideoRef.current.play();
+    }
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -864,10 +874,11 @@ const Home: React.FC = () => {
                 <ScaleOnScroll>
                   <VideoContainer onClick={() => setIsVideoModalOpen(true)}>
                     <video
+                      ref={gridVideoRef}
                       src="/images/home/produto/video.mkv"
                       muted
-                      loop
                       playsInline
+                      loop
                       autoPlay
                     />
                     <PlayOverlay className="play-overlay">
