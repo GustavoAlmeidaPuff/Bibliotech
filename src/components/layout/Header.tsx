@@ -308,7 +308,7 @@ const Header: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('precos')}
             >
-              Preços
+              Planos
             </NavItem>
             <NavItem
               isActive={activeSection === 'sobre'}

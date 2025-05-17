@@ -284,6 +284,7 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
   padding: 2rem;
   text-align: center;
   position: relative;
+  background: #1a1a1a;
   
   ${props => props.isSecond && `
     margin-top: -60px;
@@ -533,6 +534,91 @@ const ProductVideoContainer = styled(motion.div)`
   }
 `;
 
+const PlansContainer = styled.div`
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  height: 450px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 1rem;
+  }
+`;
+
+const PlanCard = styled(motion.div)`
+  flex: 1;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  border-radius: 15px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  max-width: 400px;
+  filter: grayscale(100%);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(77, 181, 255, 0.1) 0%, rgba(0, 120, 212, 0.1) 100%);
+    z-index: 1;
+  }
+`;
+
+const ComingSoonBanner = styled.div`
+  position: absolute;
+  top: 1.2rem;
+  right: -2.6rem;
+  background: #4db5ff;
+  color: white;
+  padding: 0.5rem 3rem;
+  transform: rotate(45deg);
+  font-weight: bold;
+  font-size: 0.9rem;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+`;
+
+const PlanTitle = styled.h3`
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
+`;
+
+const PlanFeatures = styled.div`
+  position: relative;
+  z-index: 2;
+`;
+
+const FeaturePlaceholder = styled.div`
+  height: 1.2rem;
+  background: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  animation: shimmer 2s infinite;
+  background-size: 200% 100%;
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+`;
+
 interface ImageModalProps {
   isOpen: boolean;
   imageUrl: string;
@@ -651,6 +737,55 @@ const ScaleOnScroll: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     </motion.div>
   );
 };
+
+const PricingSection = styled(Section)`
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(77, 181, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234db5ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  ${Title} {
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  ${Subtitle} {
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+    span {
+      color: #4db5ff;
+    }
+  }
+`;
 
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -875,7 +1010,7 @@ const Home: React.FC = () => {
                   <VideoContainer onClick={() => setIsVideoModalOpen(true)}>
                     <video
                       ref={gridVideoRef}
-                      src="/images/home/produto/video.mkv"
+                      src="/images/home/produto/video.mp4"
                       muted
                       playsInline
                       loop
@@ -893,7 +1028,7 @@ const Home: React.FC = () => {
           </ProductSection>
         </Section>
 
-        <Section
+        <PricingSection
           id="precos"
           initial="hidden"
           whileInView="visible"
@@ -901,12 +1036,47 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <Title variants={fadeInUp}>
-            Planos e Preços
+            Planos
           </Title>
           <Subtitle variants={fadeInUp}>
-            Amostra de planos diferentes, com preços e benefícios distintos.
+            Oferecemos planos <span style={{ color: '#4db5ff' }}>distintos</span>, para atender à <span style={{ color: '#4db5ff' }}>todos </span>os tipos de escola. Não gostou? Receba seu <span style={{ color: '#4db5ff' }}>dinheiro de volta!</span>
           </Subtitle>
-        </Section>
+          <PlansContainer>
+            <PlanCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <ComingSoonBanner>Em Breve</ComingSoonBanner>
+              <PlanTitle>Bibliotech Basic</PlanTitle>
+              <PlanFeatures>
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+              </PlanFeatures>
+            </PlanCard>
+
+            <PlanCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <ComingSoonBanner>Em Breve</ComingSoonBanner>
+              <PlanTitle>Bibliotech +</PlanTitle>
+              <PlanFeatures>
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+                <FeaturePlaceholder />
+              </PlanFeatures>
+            </PlanCard>
+          </PlansContainer>
+        </PricingSection>
 
         <Section
           id="sobre"
