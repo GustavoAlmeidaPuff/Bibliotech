@@ -328,6 +328,8 @@ const ProductSection = styled(motion.section)`
   text-align: center;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 768px) {
     padding: 2rem 1rem;
@@ -617,6 +619,19 @@ const FeaturePlaceholder = styled.div`
       background-position: 200% 0;
     }
   }
+`;
+
+const ProductGlow = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 900px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(77,181,255,0.25) 0%, rgba(77,181,255,0.10) 40%, transparent 80%);
+  filter: blur(40px);
+  z-index: 0;
+  pointer-events: none;
 `;
 
 interface ImageModalProps {
@@ -941,6 +956,7 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <ProductSection>
+            <ProductGlow />
             <ProductGrid>
               <ProductDescription
                 initial={{ opacity: 0, y: 50 }}
