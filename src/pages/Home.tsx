@@ -536,88 +536,104 @@ const ProductVideoContainer = styled(motion.div)`
   }
 `;
 
+const PlanCard = ({ title, price, description }: { title: string; price: string; description: string }) => (
+  <PlanCardWrapper>
+    <div className="card">
+      <div className="coming-soon">Em breve</div>
+      <div className="content">
+        <div className="title">{title}</div>
+        <div className="price">{price}</div>
+        <div className="description">{description}</div>
+      </div>
+      <button disabled>Indisponível</button>
+    </div>
+  </PlanCardWrapper>
+);
+
+const PlanCardWrapper = styled.div`
+  .card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 260px;
+    padding: 20px 1px;
+    margin: 10px 0;
+    text-align: center;
+    position: relative;
+    cursor: not-allowed;
+    box-shadow: 0 10px 15px -3px rgba(33,150,243,.4),0 4px 6px -4px rgba(33,150,243,.4);
+    border-radius: 10px;
+    background: linear-gradient(45deg, #04051dea 0%, #2b566e 100%);
+    overflow: hidden;
+  }
+  .coming-soon {
+    position: absolute;
+    top: 15px;
+    right: -40px;
+    background: #bfc3c9;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0.4rem 2.2rem;
+    border-radius: 6px;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    z-index: 2;
+    opacity: 0.85;
+  }
+  .content {
+    padding: 20px;
+  }
+  .content .price {
+    color: white;
+    font-weight: 800;
+    font-size: 50px;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.42);
+  }
+  .content .description {
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  .content .title {
+    font-weight: 800;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.64);
+    margin-top: 10px;
+    font-size: 25px;
+    letter-spacing: 1px;
+  }
+  button {
+    user-select: none;
+    border: none;
+    outline: none;
+    color: rgb(255 255 255);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: .75rem;
+    padding: 0.75rem 1.5rem;
+    background-color: rgb(33 150 243);
+    border-radius: 0.5rem;
+    width: 90%;
+    text-shadow: 0px 4px 18px #2c3442;
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+`;
+
 const PlansContainer = styled.div`
   display: flex;
   gap: 2rem;
   justify-content: center;
   align-items: stretch;
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 2rem;
-  height: 450px;
-
+  padding: 2rem 0;
   @media (max-width: 768px) {
     flex-direction: column;
-    padding: 1rem;
-  }
-`;
-
-const PlanCard = styled(motion.div)`
-  flex: 1;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-  border-radius: 15px;
-  padding: 2rem;
-  position: relative;
-  overflow: hidden;
-  max-width: 400px;
-  filter: grayscale(100%);
-  opacity: 0.8;
-  transition: all 0.3s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(77, 181, 255, 0.1) 0%, rgba(0, 120, 212, 0.1) 100%);
-    z-index: 1;
-  }
-`;
-
-const ComingSoonBanner = styled.div`
-  position: absolute;
-  top: 1.2rem;
-  right: -2.6rem;
-  background: #4db5ff;
-  color: white;
-  padding: 0.5rem 3rem;
-  transform: rotate(45deg);
-  font-weight: bold;
-  font-size: 0.9rem;
-  z-index: 2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-`;
-
-const PlanTitle = styled.h3`
-  font-size: 1.8rem;
-  color: #ffffff;
-  margin-bottom: 1.5rem;
-  position: relative;
-  z-index: 2;
-`;
-
-const PlanFeatures = styled.div`
-  position: relative;
-  z-index: 2;
-`;
-
-const FeaturePlaceholder = styled.div`
-  height: 1.2rem;
-  background: linear-gradient(90deg, #333 0%, #444 50%, #333 100%);
-  margin-bottom: 1rem;
-  border-radius: 4px;
-  animation: shimmer 2s infinite;
-  background-size: 200% 100%;
-
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
+    align-items: center;
+    gap: 1.5rem;
   }
 `;
 
@@ -628,7 +644,7 @@ const ProductGlow = styled.div`
   width: 900px;
   height: 600px;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(77,181,255,0.25) 0%, rgba(77,181,255,0.10) 40%, transparent 80%);
+  background: radial-gradient(circle, rgba(77,181,255,0.25) 0%, rgba(77,181,255,0.10) 40%, transparent 100%);
   filter: blur(40px);
   z-index: 0;
   pointer-events: none;
@@ -1059,38 +1075,15 @@ const Home: React.FC = () => {
           </Subtitle>
           <PlansContainer>
             <PlanCard
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <ComingSoonBanner>Em Breve</ComingSoonBanner>
-              <PlanTitle>Bibliotech Basic</PlanTitle>
-              <PlanFeatures>
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-              </PlanFeatures>
-            </PlanCard>
-
+              title="Bibliotech Basic"
+              price="R$ --"
+              description="Plano básico para escolas que buscam digitalizar sua biblioteca de forma simples e eficiente."
+            />
             <PlanCard
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <ComingSoonBanner>Em Breve</ComingSoonBanner>
-              <PlanTitle>Bibliotech +</PlanTitle>
-              <PlanFeatures>
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-                <FeaturePlaceholder />
-              </PlanFeatures>
-            </PlanCard>
+              title="Bibliotech +"
+              price="R$ --"
+              description="Plano avançado com recursos extras para escolas que querem o máximo em tecnologia e gestão."
+            />
           </PlansContainer>
         </PricingSection>
 
