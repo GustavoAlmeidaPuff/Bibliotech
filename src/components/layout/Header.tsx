@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
+import ReactAtom from '../shared/ReactAtom';
 
 const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   position: fixed;
@@ -35,7 +36,6 @@ const LogoContainer = styled.div`
 `;
 
 const LogoWrapper = styled.div`
-  background: white;
   border-radius: 50%;
   padding: 10px;
   display: flex;
@@ -43,11 +43,6 @@ const LogoWrapper = styled.div`
   justify-content: center;
   width: 55px;
   height: 55px;
-`;
-
-const Logo = styled.img`
-  height: 50px;
-  width: auto;
 `;
 
 const LogoText = styled.div`
@@ -276,7 +271,7 @@ const Header: React.FC = () => {
     <HeaderContainer isTransparent={isTransparent}>
       <LogoContainer onClick={() => scrollToSection('inicio')}>
         <LogoWrapper>
-          <Logo src="/images/home/logo.png" alt="Bibliotech Logo" />
+          <ReactAtom size="2.5rem" asLogo />
         </LogoWrapper>
         <LogoText>
           <h1>Bibliotech</h1>
