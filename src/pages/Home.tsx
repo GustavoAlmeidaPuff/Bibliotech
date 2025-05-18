@@ -818,6 +818,161 @@ const PricingSection = styled(Section)`
   }
 `;
 
+const AboutSection = styled(Section)`
+  background: linear-gradient(135deg, #0a192f 100%, #112240 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(77, 181, 255, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234db5ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+`;
+
+const AboutContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  gap: 3rem;
+  padding: 2rem;
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 4rem;
+  }
+`;
+
+const AboutContent = styled(motion.div)`
+  flex: 1;
+  text-align: left;
+
+  @media (max-width: 991px) {
+    text-align: center;
+    order: 2;
+  }
+`;
+
+const AboutCardsContainer = styled(motion.div)`
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+
+  @media (max-width: 991px) {
+    order: 1;
+  }
+`;
+
+const AboutCard = styled(motion.div)`
+  position: relative;
+  width: 280px;
+  height: 180px;
+  background: linear-gradient(-45deg, #143582 0%, #152a67 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+  box-shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 30px -15px rgba(2, 12, 27, 0.7);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+  }
+
+  &:hover img {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+
+  span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: rgba(10, 25, 47, 0.85);
+    color: #4db5ff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+  }
+
+  &:hover span {
+    transform: translateY(0);
+  }
+`;
+
+const AboutTextBlock = styled(motion.div)`
+  margin-bottom: 2rem;
+  position: relative;
+  padding: 0 0 0 1.5rem;
+  border-left: 2px solid #4db5ff;
+
+  @media (max-width: 991px) {
+    padding: 0;
+    border-left: none;
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    color: #4db5ff;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+`;
+
+const AboutHighlight = styled.span`
+  color: #4db5ff;
+  font-weight: 500;
+`;
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -1087,20 +1242,66 @@ const Home: React.FC = () => {
           </PlansContainer>
         </PricingSection>
 
-        <Section
+        <AboutSection
           id="sobre"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <Title variants={fadeInUp}>
-            Sobre nós
+          <Title variants={fadeInUp} isLight={true}>
+            Proton Software
           </Title>
-          <Subtitle variants={fadeInUp}>
-            falar sobre a empresa, o que fazemos, e como podemos ajudar você. assim como o suporte que temos para o cliente.
-          </Subtitle>
-        </Section>
+          <AboutContainer>
+            <AboutContent>
+              <AboutTextBlock
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <h3>Nossa história</h3>
+                <p>
+                  A <AboutHighlight>Proton Software</AboutHighlight> nasceu quando identificamos oportunidades de melhoria em uma solução mal projetada, encontrando um caminho para desenvolver um produto inovador e expansível.
+                </p>
+                <p>
+                  Assim surgiu a <AboutHighlight>Bibliotech</AboutHighlight>, nosso sistema de gerenciamento de biblioteca escolar com foco no desempenho de alunos, livros e turmas. Desenvolvemos métricas que ajudam escolas a investirem nos livros certos e motivam os estudantes através de metas trimestrais, criando um sentimento de participação.
+                </p>
+                <p>
+                  Paralelamente, expandimos para o desenvolvimento de softwares sob demanda, que atualmente representa nosso principal foco de faturamento, enquanto continuamos evoluindo nossos produtos próprios.
+                </p>
+              </AboutTextBlock>
+            </AboutContent>
+            <AboutCardsContainer
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, staggerChildren: 0.1 }}
+            >
+              <AboutCard
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img src="/images/home/about/bibliotech-dashboard.jpg" alt="Dashboard Bibliotech" />
+                <span>Dashboard intuitivo</span>
+              </AboutCard>
+              <AboutCard
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img src="/images/home/about/dev-team.jpg" alt="Equipe de desenvolvimento" />
+                <span>Equipe especializada</span>
+              </AboutCard>
+              <AboutCard
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img src="/images/home/about/innovation.jpg" alt="Inovação" />
+                <span>Inovação constante</span>
+              </AboutCard>
+            </AboutCardsContainer>
+          </AboutContainer>
+        </AboutSection>
 
         <Section
           id="contato"
