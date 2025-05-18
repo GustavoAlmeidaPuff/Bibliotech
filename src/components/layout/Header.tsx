@@ -274,7 +274,7 @@ const Header: React.FC = () => {
           <ReactAtom size="2.5rem" asLogo />
         </LogoWrapper>
         <LogoText>
-          <h1>Bibliotech</h1>
+          <h1>Bibliotech.tech</h1>
           <span>by proton</span>
         </LogoText>
       </LogoContainer>
