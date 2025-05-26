@@ -603,19 +603,6 @@ const PlansContainer = styled.div`
   }
 `;
 
-const ProductGlow = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 900px;
-  height: 600px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(77,181,255,0.25) 0%, rgba(77,181,255,0.10) 40%, transparent 100%);
-  filter: blur(40px);
-  z-index: 0;
-  pointer-events: none;
-`;
-
 interface ImageModalProps {
   isOpen: boolean;
   imageUrl: string;
@@ -1080,7 +1067,6 @@ const Home: React.FC = () => {
           transition={{ duration: 0.8 }}
         >
           <ProductSection>
-            <ProductGlow />
             <ProductGrid>
               <ProductDescription
                 initial={{ opacity: 0, y: 50 }}
