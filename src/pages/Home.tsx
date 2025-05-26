@@ -8,6 +8,15 @@ const HomeContainer = styled.div`
   width: 100%;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    overflow-x: hidden;
+  }
 `;
 
 const ProgressBar = styled(motion.div)`
@@ -46,14 +55,21 @@ const ParallaxSection = styled(motion.section)`
 
 const ParallaxBackground = styled(motion.div)`
   position: absolute;
-  top: -100px;
-  left: -100px;
-  right: -100px;
-  bottom: -100px;
+  top: -50px;
+  left: -50px;
+  right: -50px;
+  bottom: -50px;
   background-image: url('/images/home/fundo/fundo1.jpg');
   background-size: cover;
   background-position: center;
   z-index: 0;
+  
+  @media (max-width: 768px) {
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+  }
 `;
 
 const ContentWrapper = styled(motion.div)`
@@ -63,7 +79,7 @@ const ContentWrapper = styled(motion.div)`
   max-width: 1200px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 4rem;
   padding: 0 2rem;
   margin: 0 auto;
@@ -74,79 +90,27 @@ const ContentWrapper = styled(motion.div)`
     text-align: center;
     gap: 2rem;
     padding-top: 10vh;
+    padding: 1rem;
   }
 `;
 
 const TextContent = styled(motion.div)`
-  flex: 1;
-  text-align: left;
-  max-width: 600px;
+  text-align: center;
+  max-width: 800px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin-top: -300px;
+  align-items: center;
+  margin: 0 auto;
 
   @media (max-width: 768px) {
     text-align: center;
     align-items: center;
-    margin-top: -50px;
+    margin-top: 0;
     position: relative;
     z-index: 3;
     width: 100%;
     padding: 0 1rem;
-  }
-`;
-
-const ImageContent = styled(motion.div)`
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding-top: 0;
-
-  img {
-    max-width: 100%;
-    height: auto;
-    max-height: 500px;
-    object-fit: contain;
-    transition: transform 0.15s ease;
-  }
-
-  @media (max-width: 768px) {
-    justify-content: center;
-    margin-top: 4rem;
-    padding-top: 0;
-    width: 100%;
-    height: 100%;
-    position: relative;
-    z-index: 2;
-    
-    img {
-      max-height: none;
-      width: 70%;
-      margin-left: -40%;
-      margin-right: -40%;
-      object-fit: contain;
-      transform: scale(2.2);
-      transition: none;
-    }
-  }
-`;
-
-const DeviceMessage = styled.p`
-  position: absolute;
-  bottom: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  width: 100%;
-  max-width: 300px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-
-  @media (max-width: 768px) {
-    bottom: -40px;
   }
 `;
 
@@ -285,6 +249,7 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
   text-align: center;
   position: relative;
   background: #1a1a1a;
+  overflow-x: hidden;
   
   ${props => props.isSecond && `
     margin-top: -60px;
@@ -330,6 +295,7 @@ const ProductSection = styled(motion.section)`
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  overflow-x: hidden;
 
   @media (max-width: 768px) {
     padding: 2rem 1rem;
@@ -1102,19 +1068,6 @@ const Home: React.FC = () => {
                 Bibliotecas escolares com foco no&nbsp;<NeonText>aluno!</NeonText>
               </Subtitle>
             </TextContent>
-            <ImageContent
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              whileHover={!isMobile ? { scale: 1.05 } : undefined}
-            >
-              <motion.img 
-                src={isMobile ? "/images/home/notebook com site.png" : "/images/home/celular com site (sem fundo).png"}
-                alt={isMobile ? "Dashboard do Bibliotech em um notebook" : "Dashboard do Bibliotech em um celular"}
-                whileHover={!isMobile ? { scale: 1.05 } : undefined}
-                transition={{ duration: 0.15 }}
-              />
-            </ImageContent>
           </ContentWrapper>
         </ParallaxSection>
 
@@ -1262,13 +1215,13 @@ const Home: React.FC = () => {
               >
                 <h3>Nossa história</h3>
                 <p>
-                  A <AboutHighlight>Proton Software</AboutHighlight> nasceu quando identificamos oportunidades de melhoria em uma solução mal projetada, encontrando um caminho para desenvolver um produto inovador e expansível.
+                  A <AboutHighlight>Bibliotech</AboutHighlight> nasceu quando identificamos oportunidades de melhoria em uma solução mal projetada, encontrando um caminho para desenvolver um produto inovador e expansível para gerenciamento de bibliotecas escolares.
                 </p>
                 <p>
-                  Assim surgiu a <AboutHighlight>Bibliotech</AboutHighlight>, nosso sistema de gerenciamento de biblioteca escolar com foco no desempenho de alunos, livros e turmas. Desenvolvemos métricas que ajudam escolas a investirem nos livros certos e motivam os estudantes através de metas trimestrais, criando um sentimento de participação.
+                  Nosso sistema foi desenvolvido com foco no desempenho de alunos, livros e turmas. Criamos métricas que ajudam escolas a investirem nos livros certos e motivam os estudantes através de metas trimestrais, criando um sentimento de participação.
                 </p>
                 <p>
-                  Paralelamente, expandimos para o desenvolvimento de softwares sob demanda, que atualmente representa nosso principal foco de faturamento, enquanto continuamos evoluindo nossos produtos próprios.
+                  A partir desse produto, fundamos a <AboutHighlight>Proton Software</AboutHighlight>, expandindo para o desenvolvimento de softwares sob demanda, que atualmente representa nosso principal foco de faturamento, enquanto continuamos evoluindo nossos produtos próprios.
                 </p>
               </AboutTextBlock>
             </AboutContent>
