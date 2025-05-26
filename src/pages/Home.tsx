@@ -249,7 +249,7 @@ const Section = styled(motion.section)<{ isSecond?: boolean }>`
   text-align: center;
   position: relative;
   background: #1a1a1a;
-  overflow-x: hidden;
+  overflow: hidden;
   
   ${props => props.isSecond && `
     margin-top: -60px;
@@ -295,7 +295,7 @@ const ProductSection = styled(motion.section)`
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  overflow-x: hidden;
+  overflow: hidden;
 
   @media (max-width: 768px) {
     padding: 2rem 1rem;
