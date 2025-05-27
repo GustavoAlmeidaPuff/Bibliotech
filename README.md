@@ -1,261 +1,284 @@
-# EN: School Library System
+# 📚 Bibliotech - Sistema de Gestão de Biblioteca Escolar
 
-A comprehensive web application for managing school libraries, allowing librarians to efficiently track books, students, and loans in an educational environment.
+<div align="center">
 
-## Features
+**Uma solução SAAS moderna para gestão completa de bibliotecas escolares**
 
-### User Management
-- **Authentication**: Secure login system for librarians and staff
-- **Password Recovery**: Password reset functionality for account access
-- **Role-Based Access**: Different permission levels for administrators, librarians, and assistants
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
+[![License](https://img.shields.io/badge/license-MIT-green)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue)]()
+[![React](https://img.shields.io/badge/React-18+-61DAFB)]()
 
-### Book Management
-- **Complete Book Catalog**: Register and maintain detailed book information including title, authors, genres, publisher, and more
-- **Book Search**: Advanced filtering capabilities to quickly locate books by title, code, or author
-- **Book Inventory**: Track book quantities and location information (shelf, collection)
+[**🚀 Demo**](https://bibliotech-demo.vercel.app) • [**📖 Documentação**](#documentação) • [**🐛 Reportar Bug**](https://github.com/seu-usuario/bibliotech/issues) • [**💡 Solicitar Feature**](https://github.com/seu-usuario/bibliotech/issues)
 
-### Student Management
-- **Student Profiles**: Maintain records of all students with their classroom information
-- **Student Dashboard**: Individual dashboard for each student showing reading history and statistics
-- **Bulk Import/Export**: Easily add multiple students via CSV upload
-
-### Staff Management
-- **Staff Profiles**: Register and manage staff members who can borrow books
-- **Staff Loans**: Track books borrowed by staff separately from student loans
-
-### Loan System
-- **Student Loans**: Process and track book borrowing by students
-- **Staff Loans**: Process and track book borrowing by staff
-- **Return Management**: Register returned books and maintain history
-- **Withdrawal Workflow**: Step-by-step process for book withdrawal with confirmation
-- **Late Return Notifications**: Automatic alerts for overdue books
-
-### Analytics and Statistics
-- **Dashboard**: Comprehensive dashboard with key metrics and visualizations
-- **Reading Trends**: Track reading patterns across different time periods
-- **Genre Analysis**: Visualize popularity of different book genres
-- **Top Readers**: Identify and showcase the most active student readers
-- **Classroom Performance**: Compare reading statistics across different classrooms
-- **Reading Completion Rates**: Track how many students complete the books they borrow
-- **Export Reports**: Generate and download reports in PDF or Excel format
-
-### Settings and Customization
-- **System Settings**: Customize application parameters according to library needs
-- **Tag Management**: Create and manage tags for books
-- **Author Management**: Maintain a comprehensive list of authors
-- **Theme Customization**: Personalize the application appearance and colors
-
-## Installation
-
-### Requirements
-- Node.js 16.x or later
-- npm 8.x or later
-- Windows 10/11 or macOS 12+
-
-### Setup Instructions (Windows)
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/school-library-system.git
-   cd school-library-system
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Configure environment variables:
-   - Create a `.env` file in the root directory
-   - Add the necessary Firebase configuration:
-   ```
-   REACT_APP_FIREBASE_API_KEY=your_api_key
-   REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-   REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-   REACT_APP_FIREBASE_APP_ID=your_app_id
-   ```
-
-4. Start the development server:
-   ```
-   npm start
-   ```
-
-5. Build for production:
-   ```
-   npm run build
-   ```
-
-## Project Organization
-
-The project follows a well-structured React architecture:
-
-- **Authentication**: Firebase authentication for user management
-- **State Management**: Context API for global state management
-- **Routing**: React Router for navigating between different sections
-- **Database**: Firebase Firestore for data storage
-- **UI Components**: Custom components with CSS modules for styling
-- **Analytics**: Chart.js for data visualization
-- **Testing**: Jest and React Testing Library for unit and integration tests
-
-## Development
-
-The application is built using:
-- React.js v18+ with TypeScript for type safety
-- Firebase v9+ for authentication and database
-- React Router v6+ for navigation
-- Chart.js v4+ for data visualization
-- Date-fns v2+ for date manipulation
-- Heroicons for iconography
-- Tailwind CSS for styling
-
-## Contribution Guidelines
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Future Projections
-
-The system will be expanded to include:
-- **Student Self-Service Portal**: Allow students to track their own reading progress and statistics
-- **Reading Gamification**: Implement rewards and achievements for reading milestones
-- **Mobile App**: Develop a companion mobile application for on-the-go access
-- **Book Recommendations**: AI-powered book recommendations based on reading history
-- **Integration with Learning Management Systems**: Connect with school LMS platforms for seamless data sharing
-- **Advanced Analytics**: More detailed insights into reading patterns and educational impact
-- **Digital Reading Tracking**: Monitor digital book consumption alongside physical books
-- **QR Code Integration**: Generate and print QR codes for physical books to streamline checkout process
+</div>
 
 ---
 
-# PT: Sistema de Biblioteca Escolar
+## 🎯 **Sobre o Projeto**
 
-Uma aplicação web abrangente para gerenciamento de bibliotecas escolares, permitindo que bibliotecários rastreiem eficientemente livros, alunos e empréstimos em um ambiente educacional.
+**Bibliotech** é uma plataforma SaaS completa para gestão de bibliotecas escolares, desenvolvida com foco na experiência do usuário e métricas de desempenho. A solução oferece controle total sobre acervo, empréstimos, usuários e análises de leitura, contribuindo para o desenvolvimento educacional dos alunos.
 
-## Funcionalidades
+### ✨ **Principais Diferenciais**
 
-### Gestão de Usuários
-- **Autenticação**: Sistema de login seguro para bibliotecários e funcionários
-- **Recuperação de Senha**: Funcionalidade de redefinição de senha para acesso à conta
-- **Acesso Baseado em Funções**: Diferentes níveis de permissão para administradores, bibliotecários e assistentes
+- 📊 **Dashboard Analytics** - Métricas detalhadas de leitura e engajamento
+- 🎯 **Gamificação** - Sistema de pontuação para motivar alunos
+- 📱 **Design Responsivo** - Interface otimizada para todos os dispositivos
+- 🔒 **Multi-tenancy** - Suporte a múltiplas escolas
+- ⚡ **Performance** - Carregamento rápido com lazy loading
+- 🌐 **PWA Ready** - Funciona offline e pode ser instalado
 
-### Gestão de Livros
-- **Catálogo Completo de Livros**: Registre e mantenha informações detalhadas sobre livros, incluindo título, autores, gêneros, editora e mais
-- **Busca de Livros**: Recursos avançados de filtragem para localizar rapidamente livros por título, código ou autor
-- **Inventário de Livros**: Acompanhe quantidades de livros e informações de localização (estante, coleção)
+---
 
-### Gestão de Alunos
-- **Perfis de Alunos**: Mantenha registros de todos os alunos com suas informações de sala de aula
-- **Painel do Aluno**: Painel individual para cada aluno mostrando histórico de leitura e estatísticas
-- **Importação/Exportação em Massa**: Adicione facilmente múltiplos alunos via upload de CSV
+## 🚀 **Funcionalidades**
 
-### Gestão de Funcionários
-- **Perfis de Funcionários**: Registre e gerencie funcionários que podem emprestar livros
-- **Empréstimos para Funcionários**: Acompanhe livros emprestados por funcionários separadamente dos empréstimos de alunos
+### 👥 **Gestão de Usuários**
+- **Autenticação segura** com Firebase Auth
+- **Perfis diferenciados** (Administrador, Bibliotecário, Aluno)
+- **Dashboard personalizado** para cada tipo de usuário
+- **Recuperação de senha** automática
 
-### Sistema de Empréstimo
-- **Empréstimos para Alunos**: Processe e acompanhe empréstimos de livros por alunos
-- **Empréstimos para Funcionários**: Processe e acompanhe empréstimos de livros por funcionários
-- **Gestão de Devoluções**: Registre livros devolvidos e mantenha histórico
-- **Fluxo de Retirada**: Processo passo a passo para retirada de livros com confirmação
-- **Notificações de Atraso**: Alertas automáticos para livros com devolução em atraso
+### 📚 **Gerenciamento de Acervo**
+- **Cadastro completo** de livros com múltiplos campos
+- **Sistema de busca avançada** com filtros inteligentes
+- **Categorização por gêneros** e tags personalizáveis  
+- **Controle de estoque** e localização física
+- **Import/Export** via CSV
 
-### Análises e Estatísticas
-- **Painel**: Painel abrangente com métricas-chave e visualizações
-- **Tendências de Leitura**: Acompanhe padrões de leitura em diferentes períodos
-- **Análise de Gêneros**: Visualize a popularidade de diferentes gêneros de livros
-- **Principais Leitores**: Identifique e destaque os alunos leitores mais ativos
-- **Desempenho por Sala**: Compare estatísticas de leitura entre diferentes salas de aula
-- **Taxas de Conclusão de Leitura**: Acompanhe quantos alunos concluem os livros que tomam emprestados
-- **Exportação de Relatórios**: Gere e baixe relatórios em formato PDF ou Excel
+### 🔄 **Sistema de Empréstimos**
+- **Workflow intuitivo** para retirada e devolução
+- **Controle de prazos** com notificações automáticas
+- **Histórico completo** de transações
+- **Renovação automática** baseada em regras
+- **Multas e penalidades** configuráveis
 
-### Configurações e Personalização
-- **Configurações do Sistema**: Personalize parâmetros da aplicação de acordo com as necessidades da biblioteca
-- **Gestão de Tags**: Crie e gerencie tags para livros
-- **Gestão de Autores**: Mantenha uma lista abrangente de autores
-- **Personalização de Tema**: Personalize a aparência e as cores da aplicação
+### 📈 **Analytics & Relatórios**
+- **Dashboard executivo** com KPIs em tempo real
+- **Análise de tendências** de leitura por período
+- **Ranking de livros** mais populares
+- **Performance por turma** e aluno individual
+- **Taxa de conclusão** de leitura
+- **Relatórios exportáveis** (PDF, Excel)
 
-## Instalação
+### 🎨 **Customização**
+- **Temas personalizáveis** por escola
+- **Logo e branding** customizados
+- **Configurações flexíveis** de regras de negócio
+- **Campos personalizados** para livros e usuários
 
-### Requisitos
-- Node.js 16.x ou posterior
-- npm 8.x ou posterior
-- Windows 10/11 ou macOS 12+
+---
 
-### Instruções de Configuração (Windows)
-1. Clone o repositório:
-   ```
-   git clone https://github.com/seunome/sistema-biblioteca-escolar.git
-   cd sistema-biblioteca-escolar
-   ```
+## 🛠️ **Stack Tecnológica**
 
-2. Instale as dependências:
-   ```
-   npm install
-   ```
+### **Frontend**
+- **React 18** - Framework principal
+- **TypeScript** - Tipagem estática
+- **Styled Components** - CSS-in-JS
+- **Framer Motion** - Animações fluidas
+- **Chart.js** - Visualização de dados
+- **React Router v6** - Roteamento
+- **React Hook Form** - Formulários performáticos
 
-3. Configure as variáveis de ambiente:
-   - Crie um arquivo `.env` no diretório raiz
-   - Adicione a configuração necessária do Firebase:
-   ```
-   REACT_APP_FIREBASE_API_KEY=sua_chave_api
-   REACT_APP_FIREBASE_AUTH_DOMAIN=seu_dominio_auth
-   REACT_APP_FIREBASE_PROJECT_ID=seu_id_projeto
-   REACT_APP_FIREBASE_STORAGE_BUCKET=seu_bucket_armazenamento
-   REACT_APP_FIREBASE_MESSAGING_SENDER_ID=seu_id_remetente_mensagens
-   REACT_APP_FIREBASE_APP_ID=seu_id_app
-   ```
+### **Backend & Infraestrutura**
+- **Firebase v9+** - Backend as a Service
+- **Firestore** - Banco de dados NoSQL
+- **Firebase Auth** - Autenticação
+- **Firebase Storage** - Armazenamento de arquivos
+- **Vercel** - Deploy e hosting
 
-4. Inicie o servidor de desenvolvimento:
-   ```
-   npm start
-   ```
+### **Ferramentas de Desenvolvimento**
+- **Create React App** - Setup inicial
+- **ESLint + Prettier** - Code quality
+- **Husky** - Git hooks
+- **Jest + Testing Library** - Testes
+- **Storybook** - Documentação de componentes
 
-5. Compile para produção:
-   ```
-   npm run build
-   ```
+---
 
-## Organização do Projeto
+## 🚀 **Quick Start**
 
-O projeto segue uma arquitetura React bem estruturada:
+### **Pré-requisitos**
+```bash
+Node.js 18+ 
+npm 9+ ou yarn 1.22+
+Git
+```
 
-- **Autenticação**: Firebase authentication para gestão de usuários
-- **Gerenciamento de Estado**: Context API para gerenciamento de estado global
-- **Roteamento**: React Router para navegação entre diferentes seções
-- **Banco de Dados**: Firebase Firestore para armazenamento de dados
-- **Componentes de UI**: Componentes personalizados com módulos CSS para estilização
-- **Analytics**: Chart.js para visualização de dados
-- **Testes**: Jest e React Testing Library para testes unitários e de integração
+### **Instalação**
 
-## Desenvolvimento
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/bibliotech.git
+cd bibliotech
+```
 
-A aplicação é construída usando:
-- React.js v18+ com TypeScript para segurança de tipos
-- Firebase v9+ para autenticação e banco de dados
-- React Router v6+ para navegação
-- Chart.js v4+ para visualização de dados
-- Date-fns v2+ para manipulação de datas
-- Heroicons para iconografia
-- Tailwind CSS para estilização
+2. **Instale as dependências**
+```bash
+npm install
+# ou
+yarn install
+```
 
-## Diretrizes de Contribuição
-1. Faça um fork do repositório
-2. Crie uma branch de recurso (`git checkout -b feature/recurso-incrivel`)
-3. Confirme suas alterações (`git commit -m 'Adiciona um recurso incrível'`)
-4. Envie para a branch (`git push origin feature/recurso-incrivel`)
-5. Abra um Pull Request
+3. **Configure as variáveis de ambiente**
+```bash
+cp .env.example .env.local
+```
 
-## Projeções Futuras
+Edite o `.env.local` com suas credenciais do Firebase:
+```env
+REACT_APP_FIREBASE_API_KEY=sua_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=seu_projeto.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=seu_projeto_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=seu_projeto.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=123456789
+REACT_APP_FIREBASE_APP_ID=sua_app_id
+```
 
-O sistema será expandido para incluir:
-- **Portal de Autoatendimento para Alunos**: Permitir que os alunos acompanhem seu próprio progresso de leitura e estatísticas
-- **Gamificação da Leitura**: Implementar recompensas e conquistas para marcos de leitura
-- **Aplicativo Móvel**: Desenvolver um aplicativo móvel complementar para acesso em qualquer lugar
-- **Recomendações de Livros**: Recomendações de livros baseadas em IA com base no histórico de leitura
-- **Integração com Sistemas de Gestão de Aprendizagem**: Conectar-se com plataformas de LMS escolares para compartilhamento contínuo de dados
-- **Analytics Avançados**: Insights mais detalhados sobre padrões de leitura e impacto educacional
-- **Rastreamento de Leitura Digital**: Monitorar o consumo de livros digitais junto com livros físicos
-- **Integração com QR Code**: Gere e imprima códigos QR para livros físicos para agilizar o processo de empréstimo
+4. **Execute o projeto**
+```bash
+npm start
+# ou
+yarn start
+```
+
+5. **Acesse a aplicação**
+```
+http://localhost:3000
+```
+
+---
+
+## 🏗️ **Arquitetura**
+
+```
+src/
+├── components/          # Componentes reutilizáveis
+│   ├── ui/             # Componentes base (Button, Modal, etc)
+│   ├── layout/         # Layout e navegação
+│   └── shared/         # Componentes compartilhados
+├── pages/              # Páginas da aplicação
+├── contexts/           # Context API (Auth, Settings)
+├── hooks/              # Custom hooks (useAsync, useLocalStorage)
+├── services/           # Serviços e APIs (Firebase)
+├── utils/              # Utilitários e helpers
+├── types/              # Definições TypeScript
+├── constants/          # Constantes da aplicação
+└── config/             # Configurações (Firebase, rotas)
+```
+
+---
+
+## 🧪 **Testes**
+
+```bash
+# Executar todos os testes
+npm run test
+
+# Testes com coverage
+npm run test -- --coverage
+
+# Testes em modo watch
+npm run test -- --watch
+
+# Build de produção
+npm run build
+```
+
+---
+
+## 🚀 **Deploy**
+
+### **Vercel (Recomendado)**
+```bash
+npm run build
+npx vercel --prod
+```
+
+### **Netlify**
+```bash
+npm run build
+# Faça upload da pasta build/
+```
+
+### **Firebase Hosting**
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init hosting
+npm run build
+firebase deploy
+```
+
+---
+
+## 🤝 **Contribuindo**
+
+Contribuições são sempre bem-vindas! Veja como você pode ajudar:
+
+1. **Fork o projeto**
+2. **Crie sua feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit suas mudanças** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push para a branch** (`git push origin feature/AmazingFeature`)
+5. **Abra um Pull Request**
+
+### **Padrões de Código**
+- Use **TypeScript** para todos os novos arquivos
+- Siga os padrões do **ESLint** configurado
+- Escreva **testes** para novas funcionalidades
+- Mantenha **commits semânticos**
+
+---
+
+## 📊 **Roadmap**
+
+### **v1.1 - Q1 2024**
+- [ ] App Mobile (React Native)
+- [ ] Sistema de notificações push
+- [ ] API REST documentada
+- [ ] Integração com sistemas escolares
+
+### **v1.2 - Q2 2024**
+- [ ] Biblioteca digital
+- [ ] QR Code para livros físicos
+- [ ] Relatórios avançados
+- [ ] Multi-idioma (i18n)
+
+### **v2.0 - Q3 2024**
+- [ ] IA para recomendações
+- [ ] Gamificação avançada
+- [ ] Portal do aluno autônomo
+- [ ] Integração com LMS
+
+---
+
+## 📄 **Licença**
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 🆘 **Suporte**
+
+### **Documentação**
+- [📖 Guia do Usuário(em breve)](docs/user-guide.md)
+- [👨‍💻 Documentação da API(em breve)](docs/api.md) 
+
+### **Comunidade**
+- [📧 Email](mailto:suporte@bibliotech.com.br)
+- [🐛 Issues(em breve)](https://github.com/seu-usuario/bibliotech/issues)
+
+### **Enterprise**
+Para soluções empresariais e suporte dedicado:
+- 📧 **Email**: proton.hello.world@gmail.com
+- 📞 **WhatsApp**: (51) 99718-8572
+
+---
+
+<div align="center">
+
+**Desenvolvido com ❤️ pela [Proton Software](https://protonsoftware.tech)**
+
+⭐ **Se este projeto te ajudou, deixe uma estrela!** ⭐
+
+</div> 
