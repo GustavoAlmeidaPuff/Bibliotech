@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -47,10 +47,11 @@ const Books = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     if (!currentUser) return;
     
     try {
+      setLoading(true);
       const booksRef = collection(db, `users/${currentUser.uid}/books`);
       const q = query(booksRef);
       const querySnapshot = await getDocs(q);
@@ -66,11 +67,11 @@ const Books = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
 
   useEffect(() => {
     fetchBooks();
-  }, [currentUser]);
+  }, [fetchBooks]);
 
   const sortBooks = (booksToSort: Book[]) => {
     const booksCopy = [...booksToSort];

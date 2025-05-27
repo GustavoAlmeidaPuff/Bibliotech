@@ -9,6 +9,8 @@
   background-color: var(--primary-color, #4a90e2);
   color: white;
   width: 100%;
+  position: relative;
+  z-index: 1001;
 }
 
 .headerContent {
@@ -59,6 +61,8 @@
   background: linear-gradient(45deg, #ffffff, #e3f2fd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  /* Fallback para navegadores que não suportam */
+  color: white;
 }
 
 .menuButton {
@@ -69,6 +73,7 @@
   cursor: pointer;
   padding: 0.5rem;
   transition: transform 0.2s ease;
+  z-index: 1002;
 }
 
 .menuButton:hover {
@@ -118,16 +123,8 @@
   background-color: var(--primary-color, #4a90e2);
   width: 100%;
   padding: 1rem;
-  transition: all 0.3s ease;
-}
-
-.nav.sticky {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1000;
 }
 
 .navContent {
@@ -264,6 +261,14 @@
 
   .nav {
     display: none;
+    position: fixed;
+    top: 64px; /* Altura do header */
+    left: 0;
+    right: 0;
+    z-index: 999;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
   }
 
   .nav.open {
@@ -277,10 +282,19 @@
 
   .navSection {
     width: 100%;
+    min-width: auto;
   }
 
   .navSection:not(:last-child) {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 1rem;
+  }
+
+  .navSection:not(:last-child)::after {
+    display: none;
+  }
+
+  .main {
+    padding: 1rem;
   }
 } 

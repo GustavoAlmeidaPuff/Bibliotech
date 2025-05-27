@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -42,11 +42,7 @@ const Students = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchStudents();
-  }, [currentUser]);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     if (!currentUser) return;
     
     try {
@@ -67,7 +63,11 @@ const Students = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   const toggleStudentSelection = (studentId: string, e?: React.MouseEvent) => {
     if (e) {

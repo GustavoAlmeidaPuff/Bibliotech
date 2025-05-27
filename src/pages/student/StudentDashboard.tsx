@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { useAuth } from '../../contexts/AuthContext';
+import { useStudentAuth } from '../../contexts/StudentAuthContext';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -57,7 +57,7 @@ interface Book {
 }
 
 const StudentDashboard = () => {
-  const { studentUser, studentLogout } = useAuth();
+  const { studentUser, logout } = useStudentAuth();
   const navigate = useNavigate();
   
   const [loans, setLoans] = useState<Loan[]>([]);
@@ -255,7 +255,7 @@ const StudentDashboard = () => {
   };
   
   const handleLogout = () => {
-    studentLogout();
+    logout();
     navigate('/student-login');
   };
   
@@ -270,7 +270,7 @@ const StudentDashboard = () => {
           <div className={styles.header}>
             <div className={styles.studentInfo}>
               <h2>Olá, {studentUser?.name}!</h2>
-              <p>Turma: {studentUser?.classroom}</p>
+              <p>Turma: {studentUser?.className}</p>
             </div>
             <button className={styles.logoutButton} onClick={handleLogout}>
               Sair

@@ -1,64 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { useAuth } from '../../contexts/AuthContext';
-import { LibrarySettings } from '../../contexts/SettingsContext';
+import { useStudentAuth } from '../../contexts/StudentAuthContext';
+import { useAsync } from '../../hooks/useAsync';
+import { settingsService } from '../../services/firebase';
+import { StudentLoginFormData } from '../../types/common';
 import styles from './Login.module.css';
 
-const StudentLogin = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+const StudentLogin: React.FC = () => {
+  const [formData, setFormData] = useState<StudentLoginFormData>({
+    username: '',
+    password: ''
+  });
   const [schoolName, setSchoolName] = useState('School Library System');
-  const { studentUser, studentLogin } = useAuth();
+  
+  const { studentUser, login } = useStudentAuth();
+  const { execute: executeLogin, isLoading, error } = useAsync<void>();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (studentUser) {
       navigate('/student-dashboard');
     }
-    
-    // Tentar buscar o nome da escola
+  }, [studentUser, navigate]);
+
+  useEffect(() => {
+    // Carregar nome da escola
     const loadSchoolName = async () => {
       try {
-        const db = getFirestore();
-        // Recupera configurações padrão
-        const usersSnapshot = await getDoc(doc(db, 'users', 'defaultSettings'));
-        
-        if (usersSnapshot.exists()) {
-          const settingsRef = doc(db, 'users', usersSnapshot.id, 'settings', 'library');
-          const settingsDoc = await getDoc(settingsRef);
-          
-          if (settingsDoc.exists()) {
-            const settings = settingsDoc.data() as LibrarySettings;
-            if (settings.schoolName) {
-              setSchoolName(settings.schoolName);
-            }
-          }
-        }
+        const name = await settingsService.getSchoolName();
+        setSchoolName(name);
       } catch (error) {
         console.error('Erro ao carregar nome da escola:', error);
       }
     };
     
     loadSchoolName();
-  }, [studentUser, navigate]);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      setError('');
-      setLoading(true);
-      await studentLogin(username, password);
+      await executeLogin(() => login(formData.username, formData.password));
       navigate('/student-dashboard');
     } catch (error) {
+      // Erro é gerenciado pelo hook useAsync
       console.error('Falha ao fazer login:', error);
-      setError('Erro ao fazer login. Verifique suas credenciais.');
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -67,32 +63,45 @@ const StudentLogin = () => {
         <div className={styles.logo}></div>
         <h2>{schoolName}</h2>
         <h3>Portal do Aluno</h3>
+        
         {error && <div className={styles.error}>{error}</div>}
+        
         <form onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
             <label htmlFor="username">Nome de Usuário</label>
             <input
               id="username"
+              name="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={formData.username}
+              onChange={handleInputChange}
               required
+              disabled={isLoading}
             />
           </div>
+          
           <div className={styles.inputGroup}>
             <label htmlFor="password">Senha</label>
             <input
               id="password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleInputChange}
               required
+              disabled={isLoading}
             />
           </div>
-          <button type="submit" disabled={loading} className={styles.loginButton}>
-            {loading ? 'Entrando...' : 'Entrar'}
+          
+          <button 
+            type="submit" 
+            disabled={isLoading} 
+            className={styles.loginButton}
+          >
+            {isLoading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+        
         <div className={styles.links}>
           <a href="/login">Acesso para Bibliotecários</a>
         </div>

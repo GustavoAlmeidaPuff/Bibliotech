@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, getDocs, where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -108,7 +108,7 @@ const Dashboard = () => {
   const [overdueLoansCount, setOverdueLoansCount] = useState(0);
   const [totalBooksCount, setTotalBooksCount] = useState(0);
   const [activeReadersCount, setActiveReadersCount] = useState(0);
-  const [totalBooksRead, setTotalBooksRead] = useState(0);
+  const [totalBooksRead, setTotalBooksRead] = useState<number>(0);
   const [totalReadersCount, setTotalReadersCount] = useState(0);
   
   // Estados para gráficos e insights
@@ -116,7 +116,11 @@ const Dashboard = () => {
   const [topBooks, setTopBooks] = useState<TopBook[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [classroomPerformance, setClassroomPerformance] = useState<ClassroomPerformance[]>([]);
-  const [monthlyLoanData, setMonthlyLoanData] = useState<{labels: string[], borrowed: number[], returned: number[]}>({
+  const [monthlyLoanData, setMonthlyLoanData] = useState<{
+    labels: string[],
+    borrowed: number[],
+    returned: number[]
+  }>({
     labels: [],
     borrowed: [],
     returned: []
@@ -126,29 +130,7 @@ const Dashboard = () => {
     rates: []
   });
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchDashboardData();
-    }
-  }, [currentUser]);
-
-  // Atualizar dados a cada 30 segundos enquanto o dashboard estiver aberto
-  useEffect(() => {
-    if (!currentUser) return;
-    
-    // Buscar dados imediatamente
-    fetchDashboardData();
-    
-    // Configurar atualização periódica
-    const intervalId = setInterval(() => {
-      fetchDashboardData();
-    }, 30000); // 30 segundos
-    
-    // Limpar o intervalo quando o componente for desmontado
-    return () => clearInterval(intervalId);
-  }, [currentUser]); // Apenas re-executar quando o usuário mudar
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!currentUser) return;
 
     try {
@@ -233,7 +215,24 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  // Atualizar dados a cada 30 segundos enquanto o dashboard estiver aberto
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    // Configurar atualização periódica
+    const intervalId = setInterval(() => {
+      fetchDashboardData();
+    }, 30000); // 30 segundos
+    
+    // Limpar o intervalo quando o componente for desmontado
+    return () => clearInterval(intervalId);
+  }, [fetchDashboardData]);
 
   const processMainStats = (loans: Loan[], students: Student[]) => {
     // Contagem de empréstimos ativos
