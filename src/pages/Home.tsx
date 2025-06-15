@@ -1410,6 +1410,7 @@ Aguardo retorno. Obrigado!`;
           </PlansContainer>
         </PricingSection>
 
+        {/* Seção Proton Software comentada temporariamente
         <AboutSection
           id="sobre"
           initial="hidden"
@@ -1470,6 +1471,7 @@ Aguardo retorno. Obrigado!`;
             </AboutCardsContainer>
           </AboutContainer>
         </AboutSection>
+        */}
 
         <ContactSection
           id="contato"
