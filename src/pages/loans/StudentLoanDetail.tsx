@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './StudentLoanDetail.module.css';
@@ -29,6 +29,9 @@ const StudentLoanDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [readingCompleted, setReadingCompleted] = useState(false);
+  const [readingProgress, setReadingProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   
   useEffect(() => {
@@ -116,6 +119,39 @@ const StudentLoanDetail = () => {
     return styles.statusActive;
   };
   
+  const handleReturnLoan = async () => {
+    if (!currentUser || !loan) return;
+
+    try {
+      setProcessing(true);
+      const loanRef = doc(db, `users/${currentUser.uid}/loans/${loan.id}`);
+
+      await updateDoc(loanRef, {
+        status: 'returned',
+        returnDate: serverTimestamp(),
+        completed: readingCompleted,
+        readingProgress: readingProgress,
+        updatedAt: serverTimestamp()
+      });
+
+      setShowReturnDialog(false);
+      await fetchLoanDetails(); // Re-fetch data to update UI
+
+    } catch (err) {
+      console.error('Erro ao processar devolução:', err);
+      setError('Ocorreu um erro ao processar a devolução');
+      setShowReturnDialog(false);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReadingProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    setReadingProgress(value);
+    setReadingCompleted(value === 100);
+  };
+
   const handleCancelLoan = async () => {
     if (!currentUser || !loan) return;
     
@@ -226,8 +262,20 @@ const StudentLoanDetail = () => {
             {loan.status === 'active' && (
               <div className={styles.actionsSection}>
                 <button 
+                  className={styles.returnButton}
+                  onClick={() => {
+                    setReadingProgress(loan.readingProgress || 0);
+                    setReadingCompleted(loan.completed || false);
+                    setShowReturnDialog(true);
+                  }}
+                  disabled={processing}
+                >
+                  Devolver
+                </button>
+                <button 
                   className={styles.cancelButton}
                   onClick={() => setShowCancelDialog(true)}
+                  disabled={processing}
                 >
                   Cancelar Retirada
                 </button>
@@ -237,6 +285,71 @@ const StudentLoanDetail = () => {
         </div>
       )}
       
+      {showReturnDialog && loan && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Confirmar Devolução</h3>
+            <p>Livro: <strong>{loan.bookTitle}</strong></p>
+            <p>Aluno: <strong>{loan.studentName}</strong></p>
+            
+            <div className={styles.readingInfo}>
+              <h4>Informações de Leitura</h4>
+              
+              <div className={styles.readingCompletedField}>
+                <label>
+                  <input 
+                    type="checkbox" 
+                    checked={readingCompleted}
+                    onChange={(e) => {
+                      setReadingCompleted(e.target.checked);
+                      if (e.target.checked) {
+                        setReadingProgress(100);
+                      }
+                    }}
+                  />
+                  Leitura concluída
+                </label>
+              </div>
+              
+              <div className={styles.progressField}>
+                <label>Progresso da leitura: {readingProgress}%</label>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={readingProgress}
+                  onChange={handleReadingProgressChange}
+                  className={styles.progressSlider}
+                  disabled={processing}
+                />
+                <div className={styles.progressLabels}>
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.modalActions}>
+               <button 
+                className={styles.modalCancelButton}
+                onClick={() => setShowReturnDialog(false)}
+                disabled={processing}
+              >
+                Cancelar
+              </button>
+              <button 
+                className={styles.modalConfirmReturnButton}
+                onClick={handleReturnLoan}
+                disabled={processing}
+              >
+                {processing ? 'Processando...' : 'Confirmar Devolução'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCancelDialog && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
