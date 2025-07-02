@@ -5,6 +5,7 @@ import { useAsync } from '../../hooks/useAsync';
 import { settingsService } from '../../services/firebase';
 import { StudentLoginFormData } from '../../types/common';
 import styles from './Login.module.css';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 const StudentLogin: React.FC = () => {
   const [formData, setFormData] = useState<StudentLoginFormData>({
@@ -60,8 +61,18 @@ const StudentLogin: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.loginCard}>
-        <div className={styles.logo}></div>
-        <h2>{schoolName}</h2>
+        <div className={styles.logo}>
+          <UserCircleIcon style={{ width: 48, height: 48, color: 'white' }} />
+        </div>
+        <h2>
+          {schoolName === 'School Library System' ? (
+            <>
+              Biblio<span style={{ color: '#4285f4' }}>tech</span>
+            </>
+          ) : (
+            schoolName
+          )}
+        </h2>
         <h3>Portal do Aluno</h3>
         
         {error && <div className={styles.error}>{error}</div>}

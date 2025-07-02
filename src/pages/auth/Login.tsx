@@ -6,6 +6,7 @@ import { settingsService } from '../../services/firebase';
 import { LoginFormData } from '../../types/common';
 import { ROUTES } from '../../constants';
 import styles from './Login.module.css';
+import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -61,8 +62,18 @@ const Login: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.loginCard}>
-        <div className={styles.logo}></div>
-        <h2>{schoolName}</h2>
+        <div className={styles.logo}>
+          <UserCircleIcon style={{ width: 48, height: 48, color: 'white' }} />
+        </div>
+        <h2>
+          {schoolName === 'School Library System' ? (
+            <>
+              Biblio<span style={{ color: '#4285f4' }}>tech</span>
+            </>
+          ) : (
+            schoolName
+          )}
+        </h2>
         
         {error && <div className={styles.error}>{error}</div>}
         
