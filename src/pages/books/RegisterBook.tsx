@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp, query, getDocs, where } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
@@ -23,6 +23,12 @@ interface BookForm {
 interface DuplicateCheck {
   code: boolean;
   title: boolean;
+}
+
+interface DuplicateBook {
+  code: string;
+  title: string;
+  id: string;
 }
 
 // Lista de gêneros/classes sugeridos
@@ -77,6 +83,7 @@ const RegisterBook = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [duplicates, setDuplicates] = useState<DuplicateCheck>({ code: false, title: false });
+  const [duplicateBooks, setDuplicateBooks] = useState<DuplicateBook[]>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   
   const { currentUser } = useAuth();
@@ -92,17 +99,45 @@ const RegisterBook = () => {
       setCheckingDuplicates(true);
       const booksRef = collection(db, `users/${currentUser.uid}/books`);
       
-      // Verificar código duplicado
-      const codeQuery = query(booksRef, where('code', '==', code));
-      const codeSnapshot = await getDocs(codeQuery);
+      const foundDuplicates: DuplicateBook[] = [];
       
-      // Verificar título duplicado
-      const titleQuery = query(booksRef, where('title', '==', title));
-      const titleSnapshot = await getDocs(titleQuery);
+      // Buscar todos os livros para verificar duplicatas case-insensitive
+      const allBooksQuery = query(booksRef);
+      const allBooksSnapshot = await getDocs(allBooksQuery);
       
+      allBooksSnapshot.docs.forEach(doc => {
+        const bookData = doc.data();
+        const bookCode = bookData.code || '';
+        const bookTitle = bookData.title || '';
+        
+        // Verificar código duplicado (exato)
+        if (code.trim() && bookCode.toLowerCase() === code.trim().toLowerCase()) {
+          foundDuplicates.push({
+            id: doc.id,
+            code: bookCode,
+            title: bookTitle
+          });
+        }
+        
+        // Verificar título duplicado (case-insensitive)
+        if (title.trim() && bookTitle.toLowerCase() === title.trim().toLowerCase()) {
+          foundDuplicates.push({
+            id: doc.id,
+            code: bookCode,
+            title: bookTitle
+          });
+        }
+      });
+      
+      // Remover duplicatas do array (mesmo livro pode ter código e título duplicados)
+      const uniqueDuplicates = foundDuplicates.filter((book, index, self) => 
+        index === self.findIndex(b => b.id === book.id)
+      );
+      
+      setDuplicateBooks(uniqueDuplicates);
       setDuplicates({
-        code: !codeSnapshot.empty,
-        title: !titleSnapshot.empty
+        code: uniqueDuplicates.some(book => book.code.toLowerCase() === code.trim().toLowerCase()),
+        title: uniqueDuplicates.some(book => book.title.toLowerCase() === title.trim().toLowerCase())
       });
     } catch (error) {
       console.error('Erro ao verificar duplicatas:', error);
@@ -143,7 +178,14 @@ const RegisterBook = () => {
       if (duplicates.code) duplicateMessages.push('código');
       if (duplicates.title) duplicateMessages.push('título');
       
-      const message = `Pode ser que este ${duplicateMessages.join(' e ')} já exista no sistema. Deseja criar mesmo assim?`;
+      let message = `Pode ser que este ${duplicateMessages.join(' e ')} já exista no sistema.\n\n`;
+      message += 'Livros encontrados com dados similares:\n\n';
+      
+      duplicateBooks.forEach((book, index) => {
+        message += `${index + 1}. Código: ${book.code} | Título: ${book.title}\n`;
+      });
+      
+      message += '\nDeseja criar mesmo assim?';
       
       if (!window.confirm(message)) {
         return;
