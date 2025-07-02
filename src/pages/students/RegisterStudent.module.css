@@ -148,4 +148,11 @@
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.contactHint {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.25rem;
+  display: block;
 } 

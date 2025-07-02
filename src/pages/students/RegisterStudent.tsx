@@ -138,6 +138,9 @@ const RegisterStudent = () => {
                 value={formData.contact}
                 onChange={handleChange}
               />
+              <small className={styles.contactHint}>
+                escreva tudo junto, incluindo o ddd, exceto o código do país ex: "51995634964"
+              </small>
             </div>
 
             <div className={styles.formGroup}>
