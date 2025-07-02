@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './RegisterStudent.module.css';
@@ -15,6 +15,12 @@ interface StudentForm {
   complement: string;
   notes: string;
   shift: string;
+}
+
+interface DuplicateStudent {
+  id: string;
+  name: string;
+  classroom: string;
 }
 
 const RegisterStudent = () => {
@@ -32,6 +38,9 @@ const RegisterStudent = () => {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [duplicate, setDuplicate] = useState(false);
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false);
+  const [duplicateStudents, setDuplicateStudents] = useState<DuplicateStudent[]>([]);
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -44,6 +53,46 @@ const RegisterStudent = () => {
       [id]: newValue
     }));
   };
+
+  // Verificação de duplicidade de nome (case-insensitive)
+  const checkDuplicateName = useCallback(async (name: string) => {
+    if (!currentUser || !name.trim()) {
+      setDuplicate(false);
+      setDuplicateStudents([]);
+      return;
+    }
+    try {
+      setCheckingDuplicate(true);
+      const studentsRef = collection(db, `users/${currentUser.uid}/students`);
+      const allStudentsQuery = query(studentsRef);
+      const allStudentsSnapshot = await getDocs(allStudentsQuery);
+      const found: DuplicateStudent[] = [];
+      allStudentsSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.name && data.name.toLowerCase() === name.trim().toLowerCase()) {
+          found.push({
+            id: doc.id,
+            name: data.name,
+            classroom: data.classroom || ''
+          });
+        }
+      });
+      setDuplicate(found.length > 0);
+      setDuplicateStudents(found);
+    } catch (err) {
+      setDuplicate(false);
+      setDuplicateStudents([]);
+    } finally {
+      setCheckingDuplicate(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkDuplicateName(formData.name);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.name, checkDuplicateName]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,25 +107,28 @@ const RegisterStudent = () => {
       return;
     }
 
+    if (duplicate) {
+      let message = `⚠️ Já existe(m) aluno(s) com este nome cadastrado(s):\n\n`;
+      duplicateStudents.forEach((student, idx) => {
+        message += `${idx + 1}. Nome: ${student.name} | Turma: ${student.classroom}\n`;
+      });
+      message += '\nDeseja criar mesmo assim?';
+      if (!window.confirm(message)) {
+        return;
+      }
+    }
+
     try {
       setLoading(true);
       setError('');
-
-      // Prepara os dados do aluno
       const studentData = {
         ...formData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         userId: currentUser.uid, // Adiciona referência ao usuário
       };
-
-      // Referência à coleção de alunos do usuário
       const studentsRef = collection(db, `users/${currentUser.uid}/students`);
-      
-      // Adiciona o documento
       await addDoc(studentsRef, studentData);
-      
-      // Redireciona para a lista de alunos
       navigate('/students');
     } catch (err) {
       console.error('Error adding student:', err);
@@ -115,8 +167,17 @@ const RegisterStudent = () => {
                 id="name"
                 value={formData.name}
                 onChange={handleChange}
+                className={duplicate ? styles.inputError : ''}
                 required
               />
+              {checkingDuplicate && (
+                <div className={styles.checkingIndicator}>Verificando...</div>
+              )}
+              {duplicate && !checkingDuplicate && (
+                <div className={styles.duplicateWarning}>
+                  ⚠️ Este nome já existe no sistema
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>
