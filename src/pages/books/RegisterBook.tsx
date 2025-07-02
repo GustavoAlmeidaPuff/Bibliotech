@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, getDocs, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
@@ -18,6 +18,11 @@ interface BookForm {
   shelf: string;
   collection: string;
   quantity: number;
+}
+
+interface DuplicateCheck {
+  code: boolean;
+  title: boolean;
 }
 
 // Lista de gêneros/classes sugeridos
@@ -71,11 +76,53 @@ const RegisterBook = () => {
   const [currentAuthor, setCurrentAuthor] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [duplicates, setDuplicates] = useState<DuplicateCheck>({ code: false, title: false });
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
   const { authors, addAuthor, capitalizeAuthor } = useAuthors();
   const navigate = useNavigate();
+
+  // Função para verificar duplicatas
+  const checkDuplicates = useCallback(async (code: string, title: string) => {
+    if (!currentUser) return;
+    
+    try {
+      setCheckingDuplicates(true);
+      const booksRef = collection(db, `users/${currentUser.uid}/books`);
+      
+      // Verificar código duplicado
+      const codeQuery = query(booksRef, where('code', '==', code));
+      const codeSnapshot = await getDocs(codeQuery);
+      
+      // Verificar título duplicado
+      const titleQuery = query(booksRef, where('title', '==', title));
+      const titleSnapshot = await getDocs(titleQuery);
+      
+      setDuplicates({
+        code: !codeSnapshot.empty,
+        title: !titleSnapshot.empty
+      });
+    } catch (error) {
+      console.error('Erro ao verificar duplicatas:', error);
+    } finally {
+      setCheckingDuplicates(false);
+    }
+  }, [currentUser]);
+
+  // Verificar duplicatas quando código ou título mudam
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.code.trim() || formData.title.trim()) {
+        checkDuplicates(formData.code.trim(), formData.title.trim());
+      } else {
+        setDuplicates({ code: false, title: false });
+      }
+    }, 500); // Debounce de 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.code, formData.title, currentUser, checkDuplicates]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +135,19 @@ const RegisterBook = () => {
     if (!currentUser) {
       setError('Você precisa estar logado para registrar livros');
       return;
+    }
+
+    // Verificar se há duplicatas e pedir confirmação
+    if (duplicates.code || duplicates.title) {
+      const duplicateMessages = [];
+      if (duplicates.code) duplicateMessages.push('código');
+      if (duplicates.title) duplicateMessages.push('título');
+      
+      const message = `Pode ser que este ${duplicateMessages.join(' e ')} já exista no sistema. Deseja criar mesmo assim?`;
+      
+      if (!window.confirm(message)) {
+        return;
+      }
     }
 
     try {
@@ -178,24 +238,42 @@ const RegisterBook = () => {
           <div className={styles.mainSection}>
             <div className={styles.formGroup}>
               <label htmlFor="code">Código *</label>
-              <input
-                type="text"
-                id="code"
-                value={formData.code}
-                onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <input
+                  type="text"
+                  id="code"
+                  value={formData.code}
+                  onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                  className={duplicates.code ? styles.inputError : ''}
+                  required
+                />
+                {checkingDuplicates && <div className={styles.checkingIndicator}>Verificando...</div>}
+                {duplicates.code && !checkingDuplicates && (
+                  <div className={styles.duplicateWarning}>
+                    ⚠️ Este código já existe no sistema
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className={styles.formGroup}>
               <label htmlFor="title">Título do Livro *</label>
-              <input
-                type="text"
-                id="title"
-                value={formData.title}
-                onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <input
+                  type="text"
+                  id="title"
+                  value={formData.title}
+                  onChange={e => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  className={duplicates.title ? styles.inputError : ''}
+                  required
+                />
+                {checkingDuplicates && <div className={styles.checkingIndicator}>Verificando...</div>}
+                {duplicates.title && !checkingDuplicates && (
+                  <div className={styles.duplicateWarning}>
+                    ⚠️ Este título já existe no sistema
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className={styles.formRow}>
