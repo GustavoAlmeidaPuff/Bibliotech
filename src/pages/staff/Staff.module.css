@@ -284,18 +284,42 @@
 }
 
 /* Estados vazios e de carregamento */
-.loading,
-.emptyState {
-  padding: 3rem 1rem;
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 1.1rem;
+  color: #64748b;
 }
 
-.loading {
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
   color: #64748b;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+  color: #94a3b8;
+}
+
+.emptyState h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  color: #475569;
 }
 
 .emptyState p {
   color: #64748b;
   margin-bottom: 1.5rem;
+  max-width: 400px;
 }
 
 .emptyStateButton {
@@ -312,6 +336,21 @@
 
 .emptyStateButton:hover {
   background: var(--primary-color-hover, #357abd);
+}
+
+.noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+}
+
+.noResults p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
 }
 
 /* Formulários */
