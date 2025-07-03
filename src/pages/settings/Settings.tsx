@@ -462,7 +462,7 @@ const Settings = () => {
               Minha biblioteca usa códigos distintos para o mesmo título
             </label>
             <p className={styles.helpText}>
-              Quando ativado, cada exemplar físico terá seu próprio código e a quantidade será calculada automaticamente pelo número de códigos. Quando desativado, você define manualmente a quantidade de exemplares pra um mesmo Código.
+              Quando ativado, cada exemplar físico terá seu próprio código e a quantidade será calculada automaticamente pelo número de códigos. Quando desativado, você define manualmente a quantidade de exemplares para um mesmo Código.
             </p>
           </div>
           
