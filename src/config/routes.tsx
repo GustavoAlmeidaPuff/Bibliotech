@@ -25,6 +25,7 @@ import StudentReturns from '../pages/returns/StudentReturns';
 import StudentWithdrawals from '../pages/withdrawals/StudentWithdrawals';
 import StaffWithdrawals from '../pages/withdrawals/StaffWithdrawals';
 import BookSelection from '../pages/withdrawals/BookSelection';
+import CodeSelection from '../pages/withdrawals/CodeSelection';
 import WithdrawalConfirmation from '../pages/withdrawals/WithdrawalConfirmation';
 import StaffWithdrawalConfirmation from '../pages/withdrawals/StaffWithdrawalConfirmation';
 import SelectStaffBook from '../pages/withdrawals/SelectStaffBook';
@@ -142,7 +143,11 @@ export const protectedRoutes = [
     element: <BookSelection />,
   },
   {
-    path: "/student-withdrawals/:studentId/confirm/:bookId",
+    path: "/code-selection/:studentId/:bookId",
+    element: <CodeSelection />,
+  },
+  {
+    path: "/withdrawal-confirmation/:studentId/:bookId",
     element: <WithdrawalConfirmation />,
   },
   {

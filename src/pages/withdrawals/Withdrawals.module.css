@@ -674,5 +674,266 @@
   .applyFiltersButton,
   .clearFiltersButton {
     width: 100%;
+    font-size: 0.85rem;
+  }
+}
+
+/* Estilos para seleção de código */
+.headerSubtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.codeSelectionContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.selectedBookInfo {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.selectedBookIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.selectedBookDetails h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.selectedBookDetails p {
+  margin: 0.25rem 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.availableCount {
+  color: var(--primary-color) !important;
+  font-weight: 500;
+}
+
+.searchContainer {
+  margin: 1rem 0;
+}
+
+.searchWrapper {
+  position: relative;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--text-secondary);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 0.75rem 0.75rem 3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.codesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.codeCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+.codeCard:hover {
+  border-color: var(--primary-color);
+  background-color: var(--bg-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.codeCard.selected {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.codeNumber {
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  word-break: break-all;
+}
+
+.selectedIndicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  background: white;
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.noCodes {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color);
+  margin: 1rem 0;
+}
+
+.noCodes p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.selectedInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--primary-color);
+}
+
+.selectedLabel {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.selectedCode {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.nextButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nextButton:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.nextButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .codeSelectionContainer {
+    gap: 1.5rem;
+  }
+  
+  .selectedBookInfo {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .codesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .codeCard {
+    padding: 1rem 0.5rem;
+    min-height: 60px;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .searchWrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .codesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .codeNumber {
+    font-size: 0.9rem;
+  }
+  
+  .selectedInfo {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
   }
 } 

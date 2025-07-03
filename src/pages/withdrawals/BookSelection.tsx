@@ -129,11 +129,10 @@ const BookSelection = () => {
   };
 
   const handleSelectBook = (bookId: string, bookTitle: string) => {
-    navigate(`/student-withdrawals/${studentId}/confirm/${bookId}`, { 
+    navigate(`/code-selection/${studentId}/${bookId}`, { 
       state: { 
         studentName, 
-        bookTitle,
-        bookId
+        bookTitle
       } 
     });
   };

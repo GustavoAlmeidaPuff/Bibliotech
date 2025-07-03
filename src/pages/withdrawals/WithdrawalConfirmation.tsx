@@ -21,7 +21,7 @@ interface Student {
 
 interface Book {
   id: string;
-  code: string;
+  codes: string[];
   title: string;
   authors?: string[];
   publisher?: string;
@@ -31,7 +31,7 @@ interface Book {
 interface LocationState {
   studentName: string;
   bookTitle: string;
-  bookId: string;
+  selectedCode: string;
 }
 
 const WithdrawalConfirmation = () => {
@@ -76,9 +76,13 @@ const WithdrawalConfirmation = () => {
           throw new Error('Livro não encontrado');
         }
         const bookData = bookDoc.data();
+        
+        // Compatibilidade com versão antiga (code -> codes)
+        const codes = bookData.codes || (bookData.code ? [bookData.code] : []);
+        
         setBook({
           id: bookDoc.id,
-          code: bookData.code || '',
+          codes,
           title: bookData.title || '',
           authors: bookData.authors || [],
           publisher: bookData.publisher || '',
@@ -115,6 +119,7 @@ const WithdrawalConfirmation = () => {
         studentName: student.name,
         bookId: book.id,
         bookTitle: book.title,
+        bookCode: state.selectedCode, // Código específico do exemplar
         borrowDate: serverTimestamp(),
         status: 'active' as const,
         dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 dias para devolução
@@ -218,10 +223,10 @@ const WithdrawalConfirmation = () => {
                 <span className={styles.detailLabel}>Título:</span>
                 <span className={styles.detailValue}>{book?.title}</span>
               </div>
-              {book?.code && (
+              {state?.selectedCode && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Código:</span>
-                  <span className={styles.detailValue}>{book.code}</span>
+                  <span className={styles.detailValue}>{state.selectedCode}</span>
                 </div>
               )}
               {book?.authors && book.authors.length > 0 && (
