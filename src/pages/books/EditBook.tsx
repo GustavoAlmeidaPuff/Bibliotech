@@ -5,6 +5,7 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
 import { useAuthors } from '../../contexts/AuthorsContext';
+import { useDistinctCodes } from '../../hooks/useDistinctCodes';
 import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css'; // Reusando os estilos do RegisterBook
 
@@ -58,6 +59,7 @@ const EditBook = () => {
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
   const { authors, addAuthor, capitalizeAuthor } = useAuthors();
+  const useDistinctCodesEnabled = useDistinctCodes();
   const navigate = useNavigate();
 
   const fetchLoanHistory = async () => {
@@ -191,6 +193,8 @@ const EditBook = () => {
 
       const bookData = {
         ...formData,
+        // Se useDistinctCodes estiver ativado, a quantidade é o número de códigos
+        quantity: useDistinctCodesEnabled ? formData.codes.length : formData.quantity,
         updatedAt: serverTimestamp(),
       };
 
@@ -458,16 +462,33 @@ const EditBook = () => {
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="quantity">Quantidade</label>
-              <input
-                type="number"
-                id="quantity"
-                min="1"
-                value={formData.quantity}
-                onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-              />
-            </div>
+            {!useDistinctCodesEnabled && (
+              <div className={styles.formGroup}>
+                <label htmlFor="quantity">Quantidade</label>
+                <input
+                  type="number"
+                  id="quantity"
+                  min="1"
+                  value={formData.quantity}
+                  onChange={e => setFormData(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
+                />
+                <p className={styles.helpText}>
+                  Número de exemplares disponíveis deste título
+                </p>
+              </div>
+            )}
+            
+            {useDistinctCodesEnabled && (
+              <div className={styles.formGroup}>
+                <label>Quantidade Calculada</label>
+                <div className={styles.calculatedQuantity}>
+                  {formData.codes.length} exemplar(es)
+                </div>
+                <p className={styles.helpText}>
+                  A quantidade é calculada automaticamente pelo número de códigos adicionados
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

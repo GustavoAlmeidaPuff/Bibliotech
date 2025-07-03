@@ -12,6 +12,7 @@ export interface LibrarySettings {
   showOverdueWarnings: boolean;
   allowDashboard: boolean;
   themeColor: ThemeColor;
+  useDistinctCodes: boolean;
 }
 
 interface SettingsContextType {
@@ -28,7 +29,8 @@ const defaultSettings: LibrarySettings = {
   enableNotifications: true,
   showOverdueWarnings: true,
   allowDashboard: true,
-  themeColor: 'blue'
+  themeColor: 'blue',
+  useDistinctCodes: false
 };
 
 const SettingsContext = createContext<SettingsContextType | null>(null);

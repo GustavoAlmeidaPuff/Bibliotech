@@ -133,7 +133,7 @@ const Layout: React.FC = () => {
             ) : notifications.length === 0 ? (
               <div className={styles.emptyNotifications}>
                 <div style={{ marginBottom: '0.5rem' }}>🎉</div>
-                Nenhuma pendência! Todos os livros estão em dia.
+                Nenhuma notificação pendente, está tudo em dia!
               </div>
             ) : (
               notifications.map(notification => (
