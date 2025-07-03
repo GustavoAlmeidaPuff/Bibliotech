@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAsync } from '../../hooks/useAsync';
 import { settingsService } from '../../services/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useNotifications } from '../../contexts/NotificationsContext';
 import {
   UserGroupIcon,
   AcademicCapIcon,
@@ -12,17 +13,27 @@ import {
   ArrowPathIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  BellIcon
 } from '@heroicons/react/24/outline';
 import styles from './Layout.module.css';
 
 const Layout: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useSettings();
+  const { notifications, unreadCount, markAllAsRead, loading } = useNotifications();
+
+  // Marcar todas como lidas ao abrir
+  useEffect(() => {
+    if (isNotificationsOpen && unreadCount > 0) {
+      markAllAsRead();
+    }
+  }, [isNotificationsOpen, unreadCount, markAllAsRead]);
 
   const handleLogout = async () => {
     try {
@@ -43,6 +54,23 @@ const Layout: React.FC = () => {
     setIsMenuOpen(false);
   };
 
+  const formatNotificationTime = (date: Date) => {
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes}min atrás`;
+    } else if (diffInMinutes < 1440) { // 24 horas
+      return `${Math.floor(diffInMinutes / 60)}h atrás`;
+    } else {
+      return `${Math.floor(diffInMinutes / 1440)}d atrás`;
+    }
+  };
+
+  const handleBackdropClick = () => {
+    setIsNotificationsOpen(false);
+  };
+
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
@@ -53,15 +81,80 @@ const Layout: React.FC = () => {
             </div>
             <h1>{settings.schoolName}</h1>
           </Link>
-          <button
-            className={`${styles.menuButton} ${isMenuOpen ? styles.open : ''}`}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <span className={styles.menuIcon}></span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              className={styles.notificationButton}
+              onClick={() => setIsNotificationsOpen(true)}
+              aria-label="Abrir notificações"
+              style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            >
+              <BellIcon width={28} height={28} style={{ color: 'white' }} />
+              {unreadCount > 0 && (
+                <span className={styles.notificationBadge}>{unreadCount}</span>
+              )}
+            </button>
+            <button
+              className={`${styles.menuButton} ${isMenuOpen ? styles.open : ''}`}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <span className={styles.menuIcon}></span>
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* Backdrop para fechar notificações */}
+      {isNotificationsOpen && (
+        <div className={styles.notificationsBackdrop} onClick={handleBackdropClick}></div>
+      )}
+
+      {/* Gaveta de Notificações */}
+      {isNotificationsOpen && (
+        <div className={styles.notificationsDrawer}>
+          <div className={styles.notificationsHeader}>
+            <h3>Notificações</h3>
+            <button
+              className={styles.closeDrawerButton}
+              onClick={() => setIsNotificationsOpen(false)}
+              aria-label="Fechar notificações"
+            >
+              ×
+            </button>
+          </div>
+          <div className={styles.notificationsList}>
+            {loading ? (
+              <div className={styles.emptyNotifications}>Carregando notificações...</div>
+            ) : notifications.length === 0 ? (
+              <div className={styles.emptyNotifications}>
+                <div style={{ marginBottom: '0.5rem' }}>🎉</div>
+                Nenhuma pendência! Todos os livros estão em dia.
+              </div>
+            ) : (
+              notifications.map(notification => (
+                <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? styles.read : ''}`}>
+                  <div className={styles.notificationContent}>
+                    <div className={styles.notificationTitle}>
+                      {notification.title}
+                    </div>
+                    <div className={styles.notificationMessage}>
+                      {notification.message}
+                    </div>
+                    <div className={styles.notificationMeta}>
+                      <span className={styles.notificationTime}>
+                        {formatNotificationTime(notification.createdAt)}
+                      </span>
+                      <span className={`${styles.notificationBadgeType} ${styles[notification.type]}`}>
+                        {notification.daysOverdue} dia(s) de atraso
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       <nav className={`${styles.nav} ${isMenuOpen ? styles.open : ''}`}>
         <div className={styles.navContent}>

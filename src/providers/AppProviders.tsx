@@ -6,6 +6,7 @@ import { AuthorsProvider } from '../contexts/AuthorsContext';
 import { SettingsProvider } from '../contexts/SettingsContext';
 import { ThemeProvider } from '../styles/ThemeProvider';
 import CustomThemeProvider from '../components/theme/ThemeProvider';
+import { NotificationsProvider } from '../contexts/NotificationsContext';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -15,19 +16,21 @@ interface AppProvidersProps {
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <AuthProvider>
-      <StudentAuthProvider>
-        <TagsProvider>
-          <AuthorsProvider>
-            <SettingsProvider>
-              <ThemeProvider>
-                <CustomThemeProvider>
-                  {children}
-                </CustomThemeProvider>
-              </ThemeProvider>
-            </SettingsProvider>
-          </AuthorsProvider>
-        </TagsProvider>
-      </StudentAuthProvider>
+      <SettingsProvider>
+        <NotificationsProvider>
+          <TagsProvider>
+            <AuthorsProvider>
+              <StudentAuthProvider>
+                <ThemeProvider>
+                  <CustomThemeProvider>
+                    {children}
+                  </CustomThemeProvider>
+                </ThemeProvider>
+              </StudentAuthProvider>
+            </AuthorsProvider>
+          </TagsProvider>
+        </NotificationsProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 };
