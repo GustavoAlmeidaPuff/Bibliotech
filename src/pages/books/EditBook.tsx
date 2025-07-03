@@ -366,13 +366,29 @@ const EditBook = () => {
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label htmlFor="publisher">Editora</label>
-                <input
-                  type="text"
-                  id="publisher"
-                  value={formData.publisher}
-                  onChange={e => setFormData(prev => ({ ...prev, publisher: e.target.value }))}
+                <AutocompleteInput
+                  id="authors"
+                  label="Autores"
+                  value={currentAuthor}
+                  onChange={setCurrentAuthor}
+                  onSelect={handleAuthorSelect}
+                  suggestions={authors}
+                  placeholder="Digite para adicionar"
                 />
+                <div className={styles.tags}>
+                  {formData.authors.map(author => (
+                    <span key={author} className={styles.tag}>
+                      {author}
+                      <button
+                        type="button"
+                        onClick={() => removeAuthor(author)}
+                        className={styles.removeTag}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
 
               <div className={styles.formGroup}>
@@ -437,29 +453,13 @@ const EditBook = () => {
             </div>
 
             <div className={styles.formGroup}>
-              <AutocompleteInput
-                id="authors"
-                label="Autores"
-                value={currentAuthor}
-                onChange={setCurrentAuthor}
-                onSelect={handleAuthorSelect}
-                suggestions={authors}
-                placeholder="Digite para adicionar"
+              <label htmlFor="publisher">Editora</label>
+              <input
+                type="text"
+                id="publisher"
+                value={formData.publisher}
+                onChange={e => setFormData(prev => ({ ...prev, publisher: e.target.value }))}
               />
-              <div className={styles.tags}>
-                {formData.authors.map(author => (
-                  <span key={author} className={styles.tag}>
-                    {author}
-                    <button
-                      type="button"
-                      onClick={() => removeAuthor(author)}
-                      className={styles.removeTag}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
             </div>
 
             {!useDistinctCodesEnabled && (
