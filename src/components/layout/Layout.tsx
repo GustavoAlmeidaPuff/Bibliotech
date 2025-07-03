@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useSettings();
-  const { notifications, unreadCount, markAllAsRead, loading } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, deleteNotification, loading } = useNotifications();
 
   // Marcar todas como lidas ao abrir
   useEffect(() => {
@@ -69,6 +69,11 @@ const Layout: React.FC = () => {
 
   const handleBackdropClick = () => {
     setIsNotificationsOpen(false);
+  };
+
+  const handleDeleteNotification = async (notificationId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    await deleteNotification(notificationId);
   };
 
   return (
@@ -134,8 +139,18 @@ const Layout: React.FC = () => {
               notifications.map(notification => (
                 <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? styles.read : ''}`}>
                   <div className={styles.notificationContent}>
-                    <div className={styles.notificationTitle}>
-                      {notification.title}
+                    <div className={styles.notificationHeader}>
+                      <div className={styles.notificationTitle}>
+                        {notification.title}
+                      </div>
+                      <button
+                        className={styles.deleteNotificationButton}
+                        onClick={(e) => handleDeleteNotification(notification.id, e)}
+                        aria-label="Deletar notificação"
+                        title="Deletar notificação"
+                      >
+                        ×
+                      </button>
                     </div>
                     <div className={styles.notificationMessage}>
                       {notification.message}

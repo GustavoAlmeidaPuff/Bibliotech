@@ -372,10 +372,46 @@
   gap: 0.5rem;
 }
 
+.notificationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
 .notificationTitle {
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.3;
+  flex: 1;
+}
+
+.deleteNotificationButton {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.deleteNotificationButton:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  transform: scale(1.1);
+}
+
+.deleteNotificationButton:active {
+  transform: scale(0.95);
 }
 
 .notificationMessage {

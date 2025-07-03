@@ -23,6 +23,7 @@ interface NotificationsContextType {
   loading: boolean;
   markAsRead: (notificationId: string) => void;
   markAllAsRead: () => void;
+  deleteNotification: (notificationId: string) => void;
   refreshNotifications: () => Promise<void>;
 }
 
@@ -41,6 +42,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
+  const [deletedNotifications, setDeletedNotifications] = useState<Set<string>>(new Set());
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -64,6 +66,26 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Carregar notificações deletadas do Firebase
+  const loadDeletedNotifications = async (): Promise<Set<string>> => {
+    if (!currentUser) return new Set();
+
+    try {
+      const deletedNotificationsRef = doc(db, `users/${currentUser.uid}/settings/deletedNotifications`);
+      const deletedNotificationsDoc = await getDoc(deletedNotificationsRef);
+      
+      if (deletedNotificationsDoc.exists()) {
+        const data = deletedNotificationsDoc.data();
+        return new Set(data.deletedIds || []);
+      }
+      
+      return new Set();
+    } catch (error) {
+      console.error('Erro ao carregar notificações deletadas:', error);
+      return new Set();
+    }
+  };
+
   // Salvar notificações lidas no Firebase
   const saveReadNotifications = async (readIds: Set<string>) => {
     if (!currentUser) return;
@@ -76,6 +98,21 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       }, { merge: true });
     } catch (error) {
       console.error('Erro ao salvar notificações lidas:', error);
+    }
+  };
+
+  // Salvar notificações deletadas no Firebase
+  const saveDeletedNotifications = async (deletedIds: Set<string>) => {
+    if (!currentUser) return;
+
+    try {
+      const deletedNotificationsRef = doc(db, `users/${currentUser.uid}/settings/deletedNotifications`);
+      await setDoc(deletedNotificationsRef, {
+        deletedIds: Array.from(deletedIds),
+        updatedAt: new Date()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Erro ao salvar notificações deletadas:', error);
     }
   };
 
@@ -104,9 +141,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentUser) return [];
 
     try {
-      // Carregar notificações lidas
-      const readIds = await loadReadNotifications();
+      // Carregar notificações lidas e deletadas
+      const [readIds, deletedIds] = await Promise.all([
+        loadReadNotifications(),
+        loadDeletedNotifications()
+      ]);
+      
       setReadNotifications(readIds);
+      setDeletedNotifications(deletedIds);
 
       const loansRef = collection(db, `users/${currentUser.uid}/loans`);
       const q = query(loansRef, where('status', '==', 'active'));
@@ -122,14 +164,18 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         // Verificar se está atrasado
         if (dueDate < today) {
           const notificationId = `overdue-${doc.id}`;
-          const isRead = readIds.has(notificationId);
           
-          const notification = generateNotificationFromLoan({
-            id: doc.id,
-            ...loanData
-          }, isRead);
-          
-          overdueNotifications.push(notification);
+          // Não incluir notificações deletadas
+          if (!deletedIds.has(notificationId)) {
+            const isRead = readIds.has(notificationId);
+            
+            const notification = generateNotificationFromLoan({
+              id: doc.id,
+              ...loanData
+            }, isRead);
+            
+            overdueNotifications.push(notification);
+          }
         }
       });
 
@@ -182,6 +228,21 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     await saveReadNotifications(newReadNotifications);
   };
 
+  const deleteNotification = async (notificationId: string) => {
+    const newDeletedNotifications = new Set(deletedNotifications);
+    newDeletedNotifications.add(notificationId);
+    
+    setDeletedNotifications(newDeletedNotifications);
+    
+    // Remover da lista local
+    setNotifications(prev =>
+      prev.filter(notification => notification.id !== notificationId)
+    );
+
+    // Salvar no Firebase
+    await saveDeletedNotifications(newDeletedNotifications);
+  };
+
   // Buscar notificações ao carregar e a cada 5 minutos
   useEffect(() => {
     if (currentUser) {
@@ -198,6 +259,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     loading,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
     refreshNotifications
   };
 
