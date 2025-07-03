@@ -430,27 +430,7 @@ const Settings = () => {
             </label>
           </div>
           
-          <div className={styles.settingGroup}>
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={settings.showOverdueWarnings}
-                onChange={(e) => handleSettingChange('showOverdueWarnings', e.target.checked)}
-              />
-              Mostrar alertas de atraso
-            </label>
-          </div>
-          
-          <div className={styles.settingGroup}>
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={settings.allowDashboard}
-                onChange={(e) => handleSettingChange('allowDashboard', e.target.checked)}
-              />
-              Habilitar dashboard de estatísticas
-            </label>
-          </div>
+
           
           <div className={styles.settingGroup}>
             <label className={styles.checkboxLabel}>
