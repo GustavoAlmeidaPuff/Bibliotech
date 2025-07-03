@@ -9,7 +9,7 @@ import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css'; // Reusando os estilos do RegisterBook
 
 interface BookForm {
-  code: string;
+  codes: string[];
   title: string;
   genres: string[];
   authors: string[];
@@ -36,7 +36,7 @@ interface LoanHistory {
 const EditBook = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const [formData, setFormData] = useState<BookForm>({
-    code: '',
+    codes: [],
     title: '',
     genres: [],
     authors: [],
@@ -47,6 +47,7 @@ const EditBook = () => {
     quantity: 1
   });
   
+  const [currentCode, setCurrentCode] = useState('');
   const [currentGenre, setCurrentGenre] = useState('');
   const [currentAuthor, setCurrentAuthor] = useState('');
   const [loading, setLoading] = useState(true);
@@ -140,12 +141,19 @@ const EditBook = () => {
         const bookSnap = await getDoc(bookRef);
 
         if (bookSnap.exists()) {
-          const bookData = bookSnap.data() as BookForm;
-          setFormData(bookData);
+          const bookData = bookSnap.data();
+          
+          // Compatibilidade com versão antiga (code -> codes)
+          const formattedData = {
+            ...bookData,
+            codes: bookData.codes || (bookData.code ? [bookData.code] : [])
+          } as BookForm;
+          
+          setFormData(formattedData);
           
           // Adiciona os gêneros e autores às listas de sugestões
-          bookData.genres.forEach(addGenre);
-          bookData.authors.forEach(addAuthor);
+          formattedData.genres.forEach(addGenre);
+          formattedData.authors.forEach(addAuthor);
           
           // Buscar histórico de retiradas após carregar o livro
           await fetchLoanHistory();
@@ -167,8 +175,8 @@ const EditBook = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.code || !formData.title) {
-      setError('Código e título são campos obrigatórios');
+    if (!formData.codes.length || !formData.title) {
+      setError('Pelo menos um código e o título são campos obrigatórios');
       return;
     }
 
@@ -252,6 +260,26 @@ const EditBook = () => {
     return loan.status === 'returned' ? styles.statusReturned : styles.statusActive;
   };
 
+  // Função para adicionar código
+  const handleAddCode = () => {
+    const code = currentCode.trim();
+    if (code && !formData.codes.includes(code)) {
+      setFormData(prev => ({
+        ...prev,
+        codes: [...prev.codes, code]
+      }));
+      setCurrentCode('');
+    }
+  };
+
+  // Função para remover código
+  const removeCode = (codeToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      codes: prev.codes.filter(code => code !== codeToRemove)
+    }));
+  };
+
   if (loading) {
     return <div className={styles.loading}>Carregando...</div>;
   }
@@ -274,14 +302,51 @@ const EditBook = () => {
         <div className={styles.formGrid}>
           <div className={styles.mainSection}>
             <div className={styles.formGroup}>
-              <label htmlFor="code">Código *</label>
-              <input
-                type="text"
-                id="code"
-                value={formData.code}
-                onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                required
-              />
+              <label htmlFor="codes">Códigos * (cada exemplar tem seu código)</label>
+              <div className={styles.codeInputWrapper}>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    id="codes"
+                    value={currentCode}
+                    onChange={e => setCurrentCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCode();
+                      }
+                    }}
+                    placeholder="Digite o código do exemplar"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCode}
+                    className={styles.addCodeButton}
+                    disabled={!currentCode.trim()}
+                  >
+                    Adicionar
+                  </button>
+                </div>
+              </div>
+              <div className={styles.codesList}>
+                {formData.codes.map(code => (
+                  <span key={code} className={styles.codeTag}>
+                    {code}
+                    <button
+                      type="button"
+                      onClick={() => removeCode(code)}
+                      className={styles.removeTag}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              {formData.codes.length === 0 && (
+                <div className={styles.emptyCodesMessage}>
+                  Adicione pelo menos um código para o livro
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>

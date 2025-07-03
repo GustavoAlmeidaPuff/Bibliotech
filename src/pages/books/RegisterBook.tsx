@@ -9,7 +9,7 @@ import AutocompleteInput from '../../components/AutocompleteInput';
 import styles from './RegisterBook.module.css';
 
 interface BookForm {
-  code: string;
+  codes: string[];
   title: string;
   genres: string[];
   authors: string[];
@@ -21,12 +21,12 @@ interface BookForm {
 }
 
 interface DuplicateCheck {
-  code: boolean;
+  codes: boolean;
   title: boolean;
 }
 
 interface DuplicateBook {
-  code: string;
+  codes: string[];
   title: string;
   id: string;
 }
@@ -67,7 +67,7 @@ const SUGGESTED_GENRES = [
 
 const RegisterBook = () => {
   const [formData, setFormData] = useState<BookForm>({
-    code: '',
+    codes: [],
     title: '',
     genres: [],
     authors: [],
@@ -78,11 +78,12 @@ const RegisterBook = () => {
     quantity: 1
   });
   
+  const [currentCode, setCurrentCode] = useState('');
   const [currentGenre, setCurrentGenre] = useState('');
   const [currentAuthor, setCurrentAuthor] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [duplicates, setDuplicates] = useState<DuplicateCheck>({ code: false, title: false });
+  const [duplicates, setDuplicates] = useState<DuplicateCheck>({ codes: false, title: false });
   const [duplicateBooks, setDuplicateBooks] = useState<DuplicateBook[]>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   
@@ -91,8 +92,28 @@ const RegisterBook = () => {
   const { authors, addAuthor, capitalizeAuthor } = useAuthors();
   const navigate = useNavigate();
 
+  // Função para adicionar código
+  const handleAddCode = () => {
+    const code = currentCode.trim();
+    if (code && !formData.codes.includes(code)) {
+      setFormData(prev => ({
+        ...prev,
+        codes: [...prev.codes, code]
+      }));
+      setCurrentCode('');
+    }
+  };
+
+  // Função para remover código
+  const removeCode = (codeToRemove: string) => {
+    setFormData(prev => ({
+      ...prev,
+      codes: prev.codes.filter(code => code !== codeToRemove)
+    }));
+  };
+
   // Função para verificar duplicatas
-  const checkDuplicates = useCallback(async (code: string, title: string) => {
+  const checkDuplicates = useCallback(async (codes: string[], title: string) => {
     if (!currentUser) return;
     
     try {
@@ -107,37 +128,46 @@ const RegisterBook = () => {
       
       allBooksSnapshot.docs.forEach(doc => {
         const bookData = doc.data();
-        const bookCode = bookData.code || '';
+        const bookCodes = bookData.codes || (bookData.code ? [bookData.code] : []); // Compatibilidade com versão antiga
         const bookTitle = bookData.title || '';
         
-        // Verificar código duplicado (exato)
-        if (code.trim() && bookCode.toLowerCase() === code.trim().toLowerCase()) {
+        // Verificar códigos duplicados
+        const hasDuplicateCode = codes.some(code => 
+          bookCodes.some((bookCode: string) => 
+            bookCode.toLowerCase() === code.toLowerCase()
+          )
+        );
+        
+        if (hasDuplicateCode) {
           foundDuplicates.push({
             id: doc.id,
-            code: bookCode,
+            codes: bookCodes,
             title: bookTitle
           });
         }
         
         // Verificar título duplicado (case-insensitive)
         if (title.trim() && bookTitle.toLowerCase() === title.trim().toLowerCase()) {
-          foundDuplicates.push({
-            id: doc.id,
-            code: bookCode,
-            title: bookTitle
-          });
+          if (!foundDuplicates.find(dup => dup.id === doc.id)) {
+            foundDuplicates.push({
+              id: doc.id,
+              codes: bookCodes,
+              title: bookTitle
+            });
+          }
         }
       });
       
-      // Remover duplicatas do array (mesmo livro pode ter código e título duplicados)
-      const uniqueDuplicates = foundDuplicates.filter((book, index, self) => 
-        index === self.findIndex(b => b.id === book.id)
-      );
-      
-      setDuplicateBooks(uniqueDuplicates);
+      setDuplicateBooks(foundDuplicates);
       setDuplicates({
-        code: uniqueDuplicates.some(book => book.code.toLowerCase() === code.trim().toLowerCase()),
-        title: uniqueDuplicates.some(book => book.title.toLowerCase() === title.trim().toLowerCase())
+        codes: foundDuplicates.some(book => 
+          codes.some(code => 
+            book.codes.some((bookCode: string) => 
+              bookCode.toLowerCase() === code.toLowerCase()
+            )
+          )
+        ),
+        title: foundDuplicates.some(book => book.title.toLowerCase() === title.trim().toLowerCase())
       });
     } catch (error) {
       console.error('Erro ao verificar duplicatas:', error);
@@ -146,24 +176,24 @@ const RegisterBook = () => {
     }
   }, [currentUser]);
 
-  // Verificar duplicatas quando código ou título mudam
+  // Verificar duplicatas quando códigos ou título mudam
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (formData.code.trim() || formData.title.trim()) {
-        checkDuplicates(formData.code.trim(), formData.title.trim());
+      if (formData.codes.length > 0 || formData.title.trim()) {
+        checkDuplicates(formData.codes, formData.title.trim());
       } else {
-        setDuplicates({ code: false, title: false });
+        setDuplicates({ codes: false, title: false });
       }
     }, 500); // Debounce de 500ms
 
     return () => clearTimeout(timeoutId);
-  }, [formData.code, formData.title, currentUser, checkDuplicates]);
+  }, [formData.codes, formData.title, currentUser, checkDuplicates]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.code || !formData.title) {
-      setError('Código e título são campos obrigatórios');
+    if (!formData.codes.length || !formData.title) {
+      setError('Pelo menos um código e o título são campos obrigatórios');
       return;
     }
 
@@ -173,16 +203,16 @@ const RegisterBook = () => {
     }
 
     // Verificar se há duplicatas e pedir confirmação
-    if (duplicates.code || duplicates.title) {
+    if (duplicates.codes || duplicates.title) {
       const duplicateMessages = [];
-      if (duplicates.code) duplicateMessages.push('código');
+      if (duplicates.codes) duplicateMessages.push('códigos');
       if (duplicates.title) duplicateMessages.push('título');
       
-      let message = `Pode ser que este ${duplicateMessages.join(' e ')} já exista no sistema.\n\n`;
+      let message = `Pode ser que este(s) ${duplicateMessages.join(' e ')} já exista(m) no sistema.\n\n`;
       message += 'Livros encontrados com dados similares:\n\n';
       
       duplicateBooks.forEach((book, index) => {
-        message += `${index + 1}. Código: ${book.code} | Título: ${book.title}\n`;
+        message += `${index + 1}. Códigos: ${book.codes.join(', ')} | Título: ${book.title}\n`;
       });
       
       message += '\nDeseja criar mesmo assim?';
@@ -279,23 +309,58 @@ const RegisterBook = () => {
         <div className={styles.formGrid}>
           <div className={styles.mainSection}>
             <div className={styles.formGroup}>
-              <label htmlFor="code">Código *</label>
-              <div className={styles.inputWrapper}>
-                <input
-                  type="text"
-                  id="code"
-                  value={formData.code}
-                  onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                  className={duplicates.code ? styles.inputError : ''}
-                  required
-                />
-                {checkingDuplicates && <div className={styles.checkingIndicator}>Verificando...</div>}
-                {duplicates.code && !checkingDuplicates && (
+              <label htmlFor="codes">Códigos * (cada exemplar tem seu código)</label>
+              <div className={styles.codeInputWrapper}>
+                <div className={styles.inputWrapper}>
+                  <input
+                    type="text"
+                    id="codes"
+                    value={currentCode}
+                    onChange={e => setCurrentCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCode();
+                      }
+                    }}
+                    className={duplicates.codes ? styles.inputError : ''}
+                    placeholder="Digite o código do exemplar"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCode}
+                    className={styles.addCodeButton}
+                    disabled={!currentCode.trim()}
+                  >
+                    Adicionar
+                  </button>
+                  {checkingDuplicates && <div className={styles.checkingIndicator}>Verificando...</div>}
+                </div>
+                {duplicates.codes && !checkingDuplicates && (
                   <div className={styles.duplicateWarning}>
-                    ⚠️ Este código já existe no sistema
+                    ⚠️ Algum destes códigos já existe no sistema
                   </div>
                 )}
               </div>
+              <div className={styles.codesList}>
+                {formData.codes.map(code => (
+                  <span key={code} className={styles.codeTag}>
+                    {code}
+                    <button
+                      type="button"
+                      onClick={() => removeCode(code)}
+                      className={styles.removeTag}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              {formData.codes.length === 0 && (
+                <div className={styles.emptyCodesMessage}>
+                  Adicione pelo menos um código para o livro
+                </div>
+              )}
             </div>
 
             <div className={styles.formGroup}>

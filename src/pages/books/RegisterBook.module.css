@@ -309,6 +309,90 @@
   font-size: 1rem;
 }
 
+/* Estilos para códigos múltiplos */
+.codeInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.codeInputWrapper .inputWrapper {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.codeInputWrapper .inputWrapper input {
+  flex: 1;
+}
+
+.addCodeButton {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.addCodeButton:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.addCodeButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.codesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.codeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.codeTag .removeTag {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.codeTag .removeTag:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.emptyCodesMessage {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .formGrid {
     grid-template-columns: 1fr;
@@ -326,5 +410,13 @@
   
   .historyDate {
     flex-direction: column;
+  }
+  
+  .codeInputWrapper .inputWrapper {
+    flex-direction: column;
+  }
+  
+  .addCodeButton {
+    width: 100%;
   }
 } 
