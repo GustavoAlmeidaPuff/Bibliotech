@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { collection, query, getDocs, where } from 'firebase/firestore';
+import { collection, query, getDocs, where, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from './AuthContext';
 
@@ -40,10 +40,46 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   const { currentUser } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
+  const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const generateNotificationFromLoan = (loan: any): Notification => {
+  // Carregar notificações lidas do Firebase
+  const loadReadNotifications = async (): Promise<Set<string>> => {
+    if (!currentUser) return new Set();
+
+    try {
+      const readNotificationsRef = doc(db, `users/${currentUser.uid}/settings/readNotifications`);
+      const readNotificationsDoc = await getDoc(readNotificationsRef);
+      
+      if (readNotificationsDoc.exists()) {
+        const data = readNotificationsDoc.data();
+        return new Set(data.readIds || []);
+      }
+      
+      return new Set();
+    } catch (error) {
+      console.error('Erro ao carregar notificações lidas:', error);
+      return new Set();
+    }
+  };
+
+  // Salvar notificações lidas no Firebase
+  const saveReadNotifications = async (readIds: Set<string>) => {
+    if (!currentUser) return;
+
+    try {
+      const readNotificationsRef = doc(db, `users/${currentUser.uid}/settings/readNotifications`);
+      await setDoc(readNotificationsRef, {
+        readIds: Array.from(readIds),
+        updatedAt: new Date()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Erro ao salvar notificações lidas:', error);
+    }
+  };
+
+  const generateNotificationFromLoan = (loan: any, isRead: boolean = false): Notification => {
     const today = new Date();
     const dueDate = loan.dueDate?.toDate ? loan.dueDate.toDate() : new Date(loan.dueDate);
     const diffTime = today.getTime() - dueDate.getTime();
@@ -59,7 +95,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       bookTitle: loan.bookTitle,
       loanId: loan.id,
       daysOverdue,
-      read: false,
+      read: isRead,
       createdAt: new Date()
     };
   };
@@ -68,6 +104,10 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentUser) return [];
 
     try {
+      // Carregar notificações lidas
+      const readIds = await loadReadNotifications();
+      setReadNotifications(readIds);
+
       const loansRef = collection(db, `users/${currentUser.uid}/loans`);
       const q = query(loansRef, where('status', '==', 'active'));
       const querySnapshot = await getDocs(q);
@@ -81,10 +121,14 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         
         // Verificar se está atrasado
         if (dueDate < today) {
+          const notificationId = `overdue-${doc.id}`;
+          const isRead = readIds.has(notificationId);
+          
           const notification = generateNotificationFromLoan({
             id: doc.id,
             ...loanData
-          });
+          }, isRead);
+          
           overdueNotifications.push(notification);
         }
       });
@@ -100,18 +144,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true);
     try {
       const overdueNotifications = await fetchOverdueLoans();
-      
-      // Manter o status de lidas das notificações existentes
-      const existingReadIds = new Set(
-        notifications.filter(n => n.read).map(n => n.id)
-      );
-
-      const updatedNotifications = overdueNotifications.map(notification => ({
-        ...notification,
-        read: existingReadIds.has(notification.id)
-      }));
-
-      setNotifications(updatedNotifications);
+      setNotifications(overdueNotifications);
     } catch (error) {
       console.error('Erro ao atualizar notificações:', error);
     } finally {
@@ -119,7 +152,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const markAsRead = (notificationId: string) => {
+  const markAsRead = async (notificationId: string) => {
+    const newReadNotifications = new Set(readNotifications);
+    newReadNotifications.add(notificationId);
+    
+    setReadNotifications(newReadNotifications);
     setNotifications(prev =>
       prev.map(notification =>
         notification.id === notificationId
@@ -127,12 +164,22 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           : notification
       )
     );
+
+    // Salvar no Firebase
+    await saveReadNotifications(newReadNotifications);
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
+    const allNotificationIds = notifications.map(n => n.id);
+    const newReadNotifications = new Set([...Array.from(readNotifications), ...allNotificationIds]);
+    
+    setReadNotifications(newReadNotifications);
     setNotifications(prev =>
       prev.map(notification => ({ ...notification, read: true }))
     );
+
+    // Salvar no Firebase
+    await saveReadNotifications(newReadNotifications);
   };
 
   // Buscar notificações ao carregar e a cada 5 minutos
