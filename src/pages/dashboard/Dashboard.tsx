@@ -221,14 +221,14 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // Atualizar dados a cada 30 segundos enquanto o dashboard estiver aberto
+  // Atualizar dados a cada 5 minutos enquanto o dashboard estiver aberto
   useEffect(() => {
     if (!currentUser) return;
     
     // Configurar atualização periódica
     const intervalId = setInterval(() => {
       fetchDashboardData();
-    }, 30000); // 30 segundos
+    }, 300000); // 5 minutos (300000 millisegundos)
     
     // Limpar o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
