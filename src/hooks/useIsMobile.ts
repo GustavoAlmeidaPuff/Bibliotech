@@ -9,13 +9,13 @@ export const useIsMobile = (breakpoint: string = BREAKPOINTS.MOBILE) => {
       setIsMobile(window.innerWidth <= parseInt(breakpoint));
     };
 
-    // Verificar no carregamento inicial
+    // verifica no carregamento inicial
     checkIsMobile();
 
-    // Adicionar listener para mudanças de tamanho
+    // adiciona listener para mudanças de tamanho
     window.addEventListener('resize', checkIsMobile);
 
-    // Cleanup
+    // cleanup
     return () => window.removeEventListener('resize', checkIsMobile);
   }, [breakpoint]);
 

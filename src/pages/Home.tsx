@@ -1138,23 +1138,23 @@ const Home: React.FC = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const gridVideoRef = useRef<HTMLVideoElement>(null);
   
-  // Estados do formulário de contato
+  // estados do formulário de contato
   const [contactForm, setContactForm] = useState<ContactFormData>({
     nome: '',
     interesse: '',
     mensagem: ''
   });
 
-  // Configuração do spring para movimento suave
+  // configuração do spring para movimento suave
   const springConfig = { damping: 25, stiffness: 80, mass: 1.2 };
   const x = useSpring(mouseX, springConfig);
   const y = useSpring(mouseY, springConfig);
 
-  // Transform o movimento do mouse em movimento do background
+  // transforma o movimento do mouse em movimento do background
   const backgroundX = useTransform(x, [-500, 500], [60, -60]);
   const backgroundY = useTransform(y, [-500, 500], [60, -60]);
 
-  // Função para abrir WhatsApp com mensagem personalizada
+  // abre WhatsApp com mensagem personalizada
   const handleWhatsAppSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -1385,16 +1385,16 @@ Aguardo retorno. Obrigado!`;
 
         {/* 
         ====================================================================
-        SEÇÃO DE PLANOS E PREÇOS - COMENTADA TEMPORARIAMENTE
+        SEÇÃO DE PLANOS E PREÇOS - COMENTADA POR ENQUANTO
         ====================================================================
         
-        Esta seção contém os planos Bibliotech Basic e Bibliotech +.
-        Quando quiser implementar uma seção de planos e preços, 
-        ela já está pronta aqui! Basta descomentar esta seção.
+        Aqui ficam os planos Bibliotech Basic e Bibliotech +.
+        Se eu quiser implementar uma seção de planos e preços mais tarde, 
+        é só descomentar esta seção aqui.
         
-        Não crie uma nova seção de planos - use esta que já está estruturada.
+        Não vou criar uma nova seção de planos - vou usar esta que já tá pronta.
 
-        (comentario preparado para vibe coding kkkkk)
+        (comentario preparado pra facilitar minha vida depois kkkkk)
         ====================================================================
         
         <PricingSection

@@ -90,7 +90,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Salvar notificações lidas no Firebase
+  // salva as notificações lidas no Firebase
   const saveReadNotifications = async (readIds: Set<string>) => {
     if (!currentUser) return;
 
@@ -105,7 +105,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Salvar notificações deletadas no Firebase
+  // salva as notificações deletadas no Firebase
   const saveDeletedNotifications = async (deletedIds: Set<string>) => {
     if (!currentUser) return;
 
@@ -165,11 +165,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
         const loanData = doc.data();
         const dueDate = loanData.dueDate?.toDate ? loanData.dueDate.toDate() : new Date(loanData.dueDate);
         
-        // Verificar se está atrasado
+        // verifica se está atrasado
         if (dueDate < today) {
           const notificationId = `overdue-${doc.id}`;
           
-          // Não incluir notificações deletadas
+          // não inclui notificações deletadas
           if (!deletedIds.has(notificationId)) {
             const isRead = readIds.has(notificationId);
             
@@ -191,7 +191,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [currentUser]);
 
   const refreshNotifications = useCallback(async () => {
-    // Não buscar notificações se estiverem desabilitadas
+    // não busca notificações se estiverem desabilitadas
     if (!settings.enableNotifications) {
       setNotifications([]);
       return;
@@ -221,7 +221,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       )
     );
 
-    // Salvar no Firebase
+    // salva no Firebase
     await saveReadNotifications(newReadNotifications);
   };
 
@@ -234,7 +234,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       prev.map(notification => ({ ...notification, read: true }))
     );
 
-    // Salvar no Firebase
+    // salva no Firebase
     await saveReadNotifications(newReadNotifications);
   };
 
@@ -244,21 +244,21 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     
     setDeletedNotifications(newDeletedNotifications);
     
-    // Remover da lista local
+    // remove da lista local
     setNotifications(prev =>
       prev.filter(notification => notification.id !== notificationId)
     );
 
-    // Salvar no Firebase
+    // salva no Firebase
     await saveDeletedNotifications(newDeletedNotifications);
   };
 
-  // Buscar notificações ao carregar e a cada 5 minutos
+  // busca notificações ao carregar e a cada 5 minutos
   useEffect(() => {
     if (currentUser) {
       refreshNotifications();
       
-      // Só configurar o intervalo se as notificações estiverem habilitadas
+      // só configura o intervalo se as notificações estiverem habilitadas
       if (settings.enableNotifications) {
         const interval = setInterval(refreshNotifications, 5 * 60 * 1000); // 5 minutos
         return () => clearInterval(interval);

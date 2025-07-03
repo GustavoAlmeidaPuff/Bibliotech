@@ -43,7 +43,7 @@ export const useScrollPosition = (options: UseScrollPositionOptions = {}) => {
   useEffect(() => {
     if (!enabled) return;
 
-    // Configurar threshold inicial se usar seletor
+    // configura o threshold inicial se usar seletor
     if (selector) {
       const element = document.querySelector(selector) as HTMLElement;
       if (element) {
@@ -55,7 +55,7 @@ export const useScrollPosition = (options: UseScrollPositionOptions = {}) => {
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Chamar uma vez para definir o estado inicial
+    // chama uma vez pra definir o estado inicial
     handleScroll();
 
     return () => window.removeEventListener('scroll', handleScroll);

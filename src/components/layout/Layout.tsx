@@ -44,12 +44,12 @@ const Layout: React.FC = () => {
     }
   };
 
-  // Função para verificar se o link atual corresponde à página atual
+  // verifica se o link atual corresponde à página atual
   const isActiveLink = (path: string) => {
     return location.pathname === path;
   };
 
-  // Fechar menu ao navegar (mobile)
+  // fecha menu ao navegar (mobile)
   const handleLinkClick = () => {
     setIsMenuOpen(false);
   };

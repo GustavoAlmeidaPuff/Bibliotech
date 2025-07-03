@@ -189,11 +189,11 @@ const StudentDashboard = () => {
   const processData = (loansData: Loan[], booksData: Book[]) => {
     if (loansData.length === 0) return;
     
-    // Total de livros lidos (consideramos apenas os devolvidos)
+    // total de livros lidos (só os devolvidos)
     const completedLoans = loansData.filter(loan => loan.status === 'returned');
     setTotalBooksRead(completedLoans.length);
     
-    // Calcular gêneros mais lidos
+    // calcula gêneros mais lidos
     const genreCounts: {[key: string]: number} = {};
     
     loansData.forEach(loan => {
@@ -206,10 +206,10 @@ const StudentDashboard = () => {
       }
     });
     
-    // Ordenar gêneros por popularidade
+    // ordena gêneros por popularidade
     const sortedGenres = Object.entries(genreCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 5); // Top 5 gêneros
+      .slice(0, 5); // top 5 gêneros
     
     if (sortedGenres.length > 0) {
       setFavoriteGenre(sortedGenres[0][0]);
@@ -220,7 +220,7 @@ const StudentDashboard = () => {
       });
     }
     
-    // Empréstimos por mês (últimos 6 meses)
+    // empréstimos por mês (últimos 6 meses)
     const lastSixMonths = Array.from({ length: 6 }).map((_, i) => {
       const date = subMonths(new Date(), i);
       return {
@@ -231,7 +231,7 @@ const StudentDashboard = () => {
     }).reverse();
     
     const monthlyLoans = lastSixMonths.map(month => {
-      // Todos os empréstimos realizados no mês
+      // todos os empréstimos realizados no mês
       const borrowedCount = loansData.filter(loan => 
         isWithinInterval(loan.borrowDate, {
           start: month.startDate,
@@ -239,8 +239,8 @@ const StudentDashboard = () => {
         })
       ).length;
       
-      // Calculando livros lidos no mês
-      // Se um livro tem readPercentage, usa esse valor, senão verifica se completed
+      // calculando livros lidos no mês
+      // se um livro tem readPercentage, usa esse valor, senão verifica se completed
       let completedCount = 0;
       
       loansData.forEach(loan => {
@@ -251,13 +251,13 @@ const StudentDashboard = () => {
               end: month.endDate
             })) {
           if (loan.readPercentage !== undefined) {
-            // Se tiver percentual de leitura, soma o valor proporcional
+            // se tiver percentual de leitura, soma o valor proporcional
             completedCount += (loan.readPercentage / 100);
           } else if (loan.completed) {
-            // Se não tiver percentual mas estiver marcado como completo, soma 1
+            // se não tiver percentual mas estiver marcado como completo, soma 1
             completedCount += 1;
           } else {
-            // Padrão: se foi devolvido mas sem indicação, considera 50%
+            // padrão: se foi devolvido mas sem indicação, considera 50%
             completedCount += 0.5;
           }
         }
@@ -308,11 +308,11 @@ const StudentDashboard = () => {
       setBestQuarter(bestQ.name);
     }
     
-    // Calcular velocidade média de leitura (dias)
+    // calcula velocidade média de leitura (dias)
     if (completedLoans.length > 0) {
       const totalDays = completedLoans.reduce((sum, loan) => {
         if (loan.returnDate) {
-          // Diferença em dias entre empréstimo e devolução
+          // diferença em dias entre empréstimo e devolução
           const diffTime = loan.returnDate.getTime() - loan.borrowDate.getTime();
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           return sum + diffDays;
@@ -328,9 +328,9 @@ const StudentDashboard = () => {
     navigate('/students');
   };
   
-  // Função para abrir o WhatsApp
+  // abre o WhatsApp
   const openWhatsApp = () => {
-    // Verificar se existe número de telefone no campo contact ou number
+    // verifica se existe número de telefone no campo contact ou number
     const phoneNumber = student?.contact || student?.number;
     
     if (phoneNumber) {

@@ -51,7 +51,7 @@ export const StudentAuthProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   useEffect(() => {
-    // Recuperar estudante logado do localStorage, se existir
+    // recupera estudante logado do localStorage, se existir
     const storedStudent = localStorage.getItem('studentUser');
     if (storedStudent) {
       try {

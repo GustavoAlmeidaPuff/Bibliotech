@@ -8,15 +8,15 @@ const PrivateRoute: React.FC = () => {
   const location = useLocation();
 
   if (authState.status === 'loading') {
-    return null; // Não renderiza nada durante o carregamento
+    return null; // não renderiza nada enquanto carrega
   }
 
-  // Se não estiver autenticado, redireciona para o login
+  // se não tiver logado, vai pro login
   if (!currentUser) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
-  // Se estiver autenticado, renderiza as rotas protegidas
+  // se tiver logado, mostra as rotas protegidas
   return <Outlet />;
 };
 

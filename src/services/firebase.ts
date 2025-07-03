@@ -51,12 +51,12 @@ export const authService = {
 // Student auth services
 export const studentAuthService = {
   authenticate: async (username: string, password: string): Promise<Student> => {
-    // Buscar lista de todos os usuários da biblioteca
+    // pega lista de todos os usuários da biblioteca
     const usersRef = collection(db, 'users');
     const usersSnapshot = await getDocs(usersRef);
     
     for (const libraryDoc of usersSnapshot.docs) {
-      // Para cada bibliotecário, procurar na coleção de alunos
+      // para cada bibliotecário, procura na coleção de alunos
       const studentsCollRef = collection(db, `users/${libraryDoc.id}/students`);
       const studentQuery = query(
         studentsCollRef,
@@ -70,7 +70,7 @@ export const studentAuthService = {
         const doc = studentSnapshot.docs[0];
         const studentData = doc.data();
         
-        // Verificar a senha
+        // verifica a senha
         if (studentData.tempPassword === password) {
           return {
             id: doc.id,

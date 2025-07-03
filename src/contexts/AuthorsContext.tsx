@@ -24,7 +24,7 @@ export const AuthorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return author
       .split(' ')
       .map(word => {
-        // Não capitaliza palavras como "de", "da", "do", "dos", "das"
+        // não capitaliza palavras como "de", "da", "do", "dos", "das"
         const lowerCaseWords = ['de', 'da', 'do', 'dos', 'das', 'e'];
         return lowerCaseWords.includes(word.toLowerCase()) 
           ? word.toLowerCase()

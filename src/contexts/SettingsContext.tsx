@@ -68,7 +68,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             ...data
           });
         } else {
-          // Criar documento de configurações padrão se não existir
+          // cria documento de configurações padrão se não existir
           await setDoc(settingsRef, {
             ...defaultSettings,
             createdAt: new Date()

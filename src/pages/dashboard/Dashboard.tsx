@@ -136,7 +136,7 @@ const Dashboard = () => {
     try {
       setLoading(true);
       
-      // 1. Buscar todos os livros
+      // 1. pega todos os livros
       const booksRef = collection(db, `users/${currentUser.uid}/books`);
       const booksSnapshot = await getDocs(booksRef);
       const books = booksSnapshot.docs.map(doc => ({
@@ -146,7 +146,7 @@ const Dashboard = () => {
       
       setTotalBooksCount(books.length);
       
-      // 2. Buscar todos os empréstimos
+      // 2. pega todos os empréstimos
       const loansRef = collection(db, `users/${currentUser.uid}/loans`);
       const loansSnapshot = await getDocs(loansRef);
       const loans = loansSnapshot.docs.map(doc => {
@@ -188,7 +188,7 @@ const Dashboard = () => {
         };
       }) as Loan[];
       
-      // 3. Buscar todos os alunos
+      // 3. pega todos os alunos
       const studentsRef = collection(db, `users/${currentUser.uid}/students`);
       const studentsSnapshot = await getDocs(studentsRef);
       const students = studentsSnapshot.docs.map(doc => ({
@@ -196,13 +196,13 @@ const Dashboard = () => {
         ...doc.data()
       })) as Student[];
       
-      // Total de leitores registrados
+      // total de leitores registrados
       setTotalReadersCount(students.length);
       
-      // 4. Calcular estatísticas principais
+      // 4. calcula estatísticas principais
       processMainStats(loans, students);
       
-      // 5. Processar dados para os gráficos
+      // 5. processa dados para os gráficos
       processGenreData(loans, books);
       processTopBooks(loans);
       processTopStudents(loans, students);
@@ -230,7 +230,7 @@ const Dashboard = () => {
       fetchDashboardData();
     }, 300000); // 5 minutos (300000 millisegundos)
     
-    // Limpar o intervalo quando o componente for desmontado
+    // limpa o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
   }, [fetchDashboardData]);
 

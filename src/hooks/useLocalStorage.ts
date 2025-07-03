@@ -1,35 +1,35 @@
 import { useState, useEffect } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // Estado para armazenar o valor
+  // aqui eu guardo o valor atual
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      // Buscar do localStorage se existir
+      // vou tentar pegar do localStorage
       const item = window.localStorage.getItem(key);
-      // Parse do JSON guardado ou retorna valor inicial
+      // se existir, converto de JSON, senão uso o valor inicial
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      // Se erro, retorna valor inicial
+      // se deu erro, melhor usar o valor inicial mesmo
       console.warn(`Erro ao ler localStorage key "${key}":`, error);
       return initialValue;
     }
   });
 
-  // Função para definir o valor
+  // função pra atualizar o valor
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      // Permite valor ser uma função como useState
+      // suporte a função igual no useState normal
       const valueToStore = value instanceof Function ? value(storedValue) : value;
-      // Salva no estado
+      // atualiza o estado
       setStoredValue(valueToStore);
-      // Salva no localStorage
+      // e salva no localStorage também
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       console.error(`Erro ao salvar no localStorage key "${key}":`, error);
     }
   };
 
-  // Remove do localStorage
+  // remove tudo do localStorage
   const removeValue = () => {
     try {
       setStoredValue(initialValue);

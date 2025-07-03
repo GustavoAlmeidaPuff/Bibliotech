@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-// Lazy loading dos componentes para melhor performance
+// lazy loading dos componentes para melhor performance
 import Login from '../pages/auth/Login';
 import ForgotPassword from '../pages/auth/ForgotPassword';
 import StudentLogin from '../pages/auth/StudentLogin';
@@ -34,13 +34,13 @@ import Settings from '../pages/settings/Settings';
 import Home from '../pages/Home';
 import { ROUTES } from '../constants';
 
-// Componente para redirecionar com base no estado de autenticação
+// redireciona com base no estado de autenticação
 export const RedirectBasedOnAuth = () => {
   const { currentUser } = useAuth();
   return currentUser ? <Navigate to={ROUTES.DASHBOARD} /> : <Navigate to={ROUTES.LOGIN} />;
 };
 
-// Rotas públicas
+// rotas públicas
 export const publicRoutes = [
   {
     path: ROUTES.HOME,
@@ -68,7 +68,7 @@ export const publicRoutes = [
   },
 ];
 
-// Rotas protegidas
+// rotas protegidas
 export const protectedRoutes = [
   {
     path: ROUTES.DASHBOARD,

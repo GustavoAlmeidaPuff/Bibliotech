@@ -38,7 +38,7 @@ const Settings = () => {
   const [backupLoading, setBackupLoading] = useState(false);
   const [restoreFromFileLoading, setRestoreFromFileLoading] = useState(false);
   
-  // Função para obter todos os dados
+  // pega todos os dados do firebase
   const getAllData = async () => {
     if (!currentUser) return null;
     
@@ -59,7 +59,7 @@ const Settings = () => {
     return allData;
   };
   
-  // Função para exportar os dados como um arquivo JSON
+  // faz o backup dos dados em JSON
   const handleBackupData = async () => {
     try {
       setBackupLoading(true);
@@ -70,7 +70,7 @@ const Settings = () => {
         throw new Error('Não foi possível obter os dados para backup');
       }
       
-      // Adicionar metadados ao arquivo de backup
+      // coloco algumas infos extras no backup
       const backupData = {
         version: '1.0',
         timestamp: new Date().toISOString(),
@@ -78,11 +78,11 @@ const Settings = () => {
         data
       };
       
-      // Converter para JSON e criar um blob
+      // converte pra JSON e cria um blob
       const jsonString = JSON.stringify(backupData, null, 2);
       const blob = new Blob([jsonString], { type: 'application/json' });
       
-      // Criar um link para download e clicar nele
+      // truque pra fazer o download automático
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -106,7 +106,7 @@ const Settings = () => {
     }
   };
   
-  // Função para restaurar dados a partir de um arquivo de backup
+  // restaura os dados de um arquivo de backup
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !currentUser) {
@@ -117,23 +117,23 @@ const Settings = () => {
       setRestoreFromFileLoading(true);
       setMessage({ text: '', isError: false });
       
-      // Ler o arquivo como texto
+      // lê o arquivo como texto
       const text = await file.text();
       const backupData = JSON.parse(text);
       
-      // Validar o formato do arquivo de backup
+      // vê se o arquivo é válido
       if (!backupData.data || !backupData.version) {
         throw new Error('Formato de arquivo de backup inválido');
       }
       
-      // Proceder com a restauração
+      // agora vamos restaurar
       const db = getFirestore();
       const collections = ['books', 'students', 'loans', 'staff', 'staffLoans'];
       
-      // Limpar todas as coleções primeiro
+      // primeiro limpo tudo
       await restoreAllData();
       
-      // Restaurar dados do backup
+      // depois restauro os dados do backup
       for (const collectionName of collections) {
         if (Array.isArray(backupData.data[collectionName])) {
           const collectionData = backupData.data[collectionName];
@@ -160,7 +160,7 @@ const Settings = () => {
       });
     } finally {
       setRestoreFromFileLoading(false);
-      // Limpar o input de arquivo
+      // limpa o input de arquivo
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -173,7 +173,7 @@ const Settings = () => {
     }
   };
   
-  // Função para restaurar todos os dados
+  // apaga tudo do firebase
   const restoreAllData = async () => {
     if (!currentUser) return;
     
@@ -184,7 +184,7 @@ const Settings = () => {
       const collectionRef = collection(db, `users/${currentUser.uid}/${collectionName}`);
       const querySnapshot = await getDocs(query(collectionRef));
       
-      // Deletar todos os documentos na coleção
+      // deleta todos os documentos de uma vez
       const deletePromises = querySnapshot.docs.map(docSnapshot => 
         deleteDoc(doc(db, `users/${currentUser.uid}/${collectionName}/${docSnapshot.id}`))
       );
@@ -326,25 +326,25 @@ const Settings = () => {
     }
   };
   
-  // Função para apagar os empréstimos devolvidos
+  // apaga os empréstimos que já foram devolvidos
   const deleteReturnedLoans = async () => {
     if (!currentUser) return;
     
     const db = getFirestore();
     
-    // Obter e excluir empréstimos devolvidos na coleção loans
+    // pega os empréstimos devolvidos dos estudantes
     const loansRef = collection(db, `users/${currentUser.uid}/loans`);
     const returnedLoansQuery = query(loansRef, where('status', '==', 'returned'));
     const returnedSnapshot = await getDocs(returnedLoansQuery);
     
-    // Deletar todos os empréstimos devolvidos
+    // deleta todos os empréstimos devolvidos
     const deletePromises = returnedSnapshot.docs.map(docSnapshot => 
       deleteDoc(doc(db, `users/${currentUser.uid}/loans/${docSnapshot.id}`))
     );
     
     await Promise.all(deletePromises);
     
-    // Também excluir empréstimos devolvidos dos funcionários, se houver
+    // também deleta dos funcionários se tiver
     const staffLoansRef = collection(db, `users/${currentUser.uid}/staffLoans`);
     const returnedStaffLoansQuery = query(staffLoansRef, where('status', '==', 'returned'));
     const returnedStaffSnapshot = await getDocs(returnedStaffLoansQuery);
