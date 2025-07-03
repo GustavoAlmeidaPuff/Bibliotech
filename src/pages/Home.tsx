@@ -1530,7 +1530,7 @@ Aguardo retorno. Obrigado!`;
                 >
                   <option value="">Selecione um interesse</option>
                   <option value="Suporte">Suporte</option>
-                  <option value="Planos">Conhecer Planos</option>
+                  {/* <option value="Planos">Conhecer Planos</option> - Comentado temporariamente junto com a seção de planos */}
                   <option value="Conhecer mais">Conhecer mais sobre o sistema</option>
                   <option value="Demonstração">Solicitar demonstração</option>
                   <option value="Parceria">Oportunidades de parceria</option>

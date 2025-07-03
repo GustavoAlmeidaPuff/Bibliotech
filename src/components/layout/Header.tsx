@@ -195,7 +195,7 @@ const Header: React.FC = () => {
       setIsTransparent(scrollPosition < 50);
 
       // Identificar a seção atual baseado na posição do scroll
-      const sections = ['inicio', 'produto', 'precos', 'contato'];
+      const sections = ['inicio', 'produto', /* 'precos', */ 'contato'];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
@@ -298,13 +298,13 @@ const Header: React.FC = () => {
             >
               Produto
             </NavItem>
-            <NavItem
+            {/* <NavItem
               isActive={activeSection === 'precos'}
               whileHover={{ scale: 1.05 }}
               onClick={() => scrollToSection('precos')}
             >
               Planos
-            </NavItem>
+            </NavItem> - Comentado temporariamente junto com a seção de planos */}
             {/* <NavItem
               isActive={activeSection === 'sobre'}
               whileHover={{ scale: 1.05 }}
@@ -340,7 +340,7 @@ const Header: React.FC = () => {
         variants={menuVariants}
       >
         <NavList>
-          {['produto', 'precos', 'contato'].map((section, index) => (
+          {['produto', /* 'precos', */ 'contato'].map((section, index) => (
             <NavItem 
               key={section}
               isActive={activeSection === section}
