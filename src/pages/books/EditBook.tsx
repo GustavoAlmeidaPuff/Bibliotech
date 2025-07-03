@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
@@ -18,6 +18,19 @@ interface BookForm {
   shelf: string;
   collection: string;
   quantity: number;
+}
+
+interface LoanHistory {
+  id: string;
+  studentId: string;
+  studentName: string;
+  bookId: string;
+  bookTitle: string;
+  borrowDate: Date;
+  dueDate: Date;
+  returnDate?: Date;
+  status: 'active' | 'returned';
+  createdAt: Date;
 }
 
 const EditBook = () => {
@@ -38,11 +51,54 @@ const EditBook = () => {
   const [currentAuthor, setCurrentAuthor] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [loanHistory, setLoanHistory] = useState<LoanHistory[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
   const { authors, addAuthor, capitalizeAuthor } = useAuthors();
   const navigate = useNavigate();
+
+  const fetchLoanHistory = async () => {
+    if (!currentUser || !bookId) return;
+
+    try {
+      setLoadingHistory(true);
+      const loansRef = collection(db, `users/${currentUser.uid}/loans`);
+      const q = query(
+        loansRef,
+        where('bookId', '==', bookId),
+        orderBy('createdAt', 'desc')
+      );
+      
+      const loansSnap = await getDocs(q);
+      
+      const historyData = loansSnap.docs.map(doc => {
+        const data = doc.data();
+        
+        // Converter timestamps para Dates
+        const borrowDate = data.borrowDate?.toDate ? data.borrowDate.toDate() : new Date();
+        const dueDate = data.dueDate?.toDate ? data.dueDate.toDate() : new Date();
+        const returnDate = data.returnDate?.toDate ? data.returnDate.toDate() : undefined;
+        const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
+        
+        return {
+          id: doc.id,
+          ...data,
+          borrowDate,
+          dueDate,
+          returnDate,
+          createdAt
+        };
+      }) as LoanHistory[];
+      
+      setLoanHistory(historyData);
+    } catch (err) {
+      console.error('Erro ao buscar histórico de retiradas:', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -59,6 +115,9 @@ const EditBook = () => {
           // Adiciona os gêneros e autores às listas de sugestões
           bookData.genres.forEach(addGenre);
           bookData.authors.forEach(addAuthor);
+          
+          // Buscar histórico de retiradas após carregar o livro
+          await fetchLoanHistory();
         } else {
           setError('Livro não encontrado');
           navigate('/books');
@@ -146,6 +205,20 @@ const EditBook = () => {
       ...prev,
       authors: prev.authors.filter(a => a !== author)
     }));
+  };
+
+  const formatDate = (date: Date) => {
+    if (!date) return '-';
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  };
+
+  const getStatusText = (loan: LoanHistory) => {
+    if (loan.status === 'returned') return 'Devolvido';
+    return 'Retirado';
+  };
+
+  const getStatusClass = (loan: LoanHistory) => {
+    return loan.status === 'returned' ? styles.statusReturned : styles.statusActive;
   };
 
   if (loading) {
@@ -312,6 +385,41 @@ const EditBook = () => {
           </button>
         </div>
       </form>
+
+      {/* Seção de Histórico de Retiradas */}
+      <div className={styles.historySection}>
+        <h3>Histórico de Retiradas</h3>
+        
+        {loadingHistory ? (
+          <div className={styles.loading}>Carregando histórico...</div>
+        ) : loanHistory.length > 0 ? (
+          <div className={styles.historyList}>
+            {loanHistory.map(loan => (
+              <div key={loan.id} className={styles.historyCard}>
+                <div className={styles.historyHeader}>
+                  <div className={styles.studentName}>{loan.studentName}</div>
+                  <span className={`${styles.statusTag} ${getStatusClass(loan)}`}>
+                    {getStatusText(loan)}
+                  </span>
+                </div>
+                <div className={styles.historyDetails}>
+                  <div className={styles.historyDate}>
+                    <span>Retirado: {formatDate(loan.borrowDate)}</span>
+                    <span>Devolução: {formatDate(loan.dueDate)}</span>
+                    {loan.returnDate && (
+                      <span>Devolvido: {formatDate(loan.returnDate)}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.emptyHistory}>
+            <p>Este livro ainda não foi retirado.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

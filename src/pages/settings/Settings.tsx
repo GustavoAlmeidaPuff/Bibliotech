@@ -391,6 +391,7 @@ const Settings = () => {
               onChange={(e) => handleSettingChange('schoolName', e.target.value)}
               className={styles.textInput}
               placeholder="Nome que aparecerá no cabeçalho"
+              maxLength={50}
             />
           </div>
           

@@ -207,6 +207,108 @@
   border-color: var(--text-secondary);
 }
 
+/* Estilos para a seção de histórico de retiradas */
+.historySection {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  max-width: 900px;
+  margin: 2rem auto 0;
+}
+
+.historySection h3 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.historyList {
+  display: grid;
+  gap: 1rem;
+}
+
+.historyCard {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.historyCard:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.studentName {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.statusTag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.statusActive {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.statusReturned {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.historyDetails {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.historyDate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.historyDate span {
+  display: block;
+}
+
+.emptyHistory {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+
+.emptyHistory p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   .formGrid {
     grid-template-columns: 1fr;
@@ -214,5 +316,15 @@
 
   .formRow {
     grid-template-columns: 1fr;
+  }
+  
+  .historyHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .historyDate {
+    flex-direction: column;
   }
 } 

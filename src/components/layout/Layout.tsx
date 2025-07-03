@@ -3,6 +3,7 @@ import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAsync } from '../../hooks/useAsync';
 import { settingsService } from '../../services/firebase';
+import { useSettings } from '../../contexts/SettingsContext';
 import {
   UserGroupIcon,
   AcademicCapIcon,
@@ -17,26 +18,11 @@ import styles from './Layout.module.css';
 
 const Layout: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [schoolName, setSchoolName] = useState('School Library System');
   
   const { logout } = useAuth();
-  const { execute: loadSchoolName } = useAsync<string>();
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    // Carregar nome da escola
-    const fetchSchoolName = async () => {
-      try {
-        const name = await loadSchoolName(() => settingsService.getSchoolName());
-        setSchoolName(name);
-      } catch (error) {
-        console.error('Erro ao carregar nome da escola:', error);
-      }
-    };
-    
-    fetchSchoolName();
-  }, [loadSchoolName]);
+  const { settings } = useSettings();
 
   const handleLogout = async () => {
     try {
@@ -65,7 +51,7 @@ const Layout: React.FC = () => {
             <div className={styles.logoWrapper}>
               <img src="/images/sys/logo.png" alt="Bibliotech Logo" className={styles.logo} />
             </div>
-            <h1>{schoolName}</h1>
+            <h1>{settings.schoolName}</h1>
           </Link>
           <button
             className={`${styles.menuButton} ${isMenuOpen ? styles.open : ''}`}
@@ -98,7 +84,7 @@ const Layout: React.FC = () => {
               onClick={handleLinkClick}
             >
               <ArrowPathIcon className={styles.linkIcon} />
-              Locações Alunos
+              Retiradas Alunos
             </Link>
             <Link 
               to="/staff-loans" 
@@ -106,7 +92,7 @@ const Layout: React.FC = () => {
               onClick={handleLinkClick}
             >
               <ArrowPathIcon className={styles.linkIcon} />
-              Locações Professores
+              Retiradas Professores
             </Link>
           </div>
 
@@ -136,7 +122,7 @@ const Layout: React.FC = () => {
           <div className={styles.navSection}>
             <h2>
               <ArrowPathIcon className={styles.navIcon} />
-              Retiradas
+              Retirar
             </h2>
             <Link 
               to="/student-withdrawals" 
