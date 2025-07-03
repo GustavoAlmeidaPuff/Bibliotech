@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useSettings();
-  const { notifications, unreadCount, markAllAsRead, deleteNotification, loading } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, deleteNotification, loading, isEnabled } = useNotifications();
 
   // Marcar todas como lidas ao abrir
   useEffect(() => {
@@ -93,9 +93,19 @@ const Layout: React.FC = () => {
               aria-label="Abrir notificações"
               style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
             >
-              <BellIcon width={28} height={28} style={{ color: 'white' }} />
-              {unreadCount > 0 && (
+              <BellIcon 
+                width={28} 
+                height={28} 
+                style={{ 
+                  color: 'white', 
+                  opacity: isEnabled ? 1 : 0.5 
+                }} 
+              />
+              {isEnabled && unreadCount > 0 && (
                 <span className={styles.notificationBadge}>{unreadCount}</span>
+              )}
+              {!isEnabled && (
+                <span className={styles.disabledIndicator}>🔕</span>
               )}
             </button>
             <button
@@ -128,7 +138,14 @@ const Layout: React.FC = () => {
             </button>
           </div>
           <div className={styles.notificationsList}>
-            {loading ? (
+            {!isEnabled ? (
+              <div className={styles.emptyNotifications}>
+                <div style={{ marginBottom: '0.5rem', fontSize: '1.5rem' }}>🔕</div>
+                <strong>Notificações desabilitadas</strong>
+                <br />
+                Habilite em configurações da biblioteca
+              </div>
+            ) : loading ? (
               <div className={styles.emptyNotifications}>Carregando notificações...</div>
             ) : notifications.length === 0 ? (
               <div className={styles.emptyNotifications}>

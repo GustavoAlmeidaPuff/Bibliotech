@@ -283,6 +283,14 @@
   z-index: 2;
 }
 
+.disabledIndicator {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  font-size: 0.7rem;
+  z-index: 2;
+}
+
 .notificationsBackdrop {
   position: fixed;
   top: 0;

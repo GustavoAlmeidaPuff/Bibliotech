@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { collection, query, getDocs, where, doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from './AuthContext';
+import { useSettings } from './SettingsContext';
 
 export interface Notification {
   id: string;
@@ -21,6 +22,7 @@ interface NotificationsContextType {
   notifications: Notification[];
   unreadCount: number;
   loading: boolean;
+  isEnabled: boolean;
   markAsRead: (notificationId: string) => void;
   markAllAsRead: () => void;
   deleteNotification: (notificationId: string) => void;
@@ -39,12 +41,14 @@ export const useNotifications = () => {
 
 export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { currentUser } = useAuth();
+  const { settings } = useSettings();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
   const [readNotifications, setReadNotifications] = useState<Set<string>>(new Set());
   const [deletedNotifications, setDeletedNotifications] = useState<Set<string>>(new Set());
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const isEnabled = settings.enableNotifications;
 
   // Carregar notificações lidas do Firebase
   const loadReadNotifications = async (): Promise<Set<string>> => {
@@ -137,7 +141,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   };
 
-  const fetchOverdueLoans = async (): Promise<Notification[]> => {
+  const fetchOverdueLoans = useCallback(async (): Promise<Notification[]> => {
     if (!currentUser) return [];
 
     try {
@@ -184,9 +188,15 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error('Erro ao buscar empréstimos atrasados:', error);
       return [];
     }
-  };
+  }, [currentUser]);
 
-  const refreshNotifications = async () => {
+  const refreshNotifications = useCallback(async () => {
+    // Não buscar notificações se estiverem desabilitadas
+    if (!settings.enableNotifications) {
+      setNotifications([]);
+      return;
+    }
+
     setLoading(true);
     try {
       const overdueNotifications = await fetchOverdueLoans();
@@ -196,7 +206,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [settings.enableNotifications, fetchOverdueLoans]);
 
   const markAsRead = async (notificationId: string) => {
     const newReadNotifications = new Set(readNotifications);
@@ -248,15 +258,19 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     if (currentUser) {
       refreshNotifications();
       
-      const interval = setInterval(refreshNotifications, 5 * 60 * 1000); // 5 minutos
-      return () => clearInterval(interval);
+      // Só configurar o intervalo se as notificações estiverem habilitadas
+      if (settings.enableNotifications) {
+        const interval = setInterval(refreshNotifications, 5 * 60 * 1000); // 5 minutos
+        return () => clearInterval(interval);
+      }
     }
-  }, [currentUser]);
+  }, [currentUser, settings.enableNotifications, refreshNotifications]);
 
   const value = {
     notifications,
     unreadCount,
     loading,
+    isEnabled,
     markAsRead,
     markAllAsRead,
     deleteNotification,
