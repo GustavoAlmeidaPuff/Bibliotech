@@ -431,21 +431,6 @@ const Settings = () => {
               Quando ativado, cada exemplar físico terá seu próprio código e a quantidade será calculada automaticamente pelo número de códigos. Quando desativado, você define manualmente a quantidade de exemplares para um mesmo Código.
             </p>
           </div>
-          
-          <div className={styles.settingGroup}>
-            <label>Suporte</label>
-            <p className={styles.helpText}>
-              Precisa de ajuda? Entre em contato com o suporte:
-            </p>
-            <a 
-              href="https://wa.me/5551997188572" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className={styles.supportButton}
-            >
-              Contatar Suporte via WhatsApp
-            </a>
-          </div>
 
           <div className={styles.buttonContainer}>
             <button 
@@ -524,6 +509,24 @@ const Settings = () => {
             <p className={styles.helpText}>
               Esta ação apagará todos os livros, alunos, empréstimos e outros registros do sistema.
             </p>
+          </div>
+        </div>
+        
+        <div className={styles.settingsSection}>
+          <h3>Suporte</h3>
+          
+          <div className={styles.settingGroup}>
+            <p className={styles.helpText}>
+              Precisa de ajuda? Entre em contato com o suporte:
+            </p>
+            <a 
+              href="https://wa.me/5551997188572" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.supportButton}
+            >
+              Contatar Suporte via WhatsApp
+            </a>
           </div>
         </div>
       </div>
