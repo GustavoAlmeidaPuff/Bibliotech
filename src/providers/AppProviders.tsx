@@ -5,7 +5,6 @@ import { TagsProvider } from '../contexts/TagsContext';
 import { AuthorsProvider } from '../contexts/AuthorsContext';
 import { SettingsProvider } from '../contexts/SettingsContext';
 import { ThemeProvider } from '../styles/ThemeProvider';
-import CustomThemeProvider from '../components/theme/ThemeProvider';
 import { NotificationsProvider } from '../contexts/NotificationsContext';
 
 interface AppProvidersProps {
@@ -22,9 +21,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
             <AuthorsProvider>
               <StudentAuthProvider>
                 <ThemeProvider>
-                  <CustomThemeProvider>
-                    {children}
-                  </CustomThemeProvider>
+                  {children}
                 </ThemeProvider>
               </StudentAuthProvider>
             </AuthorsProvider>

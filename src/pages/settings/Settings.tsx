@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSettings, ThemeColor } from '../../contexts/SettingsContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { 
   doc, 
   collection, 
@@ -8,23 +8,11 @@ import {
   getDocs, 
   deleteDoc,
   getFirestore, 
-  getDoc, 
-  updateDoc,
   setDoc,
   where
 } from 'firebase/firestore';
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 import styles from './Settings.module.css';
-
-// Definição das cores disponíveis para seleção
-const themeColors: { value: ThemeColor; label: string; color: string }[] = [
-  { value: 'blue', label: 'Azul', color: '#4285f4' },
-  { value: 'red', label: 'Vermelho', color: '#db4437' },
-  { value: 'green', label: 'Verde', color: '#0f9d58' },
-  { value: 'purple', label: 'Roxo', color: '#673ab7' },
-  { value: 'orange', label: 'Laranja', color: '#ff5722' },
-  { value: 'brown', label: 'Marrom', color: '#795548' }
-];
 
 const Settings = () => {
   const { currentUser } = useAuth();
@@ -430,8 +418,6 @@ const Settings = () => {
             </label>
           </div>
           
-
-          
           <div className={styles.settingGroup}>
             <label className={styles.checkboxLabel}>
               <input
@@ -461,32 +447,6 @@ const Settings = () => {
             </a>
           </div>
 
-          <div className={styles.settingsSection}>
-            <h3>Aparência</h3>
-            
-            <div className={styles.settingGroup}>
-              <label>Cor Dominante do Site</label>
-              <div className={styles.colorSelector}>
-                {themeColors.map((color) => (
-                  <div 
-                    key={color.value}
-                    className={`${styles.colorOption} ${settings.themeColor === color.value ? styles.selected : ''}`}
-                    style={{ backgroundColor: color.color }}
-                    onClick={() => handleSettingChange('themeColor', color.value)}
-                    title={color.label}
-                  >
-                    {settings.themeColor === color.value && (
-                      <span className={styles.selectedCheck}>✓</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className={styles.helpText}>
-                Selecione a cor dominante do sistema. A mudança será aplicada após salvar e recarregar a página.
-              </p>
-            </div>
-          </div>
-          
           <div className={styles.buttonContainer}>
             <button 
               className={styles.saveButton}

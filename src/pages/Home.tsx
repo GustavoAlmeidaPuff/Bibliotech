@@ -1383,6 +1383,20 @@ Aguardo retorno. Obrigado!`;
           </ProductSection>
         </Section>
 
+        {/* 
+        ====================================================================
+        SEÇÃO DE PLANOS E PREÇOS - COMENTADA TEMPORARIAMENTE
+        ====================================================================
+        
+        Esta seção contém os planos Bibliotech Basic e Bibliotech +.
+        Quando quiser implementar uma seção de planos e preços, 
+        ela já está pronta aqui! Basta descomentar esta seção.
+        
+        Não crie uma nova seção de planos - use esta que já está estruturada.
+
+        (comentario preparado para vibe coding kkkkk)
+        ====================================================================
+        
         <PricingSection
           id="precos"
           initial="hidden"
@@ -1409,6 +1423,7 @@ Aguardo retorno. Obrigado!`;
             />
           </PlansContainer>
         </PricingSection>
+        */}
 
         {/* Seção Proton Software comentada temporariamente
         <AboutSection
