@@ -64,14 +64,34 @@ const EditBook = () => {
 
     try {
       setLoadingHistory(true);
+      console.log(`Buscando histórico para o livro: ${bookId}, usuário: ${currentUser.uid}`);
+      
       const loansRef = collection(db, `users/${currentUser.uid}/loans`);
       const q = query(
         loansRef,
-        where('bookId', '==', bookId),
-        orderBy('createdAt', 'desc')
+        where('bookId', '==', bookId)
       );
       
       const loansSnap = await getDocs(q);
+      console.log(`Total de documentos encontrados na consulta: ${loansSnap.docs.length}`);
+      
+      // Vamos também fazer uma consulta de todos os loans para debug
+      const allLoansQuery = query(loansRef);
+      const allLoansSnap = await getDocs(allLoansQuery);
+      console.log(`Total de loans na coleção: ${allLoansSnap.docs.length}`);
+      
+      // Verificar alguns documentos para debug
+      if (allLoansSnap.docs.length > 0) {
+        allLoansSnap.docs.slice(0, 3).forEach((doc, index) => {
+          const data = doc.data();
+          console.log(`Documento ${index + 1}:`, {
+            id: doc.id,
+            bookId: data.bookId,
+            bookTitle: data.bookTitle,
+            studentName: data.studentName
+          });
+        });
+      }
       
       const historyData = loansSnap.docs.map(doc => {
         const data = doc.data();
@@ -92,7 +112,18 @@ const EditBook = () => {
         };
       }) as LoanHistory[];
       
+      // Ordenar no lado do cliente por data de criação (mais recente primeiro)
+      historyData.sort((a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
+      
       setLoanHistory(historyData);
+      
+      console.log(`Histórico encontrado para o livro ${bookId}:`, historyData.length, 'registros');
+      if (historyData.length > 0) {
+        console.log('Primeiro registro:', historyData[0]);
+      }
     } catch (err) {
       console.error('Erro ao buscar histórico de retiradas:', err);
     } finally {
