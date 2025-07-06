@@ -22,7 +22,8 @@ interface Staff {
 
 interface Book {
   id: string;
-  code: string;
+  code?: string;
+  codes?: string[];
   title: string;
   authors?: string[];
   publisher?: string;
@@ -81,6 +82,7 @@ const StaffWithdrawalConfirmation = () => {
         setBook({
           id: bookDoc.id,
           code: bookData.code || '',
+          codes: bookData.codes || [],
           title: bookData.title || '',
           authors: bookData.authors || [],
           publisher: bookData.publisher || '',
@@ -144,6 +146,14 @@ const StaffWithdrawalConfirmation = () => {
     navigate(`/staff-withdrawals/${staffId}`, { 
       state: { staffName: staff?.name } 
     });
+  };
+
+  // Função para exibir os códigos
+  const getDisplayCode = (book: Book): string => {
+    if (book.codes && book.codes.length > 0) {
+      return book.codes.length > 1 ? 'diversos' : book.codes[0];
+    }
+    return book.code || '-';
   };
 
   if (loading) {
@@ -217,10 +227,10 @@ const StaffWithdrawalConfirmation = () => {
                 <span className={styles.detailLabel}>Título:</span>
                 <span className={styles.detailValue}>{book?.title}</span>
               </div>
-              {book?.code && (
+              {book && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Código:</span>
-                  <span className={styles.detailValue}>{book.code}</span>
+                  <span className={styles.detailValue}>{getDisplayCode(book)}</span>
                 </div>
               )}
               {book?.authors && book.authors.length > 0 && (

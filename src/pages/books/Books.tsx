@@ -8,7 +8,8 @@ import styles from './Books.module.css';
 
 interface Book {
   id: string;
-  code: string;
+  code?: string;
+  codes?: string[];
   title: string;
   genres?: string[];
   authors?: string[];
@@ -46,6 +47,20 @@ const Books = () => {
   
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  const getDisplayCode = (book: Book): string => {
+    if (book.codes && book.codes.length > 0) {
+      return book.codes.length > 1 ? 'diversos' : book.codes[0];
+    }
+    return book.code || '-';
+  };
+
+  const getAllCodes = (book: Book): string[] => {
+    if (book.codes && book.codes.length > 0) {
+      return book.codes;
+    }
+    return book.code ? [book.code] : [];
+  };
 
   const fetchBooks = useCallback(async () => {
     if (!currentUser) return;
@@ -124,7 +139,9 @@ const Books = () => {
 
     if (filters.code) {
       result = result.filter(book => 
-        book.code?.toString().toLowerCase().includes(filters.code.toLowerCase())
+        getAllCodes(book).some(code => 
+          code.toLowerCase().includes(filters.code.toLowerCase())
+        )
       );
     }
 
@@ -369,7 +386,7 @@ const Books = () => {
                       to={`/books/${book.id}`}
                       className={styles.bookLink}
                     >
-                      <p className={styles.bookCode}>Código: {book.code}</p>
+                      <p className={styles.bookCode}>Código: {getDisplayCode(book)}</p>
                       {book.authors && (
                         <p className={styles.bookAuthors}>
                           {book.authors.join(', ')}
@@ -425,7 +442,7 @@ const Books = () => {
                           </div>
                         </td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.title}</td>
-                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.code}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{getDisplayCode(book)}</td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.authors?.join(', ') || '-'}</td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
                           {book.genres?.map(genre => (

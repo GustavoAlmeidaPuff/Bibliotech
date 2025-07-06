@@ -12,7 +12,8 @@ import styles from './Withdrawals.module.css';
 
 interface Book {
   id: string;
-  code: string;
+  code?: string;
+  codes?: string[];
   title: string;
   authors?: string[];
   genres?: string[];
@@ -111,7 +112,9 @@ const BookSelection = () => {
     
     const filtered = books.filter(book => {
       const matchesTitle = !titleFilter || (book.title && book.title.toLowerCase().includes(titleFilter));
-      const matchesCode = !codeFilter || (book.code && book.code.toLowerCase().includes(codeFilter));
+              const matchesCode = !codeFilter || getAllCodes(book).some(code => 
+          code.toLowerCase().includes(codeFilter)
+        );
       const matchesAuthor = !authorFilter || (book.authors && book.authors.some(author => 
         author.toLowerCase().includes(authorFilter)
       ));
@@ -138,6 +141,20 @@ const BookSelection = () => {
   };
 
   const currentBooks = filtersApplied ? filteredBooks : books;
+
+  const getDisplayCode = (book: Book): string => {
+    if (book.codes && book.codes.length > 0) {
+      return book.codes.length > 1 ? 'diversos' : book.codes[0];
+    }
+    return book.code || '-';
+  };
+
+  const getAllCodes = (book: Book): string[] => {
+    if (book.codes && book.codes.length > 0) {
+      return book.codes;
+    }
+    return book.code ? [book.code] : [];
+  };
 
   return (
     <div className={styles.container}>
@@ -250,7 +267,7 @@ const BookSelection = () => {
                   <div key={book.id} className={styles.bookItem}>
                     <div className={styles.bookInfo}>
                       <h3 className={styles.bookTitle}>{book.title}</h3>
-                      <p className={styles.bookCode}>Código: {book.code || '-'}</p>
+                                              <p className={styles.bookCode}>Código: {getDisplayCode(book)}</p>
                       {book.authors && book.authors.length > 0 && (
                         <p className={styles.bookAuthors}>Autores: {book.authors.join(', ')}</p>
                       )}
