@@ -87,6 +87,7 @@ const RegisterBook = () => {
   const [duplicates, setDuplicates] = useState<DuplicateCheck>({ codes: false, title: false });
   const [duplicateBooks, setDuplicateBooks] = useState<DuplicateBook[]>([]);
   const [checkingDuplicates, setCheckingDuplicates] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
@@ -194,13 +195,20 @@ const RegisterBook = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Só processa o submit se for intencional (através do botão)
+    if (!isSubmittingForm) {
+      return;
+    }
+    
     if (!formData.codes.length || !formData.title) {
       setError('Pelo menos um código e o título são campos obrigatórios');
+      setIsSubmittingForm(false);
       return;
     }
 
     if (!currentUser) {
       setError('Você precisa estar logado para registrar livros');
+      setIsSubmittingForm(false);
       return;
     }
 
@@ -220,6 +228,7 @@ const RegisterBook = () => {
       message += '\nDeseja criar mesmo assim?';
       
       if (!window.confirm(message)) {
+        setIsSubmittingForm(false);
         return;
       }
     }
@@ -256,6 +265,7 @@ const RegisterBook = () => {
       }
     } finally {
       setLoading(false);
+      setIsSubmittingForm(false);
     }
   };
 
@@ -520,6 +530,7 @@ const RegisterBook = () => {
             type="submit"
             className={styles.submitButton}
             disabled={loading}
+            onClick={() => setIsSubmittingForm(true)}
           >
             {loading ? 'Registrando...' : 'Registrar Livro'}
           </button>

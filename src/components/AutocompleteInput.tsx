@@ -56,6 +56,7 @@ const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && value.trim()) {
       e.preventDefault();
+      e.stopPropagation();
       if (filteredSuggestions.length === 0) {
         onSelect(value.trim());
         onChange('');

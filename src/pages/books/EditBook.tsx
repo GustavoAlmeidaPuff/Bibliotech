@@ -55,6 +55,7 @@ const EditBook = () => {
   const [error, setError] = useState('');
   const [loanHistory, setLoanHistory] = useState<LoanHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
@@ -177,13 +178,20 @@ const EditBook = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Só processa o submit se for intencional (através do botão)
+    if (!isSubmittingForm) {
+      return;
+    }
+    
     if (!formData.codes.length || !formData.title) {
       setError('Pelo menos um código e o título são campos obrigatórios');
+      setIsSubmittingForm(false);
       return;
     }
 
     if (!currentUser || !bookId) {
       setError('Você precisa estar logado para editar livros');
+      setIsSubmittingForm(false);
       return;
     }
 
@@ -211,6 +219,7 @@ const EditBook = () => {
       }
     } finally {
       setLoading(false);
+      setIsSubmittingForm(false);
     }
   };
 
@@ -497,6 +506,7 @@ const EditBook = () => {
             type="submit"
             className={styles.submitButton}
             disabled={loading}
+            onClick={() => setIsSubmittingForm(true)}
           >
             {loading ? 'Salvando...' : 'Salvar Alterações'}
           </button>
