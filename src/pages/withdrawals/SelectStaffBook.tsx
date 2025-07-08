@@ -5,8 +5,8 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
   FunnelIcon, 
-  XMarkIcon,
-  HandRaisedIcon
+  XMarkIcon, 
+  HandRaisedIcon 
 } from '@heroicons/react/24/outline';
 import styles from './Withdrawals.module.css';
 
@@ -22,7 +22,7 @@ interface Book {
   shelf?: string;
   collection?: string;
   quantity?: number;
-  available?: boolean;
+  availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
 }
 
 interface Filters {
@@ -56,6 +56,47 @@ const SelectStaffBook = () => {
   
   const { currentUser } = useAuth();
 
+  // Função para calcular códigos disponíveis
+  const calculateAvailableCodes = async (book: Book): Promise<string[]> => {
+    if (!currentUser) return [];
+    
+    try {
+      // Obter todos os códigos do livro
+      const allCodes = book.codes && book.codes.length > 0 ? book.codes : (book.code ? [book.code] : []);
+      
+      if (allCodes.length === 0) return [];
+      
+      // Buscar empréstimos ativos para este livro (tanto de alunos quanto de funcionários)
+      const [studentLoans, staffLoans] = await Promise.all([
+        // Empréstimos de alunos
+        getDocs(query(
+          collection(db, `users/${currentUser.uid}/loans`),
+          where('bookId', '==', book.id),
+          where('status', '==', 'active')
+        )),
+        // Empréstimos de funcionários
+        getDocs(query(
+          collection(db, `users/${currentUser.uid}/staffLoans`),
+          where('bookId', '==', book.id)
+        ))
+      ]);
+      
+      // Extrair códigos que estão emprestados
+      const borrowedCodes = [
+        ...studentLoans.docs.map(doc => doc.data().bookCode),
+        ...staffLoans.docs.map(doc => doc.data().bookCode)
+      ].filter(code => code); // Remove valores undefined/null
+      
+      // Retornar códigos que não estão emprestados
+      const availableCodes = allCodes.filter(code => !borrowedCodes.includes(code));
+      
+      return availableCodes;
+    } catch (error) {
+      console.error('Erro ao calcular códigos disponíveis:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     fetchBooks();
   }, [currentUser]);
@@ -79,13 +120,27 @@ const SelectStaffBook = () => {
         return;
       }
       
-      // Filtrar livros disponíveis
-      const availableBooks = querySnapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }) as Book)
-        .filter(book => book.available !== false); // Considera disponível se o campo não existir ou for true
+      const fetchedBooks = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Book[];
+      
+      // Calcular códigos disponíveis para cada livro
+      const booksWithAvailability = await Promise.all(
+        fetchedBooks.map(async (book) => {
+          const availableCodes = await calculateAvailableCodes(book);
+          return {
+            ...book,
+            availableCodes,
+            quantity: availableCodes.length // Atualizar quantidade baseada nos códigos disponíveis
+          };
+        })
+      );
+      
+      // Filtrar apenas livros que têm pelo menos um código disponível
+      const availableBooks = booksWithAvailability.filter(book => 
+        book.availableCodes && book.availableCodes.length > 0
+      );
       
       if (availableBooks.length === 0) {
         setError('Não há livros disponíveis para empréstimo no momento.');

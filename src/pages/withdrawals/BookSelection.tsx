@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { collection, query, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs, where } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
@@ -22,6 +22,7 @@ interface Book {
   shelf?: string;
   collection?: string;
   quantity?: number;
+  availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
 }
 
 interface Filters {
@@ -54,6 +55,41 @@ const BookSelection = () => {
   
   const { currentUser } = useAuth();
 
+  // Função para calcular códigos disponíveis
+  const calculateAvailableCodes = async (book: Book): Promise<string[]> => {
+    if (!currentUser) return [];
+    
+    try {
+      // Obter todos os códigos do livro
+      const allCodes = book.codes && book.codes.length > 0 ? book.codes : (book.code ? [book.code] : []);
+      
+      if (allCodes.length === 0) return [];
+      
+      // Buscar empréstimos ativos para este livro
+      const loansRef = collection(db, `users/${currentUser.uid}/loans`);
+      const activeLoansQuery = query(
+        loansRef,
+        where('bookId', '==', book.id),
+        where('status', '==', 'active')
+      );
+      
+      const activeLoansSnapshot = await getDocs(activeLoansQuery);
+      
+      // Extrair códigos que estão emprestados
+      const borrowedCodes = activeLoansSnapshot.docs
+        .map(doc => doc.data().bookCode)
+        .filter(code => code); // Remove valores undefined/null
+      
+      // Retornar códigos que não estão emprestados
+      const availableCodes = allCodes.filter(code => !borrowedCodes.includes(code));
+      
+      return availableCodes;
+    } catch (error) {
+      console.error('Erro ao calcular códigos disponíveis:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     fetchBooks();
   }, [currentUser]);
@@ -72,8 +108,25 @@ const BookSelection = () => {
         ...doc.data()
       })) as Book[];
       
-      setBooks(fetchedBooks);
-      setFilteredBooks(fetchedBooks);
+      // Calcular códigos disponíveis para cada livro
+      const booksWithAvailability = await Promise.all(
+        fetchedBooks.map(async (book) => {
+          const availableCodes = await calculateAvailableCodes(book);
+          return {
+            ...book,
+            availableCodes,
+            quantity: availableCodes.length // Atualizar quantidade baseada nos códigos disponíveis
+          };
+        })
+      );
+      
+      // Filtrar apenas livros que têm pelo menos um código disponível
+      const availableBooks = booksWithAvailability.filter(book => 
+        book.availableCodes && book.availableCodes.length > 0
+      );
+      
+      setBooks(availableBooks);
+      setFilteredBooks(availableBooks);
     } catch (error) {
       console.error('Erro ao buscar livros:', error);
     } finally {

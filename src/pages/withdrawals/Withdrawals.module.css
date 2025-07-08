@@ -937,3 +937,26 @@
     text-align: center;
   }
 } 
+
+/* Estilos para seleção de código */
+.codeSelect {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  color: var(--text-primary);
+  min-width: 150px;
+}
+
+.codeSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(77, 181, 255, 0.2);
+}
+
+.codeSelect:disabled {
+  background-color: var(--background-secondary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+} 

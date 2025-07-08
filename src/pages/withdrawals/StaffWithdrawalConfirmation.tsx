@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
+import { collection, query, getDocs, where, doc, updateDoc, addDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { CheckIcon, XMarkIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { 
+  BookOpenIcon, 
+  CheckIcon, 
+  XMarkIcon 
+} from '@heroicons/react/24/outline';
 import styles from './Withdrawals.module.css';
 
 interface Staff {
@@ -27,7 +24,7 @@ interface Book {
   title: string;
   authors?: string[];
   publisher?: string;
-  available?: boolean;
+  availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
 }
 
 interface LocationState {
@@ -47,8 +44,50 @@ const StaffWithdrawalConfirmation = () => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCode, setSelectedCode] = useState<string | null>(null);
   
   const { currentUser } = useAuth();
+
+  // Função para calcular códigos disponíveis
+  const calculateAvailableCodes = async (bookData: Book): Promise<string[]> => {
+    if (!currentUser || !bookData.id) return [];
+    
+    try {
+      // Obter todos os códigos do livro
+      const allCodes = bookData.codes && bookData.codes.length > 0 ? bookData.codes : (bookData.code ? [bookData.code] : []);
+      
+      if (allCodes.length === 0) return [];
+      
+      // Buscar empréstimos ativos para este livro (tanto de alunos quanto de funcionários)
+      const [studentLoans, staffLoans] = await Promise.all([
+        // Empréstimos de alunos
+        getDocs(query(
+          collection(db, `users/${currentUser.uid}/loans`),
+          where('bookId', '==', bookData.id),
+          where('status', '==', 'active')
+        )),
+        // Empréstimos de funcionários
+        getDocs(query(
+          collection(db, `users/${currentUser.uid}/staffLoans`),
+          where('bookId', '==', bookData.id)
+        ))
+      ]);
+      
+      // Extrair códigos que estão emprestados
+      const borrowedCodes = [
+        ...studentLoans.docs.map(doc => doc.data().bookCode),
+        ...staffLoans.docs.map(doc => doc.data().bookCode)
+      ].filter(code => code); // Remove valores undefined/null
+      
+      // Retornar códigos que não estão emprestados
+      const availableCodes = allCodes.filter(code => !borrowedCodes.includes(code));
+      
+      return availableCodes;
+    } catch (error) {
+      console.error('Erro ao calcular códigos disponíveis:', error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     if (!currentUser || !staffId || !bookId) {
@@ -79,15 +118,28 @@ const StaffWithdrawalConfirmation = () => {
           throw new Error('Livro não encontrado');
         }
         const bookData = bookDoc.data();
-        setBook({
+        
+        const bookInfo = {
           id: bookDoc.id,
           code: bookData.code || '',
           codes: bookData.codes || [],
           title: bookData.title || '',
           authors: bookData.authors || [],
-          publisher: bookData.publisher || '',
-          available: bookData.available !== false // Se o campo não existir, assume true
+          publisher: bookData.publisher || ''
+        };
+        
+        // Calcular códigos disponíveis
+        const availableCodes = await calculateAvailableCodes(bookInfo);
+        
+        setBook({
+          ...bookInfo,
+          availableCodes
         });
+        
+        // Se há apenas um código disponível, selecioná-lo automaticamente
+        if (availableCodes.length === 1) {
+          setSelectedCode(availableCodes[0]);
+        }
 
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -101,27 +153,32 @@ const StaffWithdrawalConfirmation = () => {
   }, [currentUser, staffId, bookId, navigate]);
 
   const handleConfirm = async () => {
-    if (!currentUser || !staff || !book) return;
+    if (!currentUser || !staff || !book || !selectedCode) return;
     
     try {
       setProcessing(true);
       setError(null);
       
-      // Verificar se o livro ainda está disponível
-      if (book.available === false) {
-        setError('Este livro não está disponível para empréstimo');
+      // Verificar se ainda há exemplares disponíveis
+      if (!book.availableCodes || book.availableCodes.length === 0) {
+        setError('Não há exemplares disponíveis deste livro');
         return;
       }
       
-      // 1. Atualizar o livro para não disponível
-      const bookRef = doc(db, `users/${currentUser.uid}/books/${book.id}`);
-      await updateDoc(bookRef, { available: false });
+      // Verificar se o código selecionado ainda está disponível
+      if (!book.availableCodes.includes(selectedCode)) {
+        setError('O código selecionado não está mais disponível');
+        return;
+      }
       
-      // 2. Registrar o empréstimo
+      // Registrar o empréstimo para funcionário
       const staffLoansRef = collection(db, `users/${currentUser.uid}/staffLoans`);
       await addDoc(staffLoansRef, {
         staffId: staff.id,
+        staffName: staff.name,
         bookId: book.id,
+        bookTitle: book.title,
+        bookCode: selectedCode, // Código específico do exemplar
         loanDate: serverTimestamp(),
         createdAt: serverTimestamp()
       });
@@ -130,7 +187,7 @@ const StaffWithdrawalConfirmation = () => {
       navigate('/staff-withdrawals', { 
         state: { 
           success: true,
-          message: `Livro "${book.title}" emprestado com sucesso para ${staff.name}` 
+          message: `Livro "${book.title}" (código: ${selectedCode}) emprestado com sucesso para ${staff.name}` 
         } 
       });
       
@@ -227,12 +284,39 @@ const StaffWithdrawalConfirmation = () => {
                 <span className={styles.detailLabel}>Título:</span>
                 <span className={styles.detailValue}>{book?.title}</span>
               </div>
-              {book && (
+              
+              {/* Seleção de código quando há múltiplos códigos disponíveis */}
+              {book?.availableCodes && book.availableCodes.length > 1 && (
                 <div className={styles.detailItem}>
-                  <span className={styles.detailLabel}>Código:</span>
-                  <span className={styles.detailValue}>{getDisplayCode(book)}</span>
+                  <span className={styles.detailLabel}>Código do exemplar:</span>
+                  <select 
+                    value={selectedCode || ''} 
+                    onChange={(e) => setSelectedCode(e.target.value)}
+                    className={styles.codeSelect}
+                  >
+                    <option value="">Selecione um código</option>
+                    {book.availableCodes.map(code => (
+                      <option key={code} value={code}>{code}</option>
+                    ))}
+                  </select>
                 </div>
               )}
+              
+              {/* Mostrar código quando há apenas um disponível */}
+              {book?.availableCodes && book.availableCodes.length === 1 && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Código:</span>
+                  <span className={styles.detailValue}>{book.availableCodes[0]}</span>
+                </div>
+              )}
+              
+              {book?.availableCodes && (
+                <div className={styles.detailItem}>
+                  <span className={styles.detailLabel}>Exemplares disponíveis:</span>
+                  <span className={styles.detailValue}>{book.availableCodes.length}</span>
+                </div>
+              )}
+              
               {book?.authors && book.authors.length > 0 && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Autores:</span>
@@ -260,7 +344,7 @@ const StaffWithdrawalConfirmation = () => {
             <button 
               className={styles.confirmButton}
               onClick={handleConfirm}
-              disabled={processing}
+              disabled={processing || !selectedCode || (book?.availableCodes?.length === 0)}
             >
               {processing ? 'Processando...' : (
                 <>

@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, getDocs, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
-import { MagnifyingGlassIcon, BookOpenIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import styles from './Withdrawals.module.css';
+import { 
+  BookOpenIcon,
+  MagnifyingGlassIcon,
+  ArrowRightIcon,
+  CheckCircleIcon
+} from '@heroicons/react/24/outline';
+import styles from './CodeSelection.module.css';
 
 interface Student {
   id: string;
@@ -18,7 +23,8 @@ interface Book {
   title: string;
   authors?: string[];
   publisher?: string;
-  quantity: number;
+  quantity?: number;
+  availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
 }
 
 interface LocationState {
@@ -30,7 +36,6 @@ const CodeSelection = () => {
   const { studentId, bookId } = useParams<{ studentId: string; bookId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  // const state = location.state as LocationState;
   
   const [student, setStudent] = useState<Student | null>(null);
   const [book, setBook] = useState<Book | null>(null);
@@ -40,6 +45,41 @@ const CodeSelection = () => {
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   
   const { currentUser } = useAuth();
+
+  // Função para calcular códigos disponíveis
+  const calculateAvailableCodes = async (bookData: Book): Promise<string[]> => {
+    if (!currentUser || !bookData.id) return [];
+    
+    try {
+      // Obter todos os códigos do livro
+      const allCodes = bookData.codes || [];
+      
+      if (allCodes.length === 0) return [];
+      
+      // Buscar empréstimos ativos para este livro
+      const loansRef = collection(db, `users/${currentUser.uid}/loans`);
+      const activeLoansQuery = query(
+        loansRef,
+        where('bookId', '==', bookData.id),
+        where('status', '==', 'active')
+      );
+      
+      const activeLoansSnapshot = await getDocs(activeLoansQuery);
+      
+      // Extrair códigos que estão emprestados
+      const borrowedCodes = activeLoansSnapshot.docs
+        .map(doc => doc.data().bookCode)
+        .filter(code => code); // Remove valores undefined/null
+      
+      // Retornar códigos que não estão emprestados
+      const availableCodes = allCodes.filter(code => !borrowedCodes.includes(code));
+      
+      return availableCodes;
+    } catch (error) {
+      console.error('Erro ao calcular códigos disponíveis:', error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     if (!currentUser || !studentId || !bookId) {
@@ -73,13 +113,21 @@ const CodeSelection = () => {
         // Compatibilidade com versão antiga (code -> codes)
         const codes = bookData.codes || (bookData.code ? [bookData.code] : []);
         
-        setBook({
+        const bookInfo = {
           id: bookDoc.id,
           codes,
           title: bookData.title || '',
           authors: bookData.authors || [],
           publisher: bookData.publisher || '',
           quantity: bookData.quantity || 0
+        };
+        
+        // Calcular códigos disponíveis
+        const availableCodes = await calculateAvailableCodes(bookInfo);
+        
+        setBook({
+          ...bookInfo,
+          availableCodes
         });
 
       } catch (error) {
@@ -93,18 +141,14 @@ const CodeSelection = () => {
     fetchData();
   }, [currentUser, studentId, bookId, navigate]);
 
-  const filteredCodes = book?.codes.filter(code =>
-    code.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
-
   const handleCodeSelect = (code: string) => {
     setSelectedCode(code);
   };
 
-  const handleNext = () => {
+  const handleContinue = () => {
     if (!selectedCode || !student || !book) return;
     
-    navigate(`/withdrawal-confirmation/${studentId}/${bookId}`, {
+    navigate(`/student-withdrawals/${studentId}/${bookId}/confirm`, {
       state: {
         studentName: student.name,
         bookTitle: book.title,
@@ -113,40 +157,27 @@ const CodeSelection = () => {
     });
   };
 
-  const handleBack = () => {
-    navigate(`/student-withdrawals/${studentId}`, { 
-      state: { studentName: student?.name } 
-    });
-  };
-
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.content}>
-          <div className={styles.loading}>Carregando...</div>
-        </div>
+        <div className={styles.loading}>Carregando...</div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !book || !student) {
     return (
       <div className={styles.container}>
-        <div className={styles.content}>
-          <div className={styles.errorState}>
-            <h3>Erro</h3>
-            <p>{error}</p>
-            <button 
-              className={styles.backButton}
-              onClick={handleBack}
-            >
-              Voltar
-            </button>
-          </div>
-        </div>
+        <div className={styles.error}>{error || 'Dados não encontrados'}</div>
       </div>
     );
   }
+
+  // Usar códigos disponíveis calculados dinamicamente
+  const displayCodes = book.availableCodes || [];
+  const filteredCodes = displayCodes.filter(code =>
+    code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className={styles.container}>
@@ -168,7 +199,7 @@ const CodeSelection = () => {
                 <p>Por: {book.authors.join(', ')}</p>
               )}
               <p className={styles.availableCount}>
-                {book?.codes.length} exemplar(es) disponível(eis)
+                {book?.availableCodes?.length} exemplar(es) disponível(eis)
               </p>
             </div>
           </div>
@@ -223,13 +254,13 @@ const CodeSelection = () => {
           <div className={styles.actions}>
             <button 
               className={styles.backButton}
-              onClick={handleBack}
+              onClick={() => navigate(`/student-withdrawals/${studentId}`)}
             >
               Voltar
             </button>
             <button 
               className={styles.nextButton}
-              onClick={handleNext}
+              onClick={handleContinue}
               disabled={!selectedCode}
             >
               Avançar

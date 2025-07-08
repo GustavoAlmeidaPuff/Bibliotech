@@ -131,11 +131,8 @@ const WithdrawalConfirmation = () => {
       const docRef = await addDoc(loansRef, loanData);
       console.log('Locação salva com sucesso, ID:', docRef.id);
       
-      // 2. Atualizar a quantidade do livro
-      const bookRef = doc(db, `users/${currentUser.uid}/books/${book.id}`);
-      await updateDoc(bookRef, {
-        quantity: book.quantity - 1
-      });
+      // Nota: A quantidade agora é calculada dinamicamente baseada nos códigos disponíveis
+      // Não precisamos mais atualizar manualmente o campo quantity
       
       // Redirecionar para a página de locações
       navigate('/student-loans', { 
