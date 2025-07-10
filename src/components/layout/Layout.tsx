@@ -209,7 +209,7 @@ const Layout: React.FC = () => {
               onClick={handleLinkClick}
             >
               <ArrowPathIcon className={styles.linkIcon} />
-              Retiradas Alunos
+              Locações Alunos
             </Link>
             <Link 
               to="/staff-loans" 
@@ -217,7 +217,7 @@ const Layout: React.FC = () => {
               onClick={handleLinkClick}
             >
               <ArrowPathIcon className={styles.linkIcon} />
-              Retiradas Professores
+              Locações Professores
             </Link>
           </div>
 
