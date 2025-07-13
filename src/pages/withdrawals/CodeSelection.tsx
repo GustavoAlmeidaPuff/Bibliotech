@@ -148,7 +148,7 @@ const CodeSelection = () => {
   const handleContinue = () => {
     if (!selectedCode || !student || !book) return;
     
-    navigate(`/student-withdrawals/${studentId}/${bookId}/confirm`, {
+    navigate(`/withdrawal-confirmation/${studentId}/${bookId}`, {
       state: {
         studentName: student.name,
         bookTitle: book.title,
