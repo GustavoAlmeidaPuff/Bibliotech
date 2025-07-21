@@ -170,14 +170,14 @@ const StudentReturns = () => {
             <div className={styles.tableContainer}>
               <table className={styles.loansTable}>
                 <thead>
-                  <tr>
-                    <th>Aluno</th>
-                    <th>Livro</th>
-                    <th>Data de Empréstimo</th>
-                    <th>Data de Devolução</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                  </tr>
+                                      <tr>
+                      <th>Aluno</th>
+                      <th>Livro</th>
+                      <th>Retirado em</th>
+                      <th>Data de Devolução</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
                 </thead>
                 <tbody>
                   {activeLoans.map(loan => {
@@ -211,7 +211,13 @@ const StudentReturns = () => {
                         </span>
                       </td>
                         <td>{loan.bookTitle}</td>
-                        <td>{loan.borrowDate.toLocaleDateString()}</td>
+                        <td>{loan.borrowDate.toLocaleDateString('pt-BR', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}</td>
                         <td>{loan.dueDate.toLocaleDateString()}</td>
                         <td>
                           <span className={`${styles.status} ${isOverdue ? styles.overdueStatus : styles.activeStatus}`}>

@@ -86,6 +86,17 @@ const StudentLoanDetail = () => {
     if (!date) return '-';
     return new Intl.DateTimeFormat('pt-BR').format(date);
   };
+
+  const formatDateTime = (date: Date) => {
+    if (!date) return '-';
+    return new Intl.DateTimeFormat('pt-BR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
   
   const getDaysLeft = (dueDate: Date) => {
     if (!dueDate) return 0;
@@ -267,19 +278,24 @@ const StudentLoanDetail = () => {
             
             <div className={styles.datesSection}>
               <div className={styles.dateItem}>
-                <span className={styles.dateLabel}>Data de Retirada:</span>
-                <span className={styles.dateValue}>{formatDate(loan.borrowDate)}</span>
+                <span className={styles.dateLabel}>Retirado em:</span>
+                <span className={styles.dateValue}>{formatDateTime(loan.borrowDate)}</span>
               </div>
               
               <div className={styles.dateItem}>
-                <span className={styles.dateLabel}>Data de Devolução:</span>
+                <span className={styles.dateLabel}>Prazo para devolução:</span>
                 <span className={styles.dateValue}>{formatDate(loan.dueDate)}</span>
               </div>
               
-              {loan.returnDate && (
+              {loan.returnDate ? (
                 <div className={styles.dateItem}>
-                  <span className={styles.dateLabel}>Data de Retorno:</span>
-                  <span className={styles.dateValue}>{formatDate(loan.returnDate)}</span>
+                  <span className={styles.dateLabel}>Devolvido em:</span>
+                  <span className={styles.dateValue}>{formatDateTime(loan.returnDate)}</span>
+                </div>
+              ) : (
+                <div className={styles.dateItem}>
+                  <span className={styles.dateLabel}>Status:</span>
+                  <span className={styles.dateValue} style={{ color: '#4a90e2', fontWeight: '500' }}>Locação ainda ativa</span>
                 </div>
               )}
             </div>

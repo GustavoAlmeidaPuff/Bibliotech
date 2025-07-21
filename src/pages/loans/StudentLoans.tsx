@@ -271,6 +271,17 @@ const StudentLoans = () => {
     return new Intl.DateTimeFormat('pt-BR').format(date);
   };
 
+  const formatDateTime = (date: Date) => {
+    if (!date) return '-';
+    return new Intl.DateTimeFormat('pt-BR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
   const getDaysLeft = (dueDate: Date) => {
     if (!dueDate) return 0;
     
@@ -505,7 +516,7 @@ const StudentLoans = () => {
                     <tr>
                       <th>Aluno</th>
                       <th>Livro</th>
-                      <th>Data de Retirada</th>
+                      <th>Retirado em</th>
                       <th>Data de Devolução</th>
                       <th>Status</th>
                       <th>Ações</th>
@@ -545,7 +556,7 @@ const StudentLoans = () => {
                         </span>
                       </td>
                         <td className={styles.bookTitleCell}>{loan.bookTitle}</td>
-                        <td>{formatDate(loan.borrowDate)}</td>
+                        <td>{formatDateTime(loan.borrowDate)}</td>
                         <td>{formatDate(loan.dueDate)}</td>
                         <td>
                           <span className={`${styles.statusTag} ${getStatusClass(loan)}`}>

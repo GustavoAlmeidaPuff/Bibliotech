@@ -266,6 +266,17 @@ const EditBook = () => {
     return new Intl.DateTimeFormat('pt-BR').format(date);
   };
 
+  const formatDateTime = (date: Date) => {
+    if (!date) return '-';
+    return new Intl.DateTimeFormat('pt-BR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
   const getStatusText = (loan: LoanHistory) => {
     if (loan.status === 'returned') return 'Devolvido';
     return 'Retirado';
@@ -557,10 +568,12 @@ const EditBook = () => {
                 </div>
                 <div className={styles.historyDetails}>
                   <div className={styles.historyDate}>
-                    <span>Retirado: {formatDate(loan.borrowDate)}</span>
-                    <span>Devolução: {formatDate(loan.dueDate)}</span>
-                    {loan.returnDate && (
-                      <span>Devolvido: {formatDate(loan.returnDate)}</span>
+                    <span>Retirado em: {formatDateTime(loan.borrowDate)}</span>
+                    <span>Prazo para devolução: {formatDate(loan.dueDate)}</span>
+                    {loan.returnDate ? (
+                      <span>Devolvido em: {formatDateTime(loan.returnDate)}</span>
+                    ) : (
+                      <span style={{ color: '#4a90e2', fontWeight: '500' }}>Locação ainda ativa</span>
                     )}
                     {loan.bookCode && (
                       <span>Código: <strong>{loan.bookCode}</strong></span>
