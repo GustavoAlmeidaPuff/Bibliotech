@@ -21,6 +21,7 @@ import styles from './Layout.module.css';
 const Layout: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -76,19 +77,29 @@ const Layout: React.FC = () => {
     await deleteNotification(notificationId);
   };
 
+  const truncateText = (text: string, maxLength: number = 120): string => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
+
   const handleNotificationClick = async (notification: Notification) => {
     // Marcar como lida
     await markAsRead(notification.id);
     
     // Verificar o tipo de notificação para navegação apropriada
     if (notification.type === 'update') {
-      // Para notificações de atualização, apenas fechar o drawer
-      setIsNotificationsOpen(false);
+      // Para notificações de atualização, abrir modal
+      setSelectedNotification(notification);
     } else if (notification.loanId) {
       // Para notificações de empréstimo, navegar para detalhes
       navigate(`/student-loan-detail/${notification.loanId}`);
       setIsNotificationsOpen(false);
     }
+  };
+
+  const closeNotificationModal = () => {
+    setSelectedNotification(null);
+    setIsNotificationsOpen(false);
   };
 
   const renderNotificationContent = (notification: Notification) => {
@@ -99,7 +110,7 @@ const Layout: React.FC = () => {
             📢 {notification.title}
           </div>
           <div className={styles.notificationMessage}>
-            {notification.message}
+            {truncateText(notification.message)}
           </div>
           <div className={styles.notificationMeta}>
             <span className={styles.notificationTime}>
@@ -380,6 +391,47 @@ const Layout: React.FC = () => {
       <main className={styles.main}>
         <Outlet />
       </main>
+
+      {/* Modal de Notificação de Atualização */}
+      {selectedNotification && selectedNotification.type === 'update' && (
+        <div className={styles.notificationModalBackdrop} onClick={closeNotificationModal}>
+          <div className={styles.notificationModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.notificationModalHeader}>
+              <h3>📢 {selectedNotification.title}</h3>
+              <button
+                className={styles.closeModalButton}
+                onClick={closeNotificationModal}
+                aria-label="Fechar"
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.notificationModalContent}>
+              <div className={styles.notificationModalMessage}>
+                {selectedNotification.message.split('\n').map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
+              <div className={styles.notificationModalMeta}>
+                <span className={styles.notificationTime}>
+                  {formatNotificationTime(selectedNotification.createdAt)}
+                </span>
+                <span className={`${styles.notificationBadgeType} ${styles.update}`}>
+                  Atualização do Sistema
+                </span>
+              </div>
+            </div>
+            <div className={styles.notificationModalActions}>
+              <button 
+                className={styles.modalActionButton}
+                onClick={closeNotificationModal}
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
