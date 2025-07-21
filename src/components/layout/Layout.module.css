@@ -364,14 +364,25 @@
   padding: 1rem;
   font-size: 0.95rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-  transition: background 0.2s;
+  transition: all 0.2s ease;
   border-left: 4px solid #2563eb;
+  cursor: pointer;
+}
+
+.notificationItem:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .notificationItem.read {
   background: #f1f5f9;
   color: #64748b;
   border-left-color: #94a3b8;
+}
+
+.notificationItem.read:hover {
+  background: #e2e8f0;
 }
 
 .notificationContent {

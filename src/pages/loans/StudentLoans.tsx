@@ -4,6 +4,7 @@ import { collection, query, getDocs, doc, updateDoc, orderBy, where, serverTimes
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import styles from './Loans.module.css';
 
 interface Loan {
@@ -40,7 +41,7 @@ const StudentLoans = () => {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [filteredLoans, setFilteredLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [showMessage, setShowMessage] = useState(!!message);
   const [filters, setFilters] = useState<Filters>({
@@ -518,7 +519,31 @@ const StudentLoans = () => {
                         onClick={() => navigate(`/student-loan-detail/${loan.id}`)}
                         style={{ cursor: 'pointer' }}
                       >
-                        <td>{loan.studentName}</td>
+                        <td>
+                        <span 
+                          style={{
+                            cursor: 'pointer',
+                            color: '#4a90e2',
+                            borderBottom: '1px dotted #4a90e2',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/students/${loan.studentId}`);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#2c5aa0';
+                            e.currentTarget.style.borderBottomStyle = 'solid';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#4a90e2';
+                            e.currentTarget.style.borderBottomStyle = 'dotted';
+                          }}
+                          title={`Ir para o perfil de ${loan.studentName}`}
+                        >
+                          {loan.studentName}
+                        </span>
+                      </td>
                         <td className={styles.bookTitleCell}>{loan.bookTitle}</td>
                         <td>{formatDate(loan.borrowDate)}</td>
                         <td>{formatDate(loan.dueDate)}</td>
@@ -552,7 +577,31 @@ const StudentLoans = () => {
           <div className={styles.modalContent}>
             <h3>Confirmar Devolução</h3>
             <p>Livro: <strong>{selectedLoan.bookTitle}</strong></p>
-            <p>Aluno: <strong>{selectedLoan.studentName}</strong></p>
+                            <p>Aluno: <strong>
+                  <span 
+                    style={{
+                      cursor: 'pointer',
+                      color: '#4a90e2',
+                      borderBottom: '1px dotted #4a90e2',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/students/${selectedLoan.studentId}`);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#2c5aa0';
+                      e.currentTarget.style.borderBottomStyle = 'solid';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#4a90e2';
+                      e.currentTarget.style.borderBottomStyle = 'dotted';
+                    }}
+                    title={`Ir para o perfil de ${selectedLoan.studentName}`}
+                  >
+                    {selectedLoan.studentName}
+                  </span>
+                </strong></p>
             
             <div className={styles.readingInfo}>
               <h4>Informações de Leitura</h4>

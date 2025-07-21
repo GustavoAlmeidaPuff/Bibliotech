@@ -45,7 +45,7 @@ const BookSelection = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [filtersApplied, setFiltersApplied] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     title: '',

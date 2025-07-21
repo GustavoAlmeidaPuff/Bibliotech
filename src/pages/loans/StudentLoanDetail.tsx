@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+
 import styles from './StudentLoanDetail.module.css';
 
 interface Loan {
@@ -236,7 +237,31 @@ const StudentLoanDetail = () => {
               </div>
               
               <div className={styles.studentInfo}>
-                <p>Aluno: <strong>{loan.studentName}</strong></p>
+                <p>Aluno: <strong>
+                  <span 
+                    style={{
+                      cursor: 'pointer',
+                      color: '#4a90e2',
+                      borderBottom: '1px dotted #4a90e2',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/students/${loan.studentId}`);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#2c5aa0';
+                      e.currentTarget.style.borderBottomStyle = 'solid';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#4a90e2';
+                      e.currentTarget.style.borderBottomStyle = 'dotted';
+                    }}
+                    title={`Ir para o perfil de ${loan.studentName}`}
+                  >
+                    {loan.studentName}
+                  </span>
+                </strong></p>
               </div>
             </div>
             

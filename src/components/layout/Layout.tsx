@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useAsync } from '../../hooks/useAsync';
 import { settingsService } from '../../services/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
-import { useNotifications } from '../../contexts/NotificationsContext';
+import { useNotifications, Notification } from '../../contexts/NotificationsContext';
 import {
   UserGroupIcon,
   AcademicCapIcon,
@@ -26,7 +26,7 @@ const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useSettings();
-  const { notifications, unreadCount, markAllAsRead, deleteNotification, loading, isEnabled } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, markAsRead, deleteNotification, loading, isEnabled } = useNotifications();
 
   // Marcar todas como lidas ao abrir
   useEffect(() => {
@@ -74,6 +74,17 @@ const Layout: React.FC = () => {
   const handleDeleteNotification = async (notificationId: string, event: React.MouseEvent) => {
     event.stopPropagation();
     await deleteNotification(notificationId);
+  };
+
+  const handleNotificationClick = async (notification: Notification) => {
+    // Marcar como lida
+    await markAsRead(notification.id);
+    
+    // Navegar para a página de detalhes do empréstimo
+    navigate(`/student-loan-detail/${notification.loanId}`);
+    
+    // Fechar o drawer de notificações
+    setIsNotificationsOpen(false);
   };
 
   return (
@@ -154,12 +165,48 @@ const Layout: React.FC = () => {
               </div>
             ) : (
               notifications.map(notification => (
-                <div key={notification.id} className={`${styles.notificationItem} ${notification.read ? styles.read : ''}`}>
+                <div 
+                  key={notification.id} 
+                  className={`${styles.notificationItem} ${notification.read ? styles.read : ''}`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
                   <div className={styles.notificationContent}>
                     <div className={styles.notificationHeader}>
-                      <div className={styles.notificationTitle}>
-                        {notification.title}
-                      </div>
+                                          <div className={styles.notificationTitle}>
+                      {notification.title.replace(
+                        `Aluno(a) ${notification.studentName}`,
+                        ''
+                      )}
+                      <span 
+                        style={{
+                          cursor: 'pointer',
+                          color: '#1e3a8a',
+                          borderBottom: '1px dotted #1e3a8a',
+                          transition: 'all 0.2s ease',
+                          fontWeight: 'bold'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/students/${notification.studentId}`);
+                          setIsNotificationsOpen(false);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#0f172a';
+                          e.currentTarget.style.borderBottomStyle = 'solid';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#1e3a8a';
+                          e.currentTarget.style.borderBottomStyle = 'dotted';
+                        }}
+                        title={`Ir para o perfil de ${notification.studentName}`}
+                      >
+                        Aluno(a) {notification.studentName}
+                      </span>
+                      {notification.title.replace(
+                        `Aluno(a) ${notification.studentName} está com a devolução do livro "${notification.bookTitle}" atrasada!`,
+                        ` está com a devolução do livro "${notification.bookTitle}" atrasada!`
+                      )}
+                    </div>
                       <button
                         className={styles.deleteNotificationButton}
                         onClick={(e) => handleDeleteNotification(notification.id, e)}

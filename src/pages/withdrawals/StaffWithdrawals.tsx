@@ -30,7 +30,7 @@ interface Filters {
 }
 
 const StaffWithdrawals = () => {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [staffList, setStaffList] = useState<Staff[]>([]);
   const [filteredStaffList, setFilteredStaffList] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);

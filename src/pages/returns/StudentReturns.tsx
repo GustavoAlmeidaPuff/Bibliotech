@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+
 import styles from './Returns.module.css';
 
 interface Loan {
@@ -29,6 +31,7 @@ const StudentReturns = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchActiveLoans();
@@ -182,7 +185,31 @@ const StudentReturns = () => {
                     
                     return (
                       <tr key={loan.id} className={isOverdue ? styles.overdue : ''}>
-                        <td>{loan.studentName}</td>
+                        <td>
+                        <span 
+                          style={{
+                            cursor: 'pointer',
+                            color: '#4a90e2',
+                            borderBottom: '1px dotted #4a90e2',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/students/${loan.studentId}`);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#2c5aa0';
+                            e.currentTarget.style.borderBottomStyle = 'solid';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#4a90e2';
+                            e.currentTarget.style.borderBottomStyle = 'dotted';
+                          }}
+                          title={`Ir para o perfil de ${loan.studentName}`}
+                        >
+                          {loan.studentName}
+                        </span>
+                      </td>
                         <td>{loan.bookTitle}</td>
                         <td>{loan.borrowDate.toLocaleDateString()}</td>
                         <td>{loan.dueDate.toLocaleDateString()}</td>
@@ -214,7 +241,31 @@ const StudentReturns = () => {
           <div className={styles.modalContent}>
             <h3>Confirmar Devolução</h3>
             <p>Livro: <strong>{selectedLoan.bookTitle}</strong></p>
-            <p>Aluno: <strong>{selectedLoan.studentName}</strong></p>
+                          <p>Aluno: <strong>
+                <span 
+                  style={{
+                    cursor: 'pointer',
+                    color: '#4a90e2',
+                    borderBottom: '1px dotted #4a90e2',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/students/${selectedLoan.studentId}`);
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#2c5aa0';
+                    e.currentTarget.style.borderBottomStyle = 'solid';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#4a90e2';
+                    e.currentTarget.style.borderBottomStyle = 'dotted';
+                  }}
+                  title={`Ir para o perfil de ${selectedLoan.studentName}`}
+                >
+                  {selectedLoan.studentName}
+                </span>
+              </strong></p>
             
             <div className={styles.readingInfo}>
               <h4>Informações de Leitura</h4>

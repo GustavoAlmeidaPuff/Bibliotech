@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -101,6 +103,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, description }) => (
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   
   // Estados para estatísticas principais
@@ -809,7 +812,31 @@ const Dashboard = () => {
                 <tbody>
                   {topStudents.map((student, index) => (
                     <tr key={student.id} className={index === 0 ? styles.topRanked : ''}>
-                      <td>{student.name}</td>
+                      <td>
+                        <span 
+                          style={{
+                            cursor: 'pointer',
+                            color: '#4a90e2',
+                            borderBottom: '1px dotted #4a90e2',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/students/${student.id}`);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#2c5aa0';
+                            e.currentTarget.style.borderBottomStyle = 'solid';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#4a90e2';
+                            e.currentTarget.style.borderBottomStyle = 'dotted';
+                          }}
+                          title={`Ir para o perfil de ${student.name}`}
+                        >
+                          {student.name}
+                        </span>
+                      </td>
                       <td>{student.classroom}</td>
                       <td>{student.booksRead.toFixed(1)}</td>
                     </tr>

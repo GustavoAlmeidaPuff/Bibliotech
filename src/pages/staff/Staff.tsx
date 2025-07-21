@@ -23,7 +23,7 @@ interface Filters {
 }
 
 const Staff = () => {
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [filteredStaffMembers, setFilteredStaffMembers] = useState<StaffMember[]>([]);
   const [loading, setLoading] = useState(true);

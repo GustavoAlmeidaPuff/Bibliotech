@@ -7,6 +7,7 @@ import { useTags } from '../../contexts/TagsContext';
 import { useAuthors } from '../../contexts/AuthorsContext';
 import { useDistinctCodes } from '../../hooks/useDistinctCodes';
 import AutocompleteInput from '../../components/AutocompleteInput';
+
 import styles from './RegisterBook.module.css'; // Reusando os estilos do RegisterBook
 
 interface BookForm {
@@ -525,7 +526,31 @@ const EditBook = () => {
             {loanHistory.map(loan => (
               <div key={loan.id} className={styles.historyCard}>
                 <div className={styles.historyHeader}>
-                  <div className={styles.studentName}>{loan.studentName}</div>
+                  <div className={styles.studentName}>
+                  <span 
+                    style={{
+                      cursor: 'pointer',
+                      color: '#4a90e2',
+                      borderBottom: '1px dotted #4a90e2',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/students/${loan.studentId}`);
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#2c5aa0';
+                      e.currentTarget.style.borderBottomStyle = 'solid';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#4a90e2';
+                      e.currentTarget.style.borderBottomStyle = 'dotted';
+                    }}
+                    title={`Ir para o perfil de ${loan.studentName}`}
+                  >
+                    {loan.studentName}
+                  </span>
+                </div>
                   <span className={`${styles.statusTag} ${getStatusClass(loan)}`}>
                     {getStatusText(loan)}
                   </span>
