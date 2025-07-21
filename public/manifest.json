@@ -1,6 +1,9 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Bibliotech",
+  "name": "Bibliotech - Sistema para Biblioteca Escolar",
+  "description": "Sistema completo para gestão de biblioteca escolar. Software profissional para controle de empréstimos, catalogação de livros e métricas de leitura.",
+  "keywords": "sistema biblioteca escolar, software biblioteca, gestão bibliotecária, empréstimos livros",
+  "categories": ["education", "productivity", "libraries"],
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +11,22 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "images/sys/logo.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
-      "type": "image/png",
+      "src": "images/sys/logo.png",
+      "type": "image/png", 
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#4db5ff",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "dir": "ltr"
 }

@@ -185,12 +185,32 @@ const BookSelection = () => {
   };
 
   const handleSelectBook = (bookId: string, bookTitle: string) => {
-    navigate(`/code-selection/${studentId}/${bookId}`, { 
-      state: { 
-        studentName, 
-        bookTitle
-      } 
-    });
+    // Encontrar o livro selecionado para verificar quantos códigos disponíveis tem
+    const selectedBook = books.find(book => book.id === bookId);
+    
+    if (!selectedBook || !selectedBook.availableCodes) {
+      console.error('Livro não encontrado ou sem códigos disponíveis');
+      return;
+    }
+    
+    // Se tem apenas 1 código disponível, ir direto para confirmação
+    if (selectedBook.availableCodes.length === 1) {
+      navigate(`/withdrawal-confirmation/${studentId}/${bookId}`, { 
+        state: { 
+          studentName, 
+          bookTitle,
+          selectedCode: selectedBook.availableCodes[0] // Selecionar automaticamente o único código
+        } 
+      });
+    } else {
+      // Se tem mais de 1 código, ir para seleção de código
+      navigate(`/code-selection/${studentId}/${bookId}`, { 
+        state: { 
+          studentName, 
+          bookTitle
+        } 
+      });
+    }
   };
 
   const currentBooks = filtersApplied ? filteredBooks : books;

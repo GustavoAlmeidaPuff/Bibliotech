@@ -27,6 +27,7 @@ interface LoanHistory {
   studentName: string;
   bookId: string;
   bookTitle: string;
+  bookCode?: string;
   borrowDate: Date;
   dueDate: Date;
   returnDate?: Date;
@@ -535,6 +536,9 @@ const EditBook = () => {
                     <span>Devolução: {formatDate(loan.dueDate)}</span>
                     {loan.returnDate && (
                       <span>Devolvido: {formatDate(loan.returnDate)}</span>
+                    )}
+                    {loan.bookCode && (
+                      <span>Código: <strong>{loan.bookCode}</strong></span>
                     )}
                   </div>
                 </div>

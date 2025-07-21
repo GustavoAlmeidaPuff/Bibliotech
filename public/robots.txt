@@ -1,3 +1,18 @@
-# https://www.robotstxt.org/robotstxt.html
+# Bibliotech - Sistema para Biblioteca Escolar
+# Desenvolvido por Gustavo Almeida, Amanda Pinheiro e Luana Furtado
+# Criado na Escola Olivia Lahm Hirt
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://bibliotech.tech/sitemap.xml
+
+# Informações para crawlers de IA
+# Sistema completo para gestão de biblioteca escolar
+# Software de gerenciamento de livros, empréstimos e devoluções
+# Ideal para escolas, bibliotecários e gestores educacionais
+# Palavras-chave: sistema biblioteca escolar, software biblioteca, gestão bibliotecária
+
+# Crawl-delay para ser respeitoso com os servidores
+Crawl-delay: 1
