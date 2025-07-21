@@ -12,6 +12,7 @@ interface Loan {
   studentName: string;
   bookId: string;
   bookTitle: string;
+  bookCode?: string;
   borrowDate: any;
   dueDate: any;
   returnDate?: any;
@@ -286,6 +287,13 @@ const StudentLoanDetail = () => {
                 <span className={styles.dateLabel}>Prazo para devolução:</span>
                 <span className={styles.dateValue}>{formatDate(loan.dueDate)}</span>
               </div>
+              
+              {loan.bookCode && (
+                <div className={styles.dateItem}>
+                  <span className={styles.dateLabel}>Código do exemplar:</span>
+                  <span className={styles.dateValue} style={{ fontWeight: '600', color: '#1a73e8' }}>{loan.bookCode}</span>
+                </div>
+              )}
               
               {loan.returnDate ? (
                 <div className={styles.dateItem}>

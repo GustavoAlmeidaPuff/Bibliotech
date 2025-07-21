@@ -12,6 +12,7 @@ interface Loan {
   studentName: string;
   bookId: string;
   bookTitle: string;
+  bookCode?: string;
   borrowDate: Date;
   dueDate: Date;
   status: 'active' | 'returned';
@@ -173,6 +174,7 @@ const StudentReturns = () => {
                                       <tr>
                       <th>Aluno</th>
                       <th>Livro</th>
+                      <th>Código</th>
                       <th>Retirado em</th>
                       <th>Data de Devolução</th>
                       <th>Status</th>
@@ -211,6 +213,7 @@ const StudentReturns = () => {
                         </span>
                       </td>
                         <td>{loan.bookTitle}</td>
+                        <td style={{ fontWeight: '600', color: '#1a73e8' }}>{loan.bookCode || '-'}</td>
                         <td>{loan.borrowDate.toLocaleDateString('pt-BR', {
                           year: 'numeric',
                           month: '2-digit',
