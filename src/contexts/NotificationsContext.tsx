@@ -90,6 +90,62 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Carregar datas de criação das notificações do Firebase
+  const loadNotificationCreationDates = async (): Promise<Map<string, Date>> => {
+    if (!currentUser) return new Map();
+
+    try {
+      const creationDatesRef = doc(db, `users/${currentUser.uid}/settings/notificationCreationDates`);
+      const creationDatesDoc = await getDoc(creationDatesRef);
+      
+      if (creationDatesDoc.exists()) {
+        const data = creationDatesDoc.data();
+        const creationDates = new Map<string, Date>();
+        
+        if (data.dates) {
+          Object.entries(data.dates).forEach(([notificationId, timestamp]: [string, any]) => {
+            try {
+              // Converter timestamp para Date
+              const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
+              creationDates.set(notificationId, date);
+            } catch (error) {
+              console.error(`Erro ao converter timestamp para notificação ${notificationId}:`, error);
+            }
+          });
+        }
+        
+        return creationDates;
+      }
+      
+      return new Map();
+    } catch (error) {
+      console.error('Erro ao carregar datas de criação das notificações:', error);
+      return new Map();
+    }
+  };
+
+  // Salvar datas de criação das notificações no Firebase
+  const saveNotificationCreationDates = async (creationDates: Map<string, Date>) => {
+    if (!currentUser) return;
+
+    try {
+      const creationDatesRef = doc(db, `users/${currentUser.uid}/settings/notificationCreationDates`);
+      
+      // Converter Map para objeto simples
+      const datesObject: { [key: string]: Date } = {};
+      creationDates.forEach((date, notificationId) => {
+        datesObject[notificationId] = date;
+      });
+      
+      await setDoc(creationDatesRef, {
+        dates: datesObject,
+        updatedAt: new Date()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Erro ao salvar datas de criação das notificações:', error);
+    }
+  };
+
   // salva as notificações lidas no Firebase
   const saveReadNotifications = async (readIds: Set<string>) => {
     if (!currentUser) return;
@@ -120,7 +176,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const generateNotificationFromLoan = (loan: any, isRead: boolean = false): Notification => {
+  const generateNotificationFromLoan = (loan: any, isRead: boolean = false, existingCreatedAt?: Date): Notification => {
     const today = new Date();
     const dueDate = loan.dueDate?.toDate ? loan.dueDate.toDate() : new Date(loan.dueDate);
     const diffTime = today.getTime() - dueDate.getTime();
@@ -137,7 +193,7 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       loanId: loan.id,
       daysOverdue,
       read: isRead,
-      createdAt: new Date()
+      createdAt: existingCreatedAt || new Date() // Usa a data existente ou cria uma nova
     };
   };
 
@@ -145,10 +201,11 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentUser) return [];
 
     try {
-      // Carregar notificações lidas e deletadas
-      const [readIds, deletedIds] = await Promise.all([
+      // Carregar notificações lidas, deletadas e datas de criação
+      const [readIds, deletedIds, creationDates] = await Promise.all([
         loadReadNotifications(),
-        loadDeletedNotifications()
+        loadDeletedNotifications(),
+        loadNotificationCreationDates()
       ]);
       
       setReadNotifications(readIds);
@@ -159,7 +216,9 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
       const querySnapshot = await getDocs(q);
 
       const overdueNotifications: Notification[] = [];
+      const newCreationDates = new Map(creationDates);
       const today = new Date();
+      let hasNewNotifications = false;
 
       querySnapshot.docs.forEach(doc => {
         const loanData = doc.data();
@@ -173,15 +232,30 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
           if (!deletedIds.has(notificationId)) {
             const isRead = readIds.has(notificationId);
             
+            // Verifica se já existe uma data de criação para esta notificação
+            let existingCreatedAt = creationDates.get(notificationId);
+            
+            // Se não existe, cria uma nova e marca para salvar
+            if (!existingCreatedAt) {
+              existingCreatedAt = new Date();
+              newCreationDates.set(notificationId, existingCreatedAt);
+              hasNewNotifications = true;
+            }
+            
             const notification = generateNotificationFromLoan({
               id: doc.id,
               ...loanData
-            }, isRead);
+            }, isRead, existingCreatedAt);
             
             overdueNotifications.push(notification);
           }
         }
       });
+
+      // Salva as novas datas de criação se houver
+      if (hasNewNotifications) {
+        await saveNotificationCreationDates(newCreationDates);
+      }
 
       return overdueNotifications;
     } catch (error) {
@@ -251,6 +325,17 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // salva no Firebase
     await saveDeletedNotifications(newDeletedNotifications);
+    
+    // Remove a data de criação da notificação deletada
+    try {
+      const creationDates = await loadNotificationCreationDates();
+      if (creationDates.has(notificationId)) {
+        creationDates.delete(notificationId);
+        await saveNotificationCreationDates(creationDates);
+      }
+    } catch (error) {
+      console.error('Erro ao limpar data de criação da notificação deletada:', error);
+    }
   };
 
   // busca notificações ao carregar e a cada 5 minutos
