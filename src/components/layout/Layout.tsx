@@ -80,11 +80,90 @@ const Layout: React.FC = () => {
     // Marcar como lida
     await markAsRead(notification.id);
     
-    // Navegar para a página de detalhes do empréstimo
-    navigate(`/student-loan-detail/${notification.loanId}`);
+    // Verificar o tipo de notificação para navegação apropriada
+    if (notification.type === 'update') {
+      // Para notificações de atualização, apenas fechar o drawer
+      setIsNotificationsOpen(false);
+    } else if (notification.loanId) {
+      // Para notificações de empréstimo, navegar para detalhes
+      navigate(`/student-loan-detail/${notification.loanId}`);
+      setIsNotificationsOpen(false);
+    }
+  };
+
+  const renderNotificationContent = (notification: Notification) => {
+    if (notification.type === 'update') {
+      return (
+        <>
+          <div className={styles.notificationTitle}>
+            📢 {notification.title}
+          </div>
+          <div className={styles.notificationMessage}>
+            {notification.message}
+          </div>
+          <div className={styles.notificationMeta}>
+            <span className={styles.notificationTime}>
+              {formatNotificationTime(notification.createdAt)}
+            </span>
+            <span className={`${styles.notificationBadgeType} ${styles.update}`}>
+              Atualização
+            </span>
+          </div>
+        </>
+      );
+    }
     
-    // Fechar o drawer de notificações
-    setIsNotificationsOpen(false);
+    // Renderização para notificações de empréstimo
+    return (
+      <>
+        <div className={styles.notificationTitle}>
+          {notification.title.replace(
+            `Aluno(a) ${notification.studentName}`,
+            ''
+          )}
+          <span 
+            style={{
+              cursor: 'pointer',
+              color: '#1e3a8a',
+              borderBottom: '1px dotted #1e3a8a',
+              transition: 'all 0.2s ease',
+              fontWeight: 'bold'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/students/${notification.studentId}`);
+              setIsNotificationsOpen(false);
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#0f172a';
+              e.currentTarget.style.borderBottomStyle = 'solid';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#1e3a8a';
+              e.currentTarget.style.borderBottomStyle = 'dotted';
+            }}
+            title={`Ir para o perfil de ${notification.studentName}`}
+          >
+            Aluno(a) {notification.studentName}
+          </span>
+          {notification.title.replace(
+            `Aluno(a) ${notification.studentName} está com a devolução do livro "${notification.bookTitle}" atrasada!`,
+            ` está com a devolução do livro "${notification.bookTitle}" atrasada!`
+          )}
+        </div>
+        <div className={styles.notificationMessage}>
+          {notification.message}
+        </div>
+        <div className={styles.notificationMeta}>
+          <span className={styles.notificationTime}>
+            {formatNotificationTime(notification.createdAt)}
+          </span>
+          <span className={`${styles.notificationBadgeType} ${styles[notification.type]}`}>
+            {notification.daysOverdue} dia(s) de atraso
+          </span>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -167,46 +246,11 @@ const Layout: React.FC = () => {
               notifications.map(notification => (
                 <div 
                   key={notification.id} 
-                  className={`${styles.notificationItem} ${notification.read ? styles.read : ''}`}
+                  className={`${styles.notificationItem} ${notification.read ? styles.read : ''} ${notification.type === 'update' ? styles.updateNotification : ''}`}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className={styles.notificationContent}>
                     <div className={styles.notificationHeader}>
-                                          <div className={styles.notificationTitle}>
-                      {notification.title.replace(
-                        `Aluno(a) ${notification.studentName}`,
-                        ''
-                      )}
-                      <span 
-                        style={{
-                          cursor: 'pointer',
-                          color: '#1e3a8a',
-                          borderBottom: '1px dotted #1e3a8a',
-                          transition: 'all 0.2s ease',
-                          fontWeight: 'bold'
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/students/${notification.studentId}`);
-                          setIsNotificationsOpen(false);
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = '#0f172a';
-                          e.currentTarget.style.borderBottomStyle = 'solid';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = '#1e3a8a';
-                          e.currentTarget.style.borderBottomStyle = 'dotted';
-                        }}
-                        title={`Ir para o perfil de ${notification.studentName}`}
-                      >
-                        Aluno(a) {notification.studentName}
-                      </span>
-                      {notification.title.replace(
-                        `Aluno(a) ${notification.studentName} está com a devolução do livro "${notification.bookTitle}" atrasada!`,
-                        ` está com a devolução do livro "${notification.bookTitle}" atrasada!`
-                      )}
-                    </div>
                       <button
                         className={styles.deleteNotificationButton}
                         onClick={(e) => handleDeleteNotification(notification.id, e)}
@@ -216,17 +260,7 @@ const Layout: React.FC = () => {
                         ×
                       </button>
                     </div>
-                    <div className={styles.notificationMessage}>
-                      {notification.message}
-                    </div>
-                    <div className={styles.notificationMeta}>
-                      <span className={styles.notificationTime}>
-                        {formatNotificationTime(notification.createdAt)}
-                      </span>
-                      <span className={`${styles.notificationBadgeType} ${styles[notification.type]}`}>
-                        {notification.daysOverdue} dia(s) de atraso
-                      </span>
-                    </div>
+                    {renderNotificationContent(notification)}
                   </div>
                 </div>
               ))

@@ -8,12 +8,12 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'overdue' | 'warning' | 'info';
-  studentId: string;
-  studentName: string;
-  bookTitle: string;
-  loanId: string;
-  daysOverdue: number;
+  type: 'overdue' | 'warning' | 'info' | 'update';
+  studentId?: string;
+  studentName?: string;
+  bookTitle?: string;
+  loanId?: string;
+  daysOverdue?: number;
   read: boolean;
   createdAt: Date;
 }
@@ -27,6 +27,7 @@ interface NotificationsContextType {
   markAllAsRead: () => void;
   deleteNotification: (notificationId: string) => void;
   refreshNotifications: () => Promise<void>;
+  sendUpdateNotificationToAllUsers: (title: string, content: string) => Promise<void>;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | null>(null);
@@ -176,6 +177,96 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Carregar notificações de atualização do Firebase
+  const loadUpdateNotifications = async (): Promise<Notification[]> => {
+    if (!currentUser) return [];
+
+    try {
+      const updateNotificationsRef = doc(db, `globalNotifications/updateNotifications`);
+      const updateNotificationsDoc = await getDoc(updateNotificationsRef);
+      
+      if (updateNotificationsDoc.exists()) {
+        const data = updateNotificationsDoc.data();
+        const notifications: Notification[] = [];
+        
+        if (data.notifications && Array.isArray(data.notifications)) {
+          // Carregar IDs das notificações lidas e deletadas
+          const [readIds, deletedIds] = await Promise.all([
+            loadReadNotifications(),
+            loadDeletedNotifications()
+          ]);
+          
+          data.notifications.forEach((notif: any) => {
+            if (!deletedIds.has(notif.id)) {
+              const isRead = readIds.has(notif.id);
+              
+              notifications.push({
+                id: notif.id,
+                title: notif.title,
+                message: notif.message,
+                type: 'update',
+                read: isRead,
+                createdAt: notif.createdAt?.toDate ? notif.createdAt.toDate() : new Date(notif.createdAt)
+              });
+            }
+          });
+        }
+        
+        return notifications;
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Erro ao carregar notificações de atualização:', error);
+      return [];
+    }
+  };
+
+  // Enviar notificação de atualização para todos os usuários
+  const sendUpdateNotificationToAllUsers = async (title: string, content: string): Promise<void> => {
+    if (!currentUser) throw new Error('Usuário não autenticado');
+    
+    // Verificar se é admin
+    if (currentUser.email !== 'admin@admin.com') {
+      throw new Error('Apenas o administrador pode enviar notificações de atualização');
+    }
+
+    try {
+      const notificationId = `update-${Date.now()}`;
+      const newNotification = {
+        id: notificationId,
+        title,
+        message: content,
+        createdAt: new Date()
+      };
+
+      // Salvar na coleção global de notificações
+      const updateNotificationsRef = doc(db, `globalNotifications/updateNotifications`);
+      const updateNotificationsDoc = await getDoc(updateNotificationsRef);
+      
+      let existingNotifications = [];
+      if (updateNotificationsDoc.exists()) {
+        const data = updateNotificationsDoc.data();
+        existingNotifications = data.notifications || [];
+      }
+      
+      // Adicionar nova notificação no início da lista
+      const updatedNotifications = [newNotification, ...existingNotifications];
+      
+      // Manter apenas as últimas 50 notificações para não sobrecarregar
+      const limitedNotifications = updatedNotifications.slice(0, 50);
+      
+      await setDoc(updateNotificationsRef, {
+        notifications: limitedNotifications,
+        lastUpdated: new Date()
+      }, { merge: true });
+      
+    } catch (error) {
+      console.error('Erro ao enviar notificação de atualização:', error);
+      throw error;
+    }
+  };
+
   const generateNotificationFromLoan = (loan: any, isRead: boolean = false, existingCreatedAt?: Date): Notification => {
     const today = new Date();
     const dueDate = loan.dueDate?.toDate ? loan.dueDate.toDate() : new Date(loan.dueDate);
@@ -273,8 +364,17 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setLoading(true);
     try {
-      const overdueNotifications = await fetchOverdueLoans();
-      setNotifications(overdueNotifications);
+      // Buscar tanto notificações de empréstimos atrasados quanto de atualização
+      const [overdueNotifications, updateNotifications] = await Promise.all([
+        fetchOverdueLoans(),
+        loadUpdateNotifications()
+      ]);
+      
+      // Combinar e ordenar por data de criação (mais recentes primeiro)
+      const allNotifications = [...overdueNotifications, ...updateNotifications]
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      
+      setNotifications(allNotifications);
     } catch (error) {
       console.error('Erro ao atualizar notificações:', error);
     } finally {
@@ -359,7 +459,8 @@ export const NotificationsProvider: React.FC<{ children: React.ReactNode }> = ({
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    refreshNotifications
+    refreshNotifications,
+    sendUpdateNotificationToAllUsers
   };
 
   return (

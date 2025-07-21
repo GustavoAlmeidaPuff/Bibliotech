@@ -340,5 +340,22 @@
 
 .supportButton:hover {
   background-color: #128C7E;
+}
+
+.adminButton {
+  background-color: #6f42c1;
   color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.adminButton:hover {
+  background-color: #5a32a3;
 } 

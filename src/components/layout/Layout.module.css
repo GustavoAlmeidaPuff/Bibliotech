@@ -470,6 +470,31 @@
   color: #dc2626;
 }
 
+.notificationBadgeType.update {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+}
+
+.updateNotification {
+  background: #ecfdf5 !important;
+  color: #065f46 !important;
+  border-left-color: #059669 !important;
+}
+
+.updateNotification:hover {
+  background: #d1fae5 !important;
+}
+
+.updateNotification.read {
+  background: #f0fdf4 !important;
+  color: #6b7280 !important;
+  border-left-color: #9ca3af !important;
+}
+
+.updateNotification.read:hover {
+  background: #e5e7eb !important;
+}
+
 .emptyNotifications {
   color: #64748b;
   text-align: center;

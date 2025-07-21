@@ -31,6 +31,7 @@ import StaffWithdrawalConfirmation from '../pages/withdrawals/StaffWithdrawalCon
 import SelectStaffBook from '../pages/withdrawals/SelectStaffBook';
 import StaffReturns from '../pages/returns/StaffReturns';
 import Settings from '../pages/settings/Settings';
+import UpdateNotification from '../pages/admin/UpdateNotification';
 import Home from '../pages/Home';
 import { ROUTES } from '../constants';
 
@@ -165,5 +166,9 @@ export const protectedRoutes = [
   {
     path: ROUTES.SETTINGS,
     element: <Settings />,
+  },
+  {
+    path: "/admin/update-notification",
+    element: <UpdateNotification />,
   },
 ]; 

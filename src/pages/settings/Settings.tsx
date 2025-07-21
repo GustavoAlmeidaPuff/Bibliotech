@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useNavigate } from 'react-router-dom';
 import { 
   doc, 
   collection, 
@@ -17,6 +18,7 @@ import styles from './Settings.module.css';
 const Settings = () => {
   const { currentUser } = useAuth();
   const { settings, updateSettings, saveSettings } = useSettings();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', isError: false });
   
@@ -356,6 +358,9 @@ const Settings = () => {
     await Promise.all(deleteStaffPromises);
   };
 
+  // Verificar se é admin
+  const isAdmin = currentUser?.email === 'admin@admin.com';
+
   return (
     <div className={styles.container}>
       <h2>Configurações da Biblioteca</h2>
@@ -367,6 +372,24 @@ const Settings = () => {
       )}
       
       <div className={styles.content}>
+        {isAdmin && (
+          <div className={styles.settingsSection}>
+            <h3>Administração</h3>
+            
+            <div className={styles.settingGroup}>
+              <p className={styles.helpText}>
+                Funcionalidades exclusivas para administradores do sistema.
+              </p>
+              <button 
+                className={styles.adminButton}
+                onClick={() => navigate('/admin/update-notification')}
+              >
+                Escrever Notificação de Atualização
+              </button>
+            </div>
+          </div>
+        )}
+        
         <div className={styles.settingsSection}>
           <h3>Configurações Gerais</h3>
           
