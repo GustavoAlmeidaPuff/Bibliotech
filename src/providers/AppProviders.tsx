@@ -11,24 +11,38 @@ interface AppProvidersProps {
   children: React.ReactNode;
 }
 
+// Core providers that affect authentication and theming
+const CoreProviders: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => (
+  <AuthProvider>
+    <SettingsProvider>
+      <ThemeProvider>
+        {children}
+      </ThemeProvider>
+    </SettingsProvider>
+  </AuthProvider>
+));
+
+// Data providers that can be lazy-loaded
+const DataProviders: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => (
+  <NotificationsProvider>
+    <TagsProvider>
+      <AuthorsProvider>
+        <StudentAuthProvider>
+          {children}
+        </StudentAuthProvider>
+      </AuthorsProvider>
+    </TagsProvider>
+  </NotificationsProvider>
+));
+
 // Provedor unificado que combina todos os providers necessários
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <AuthProvider>
-      <SettingsProvider>
-        <NotificationsProvider>
-          <TagsProvider>
-            <AuthorsProvider>
-              <StudentAuthProvider>
-                <ThemeProvider>
-                  {children}
-                </ThemeProvider>
-              </StudentAuthProvider>
-            </AuthorsProvider>
-          </TagsProvider>
-        </NotificationsProvider>
-      </SettingsProvider>
-    </AuthProvider>
+    <CoreProviders>
+      <DataProviders>
+        {children}
+      </DataProviders>
+    </CoreProviders>
   );
 };
 

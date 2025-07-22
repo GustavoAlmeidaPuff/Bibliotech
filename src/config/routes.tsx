@@ -1,39 +1,60 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
-// lazy loading dos componentes para melhor performance
-import Login from '../pages/auth/Login';
-import ForgotPassword from '../pages/auth/ForgotPassword';
-import StudentLogin from '../pages/auth/StudentLogin';
-import StudentDashboardPage from '../pages/student/StudentDashboard';
-import Dashboard from '../pages/dashboard/Dashboard';
-import Students from '../pages/students/Students';
-import RegisterStudent from '../pages/students/RegisterStudent';
-import EditStudent from '../pages/students/EditStudent';
-import StudentDashboard from '../pages/students/StudentDashboard';
-import Staff from '../pages/staff/Staff';
-import RegisterStaff from '../pages/staff/RegisterStaff';
-import EditStaff from '../pages/staff/EditStaff';
-import Books from '../pages/books/Books';
-import RegisterBook from '../pages/books/RegisterBook';
-import EditBook from '../pages/books/EditBook';
-import StudentLoans from '../pages/loans/StudentLoans';
-import StudentLoanDetail from '../pages/loans/StudentLoanDetail';
-import StaffLoans from '../pages/loans/StaffLoans';
-import StudentReturns from '../pages/returns/StudentReturns';
-import StudentWithdrawals from '../pages/withdrawals/StudentWithdrawals';
-import StaffWithdrawals from '../pages/withdrawals/StaffWithdrawals';
-import BookSelection from '../pages/withdrawals/BookSelection';
-import CodeSelection from '../pages/withdrawals/CodeSelection';
-import WithdrawalConfirmation from '../pages/withdrawals/WithdrawalConfirmation';
-import StaffWithdrawalConfirmation from '../pages/withdrawals/StaffWithdrawalConfirmation';
-import SelectStaffBook from '../pages/withdrawals/SelectStaffBook';
-import StaffReturns from '../pages/returns/StaffReturns';
-import Settings from '../pages/settings/Settings';
-import UpdateNotification from '../pages/admin/UpdateNotification';
-import Home from '../pages/Home';
 import { ROUTES } from '../constants';
+
+// Lazy loading dos componentes para melhor performance
+const Login = React.lazy(() => import('../pages/auth/Login'));
+const ForgotPassword = React.lazy(() => import('../pages/auth/ForgotPassword'));
+const StudentLogin = React.lazy(() => import('../pages/auth/StudentLogin'));
+const StudentDashboardPage = React.lazy(() => import('../pages/student/StudentDashboard'));
+const Dashboard = React.lazy(() => import('../pages/dashboard/Dashboard'));
+const Students = React.lazy(() => import('../pages/students/Students'));
+const RegisterStudent = React.lazy(() => import('../pages/students/RegisterStudent'));
+const EditStudent = React.lazy(() => import('../pages/students/EditStudent'));
+const StudentDashboard = React.lazy(() => import('../pages/students/StudentDashboard'));
+const Staff = React.lazy(() => import('../pages/staff/Staff'));
+const RegisterStaff = React.lazy(() => import('../pages/staff/RegisterStaff'));
+const EditStaff = React.lazy(() => import('../pages/staff/EditStaff'));
+const Books = React.lazy(() => import('../pages/books/Books'));
+const RegisterBook = React.lazy(() => import('../pages/books/RegisterBook'));
+const EditBook = React.lazy(() => import('../pages/books/EditBook'));
+const StudentLoans = React.lazy(() => import('../pages/loans/StudentLoans'));
+const StudentLoanDetail = React.lazy(() => import('../pages/loans/StudentLoanDetail'));
+const StaffLoans = React.lazy(() => import('../pages/loans/StaffLoans'));
+const StudentReturns = React.lazy(() => import('../pages/returns/StudentReturns'));
+const StudentWithdrawals = React.lazy(() => import('../pages/withdrawals/StudentWithdrawals'));
+const StaffWithdrawals = React.lazy(() => import('../pages/withdrawals/StaffWithdrawals'));
+const BookSelection = React.lazy(() => import('../pages/withdrawals/BookSelection'));
+const CodeSelection = React.lazy(() => import('../pages/withdrawals/CodeSelection'));
+const WithdrawalConfirmation = React.lazy(() => import('../pages/withdrawals/WithdrawalConfirmation'));
+const StaffWithdrawalConfirmation = React.lazy(() => import('../pages/withdrawals/StaffWithdrawalConfirmation'));
+const SelectStaffBook = React.lazy(() => import('../pages/withdrawals/SelectStaffBook'));
+const Settings = React.lazy(() => import('../pages/settings/Settings'));
+const UpdateNotification = React.lazy(() => import('../pages/admin/UpdateNotification'));
+const Home = React.lazy(() => import('../pages/Home'));
+
+// Loading component for lazy routes
+const LoadingSpinner: React.FC = () => (
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    fontSize: '18px'
+  }}>
+    Carregando...
+  </div>
+);
+
+// Higher-order component to wrap lazy components with Suspense
+const withSuspense = (Component: React.LazyExoticComponent<React.ComponentType<any>>) => {
+  return (props: any) => (
+    <Suspense fallback={<LoadingSpinner />}>
+      <Component {...props} />
+    </Suspense>
+  );
+};
 
 // redireciona com base no estado de autenticação
 export const RedirectBasedOnAuth = () => {
@@ -45,27 +66,27 @@ export const RedirectBasedOnAuth = () => {
 export const publicRoutes = [
   {
     path: ROUTES.HOME,
-    element: <Home />,
+    element: withSuspense(Home)({}),
   },
   {
     path: "/home",
-    element: <Home />,
+    element: withSuspense(Home)({}),
   },
   {
     path: ROUTES.LOGIN,
-    element: <Login />,
+    element: withSuspense(Login)({}),
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword />,
+    element: withSuspense(ForgotPassword)({}),
   },
   {
     path: "/student-login",
-    element: <StudentLogin />,
+    element: withSuspense(StudentLogin)({}),
   },
   {
     path: "/student-dashboard",
-    element: <StudentDashboardPage />,
+    element: withSuspense(StudentDashboardPage)({}),
   },
 ];
 
@@ -73,102 +94,102 @@ export const publicRoutes = [
 export const protectedRoutes = [
   {
     path: ROUTES.DASHBOARD,
-    element: <Dashboard />,
+    element: withSuspense(Dashboard)({}),
   },
   {
     path: ROUTES.STUDENTS,
-    element: <Students />,
+    element: withSuspense(Students)({}),
   },
   {
     path: "/students/register",
-    element: <RegisterStudent />,
+    element: withSuspense(RegisterStudent)({}),
   },
   {
     path: "/students/:studentId/edit",
-    element: <EditStudent />,
+    element: withSuspense(EditStudent)({}),
   },
   {
     path: "/students/:studentId",
-    element: <StudentDashboard />,
+    element: withSuspense(StudentDashboard)({}),
   },
   {
     path: ROUTES.STAFF,
-    element: <Staff />,
+    element: withSuspense(Staff)({}),
   },
   {
     path: "/staff/register",
-    element: <RegisterStaff />,
+    element: withSuspense(RegisterStaff)({}),
   },
   {
     path: "/staff/:id",
-    element: <EditStaff />,
+    element: withSuspense(EditStaff)({}),
   },
   {
     path: "/staff/:id/edit",
-    element: <EditStaff />,
+    element: withSuspense(EditStaff)({}),
   },
   {
     path: ROUTES.BOOKS,
-    element: <Books />,
+    element: withSuspense(Books)({}),
   },
   {
     path: "/books/register",
-    element: <RegisterBook />,
+    element: withSuspense(RegisterBook)({}),
   },
   {
     path: "/books/:bookId",
-    element: <EditBook />,
+    element: withSuspense(EditBook)({}),
   },
   {
     path: "/student-loans",
-    element: <StudentLoans key="student-loans" />,
+    element: withSuspense(StudentLoans)({ key: "student-loans" }),
   },
   {
     path: "/student-loan-detail/:loanId",
-    element: <StudentLoanDetail />,
+    element: withSuspense(StudentLoanDetail)({}),
   },
   {
     path: "/staff-loans",
-    element: <StaffLoans />,
+    element: withSuspense(StaffLoans)({}),
   },
   {
     path: "/student-returns",
-    element: <StudentReturns />,
+    element: withSuspense(StudentReturns)({}),
   },
   {
     path: "/student-withdrawals",
-    element: <StudentWithdrawals />,
+    element: withSuspense(StudentWithdrawals)({}),
   },
   {
     path: "/student-withdrawals/:studentId",
-    element: <BookSelection />,
+    element: withSuspense(BookSelection)({}),
   },
   {
     path: "/code-selection/:studentId/:bookId",
-    element: <CodeSelection />,
+    element: withSuspense(CodeSelection)({}),
   },
   {
     path: "/withdrawal-confirmation/:studentId/:bookId",
-    element: <WithdrawalConfirmation />,
+    element: withSuspense(WithdrawalConfirmation)({}),
   },
   {
     path: "/staff-withdrawals",
-    element: <StaffWithdrawals />,
+    element: withSuspense(StaffWithdrawals)({}),
   },
   {
     path: "/staff-withdrawals/:staffId",
-    element: <SelectStaffBook />,
+    element: withSuspense(SelectStaffBook)({}),
   },
   {
     path: "/staff-withdrawals/:staffId/confirm/:bookId",
-    element: <StaffWithdrawalConfirmation />,
+    element: withSuspense(StaffWithdrawalConfirmation)({}),
   },
   {
     path: ROUTES.SETTINGS,
-    element: <Settings />,
+    element: withSuspense(Settings)({}),
   },
   {
     path: "/admin/update-notification",
-    element: <UpdateNotification />,
+    element: withSuspense(UpdateNotification)({}),
   },
 ]; 

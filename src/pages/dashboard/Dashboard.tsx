@@ -4,35 +4,12 @@ import { collection, query, getDocs, where, orderBy, limit, Timestamp } from 'fi
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 
-import { Bar, Pie, Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement
-} from 'chart.js';
+import LazyChart from '../../components/charts/LazyChart';
 import { subMonths, startOfMonth, endOfMonth, format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import styles from './Dashboard.module.css';
 
-// Registrando os componentes do Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-  PointElement,
-  LineElement
-);
+// Chart.js components are now lazy loaded in LazyChart component
 
 interface StatCardProps {
   title: string;
@@ -597,7 +574,8 @@ const Dashboard = () => {
           <h3>Empréstimos por Categoria</h3>
           {genreData.length > 0 ? (
             <div className={styles.chartContainer}>
-              <Pie
+              <LazyChart
+                type="pie"
                 data={{
                   labels: genreData.map(item => item.genre),
                   datasets: [
@@ -678,7 +656,8 @@ const Dashboard = () => {
           <h3>Evolução Mensal</h3>
           {monthlyLoanData.labels.length > 0 ? (
             <div className={styles.chartContainer}>
-              <Line
+              <LazyChart
+                type="line"
                 data={{
                   labels: monthlyLoanData.labels,
                   datasets: [
@@ -710,10 +689,10 @@ const Dashboard = () => {
                     },
                     tooltip: {
                       callbacks: {
-                        title: function(tooltipItems) {
+                        title: function(tooltipItems: any) {
                           return tooltipItems[0].label;
                         },
-                        label: function(context) {
+                        label: function(context: any) {
                           const value = context.raw as number;
                           const label = context.dataset.label || '';
                           return `${label}: ${value} livros`;
@@ -748,7 +727,8 @@ const Dashboard = () => {
           <h3>Média de Progresso de Leitura</h3>
           {completionRateData.labels.length > 0 ? (
             <div className={styles.chartContainer}>
-              <Bar
+              <LazyChart
+                type="bar"
                 data={{
                   labels: completionRateData.labels,
                   datasets: [
@@ -767,7 +747,7 @@ const Dashboard = () => {
                     },
                     tooltip: {
                       callbacks: {
-                        label: function(context) {
+                        label: function(context: any) {
                           return `Média: ${context.raw}%`;
                         }
                       }
@@ -778,7 +758,7 @@ const Dashboard = () => {
                       beginAtZero: true,
                       max: 100,
                       ticks: {
-                        callback: function(value) {
+                        callback: function(value: any) {
                           return value + '%';
                         }
                       }
@@ -856,7 +836,8 @@ const Dashboard = () => {
           <h3>Desempenho por Turma</h3>
           {classroomPerformance.length > 0 ? (
             <div className={styles.chartContainer}>
-              <Bar
+              <LazyChart
+                type="bar"
                 data={{
                   labels: classroomPerformance.map(c => c.classroom),
                   datasets: [
@@ -875,7 +856,7 @@ const Dashboard = () => {
                     },
                     tooltip: {
                       callbacks: {
-                        label: function(context) {
+                        label: function(context: any) {
                           return `Livros: ${context.raw} livros`;
                         }
                       }

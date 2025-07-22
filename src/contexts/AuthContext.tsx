@@ -76,13 +76,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const value = {
+  const value = React.useMemo(() => ({
     currentUser,
     login,
     logout,
     resetPassword,
     authState,
-  };
+  }), [currentUser, authState]);
 
   return (
     <AuthContext.Provider value={value}>
