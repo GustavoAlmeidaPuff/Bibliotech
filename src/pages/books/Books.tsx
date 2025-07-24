@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useInfiniteScroll } from '../../hooks';
 import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import styles from './Books.module.css';
 
@@ -105,10 +106,34 @@ const Books = () => {
     }
   };
 
-  const booksToDisplay = () => {
-    const booksToSort = filtersApplied ? filteredBooks : books;
-    return sortBooks(booksToSort);
-  };
+  const currentBooks = filtersApplied ? filteredBooks : books;
+  const sortedBooks = useMemo(() => sortBooks(currentBooks), [currentBooks, sortBy, sortBooks]);
+
+  console.log('Books pagination debug:', {
+    totalBooks: books.length,
+    sortedBooks: sortedBooks.length,
+    filtersApplied
+  });
+
+  // Hook de paginação com scroll infinito
+  const {
+    displayedItems: displayedBooks,
+    isLoading: isLoadingMore,
+    loadingRef,
+    resetPagination
+  } = useInfiniteScroll({
+    items: sortedBooks,
+    itemsPerPage: 30,
+    threshold: 200,
+    enabled: !loading
+  });
+
+  console.log('Displayed books:', displayedBooks.length);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    resetPagination();
+  }, [filtersApplied, filteredBooks, books, sortBy, resetPagination]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,10 +208,11 @@ const Books = () => {
   };
 
   const handleSelectAll = () => {
+    const currentBooks = displayedBooks;
     setSelectedBooks(
-      selectedBooks.length === books.length
+      selectedBooks.length === currentBooks.length
         ? []
-        : books.map(book => book.id)
+        : currentBooks.map(book => book.id)
     );
   };
 
@@ -220,7 +246,7 @@ const Books = () => {
                 className={styles.selectAllButton}
                 onClick={handleSelectAll}
               >
-                {selectedBooks.length === books.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+                {selectedBooks.length === displayedBooks.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
               </button>
               <button
                 className={styles.deleteButton}
@@ -358,7 +384,7 @@ const Books = () => {
           <>
             {viewMode === 'grid' ? (
               <div className={styles.booksGrid}>
-                {booksToDisplay().map(book => (
+                {displayedBooks.map(book => (
                   <div
                     key={book.id}
                     className={`${styles.bookCard} ${selectedBooks.includes(book.id) ? styles.selected : ''}`}
@@ -404,6 +430,9 @@ const Books = () => {
                     </Link>
                   </div>
                 ))}
+                <div ref={loadingRef} className={styles.loadingMore}>
+                  {isLoadingMore ? 'Carregando mais livros...' : ''}
+                </div>
               </div>
             ) : (
               <div className={styles.booksList}>
@@ -418,7 +447,7 @@ const Books = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {booksToDisplay().map(book => (
+                    {displayedBooks.map(book => (
                       <tr 
                         key={book.id} 
                         className={selectedBooks.includes(book.id) ? styles.selected : ''}
@@ -455,6 +484,9 @@ const Books = () => {
                     ))}
                   </tbody>
                 </table>
+                <div ref={loadingRef} className={styles.loadingMore}>
+                  {isLoadingMore ? 'Carregando mais livros...' : ''}
+                </div>
               </div>
             )}
             {!loading && filteredBooks.length === 0 && filtersApplied && (
