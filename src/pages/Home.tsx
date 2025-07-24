@@ -1126,6 +1126,185 @@ interface ContactFormData {
   mensagem: string;
 }
 
+// Componente de contador animado
+const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: string }> = ({ 
+  end, 
+  duration = 2, 
+  suffix = '' 
+}) => {
+  const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-200px 0px -200px 0px" });
+
+  useEffect(() => {
+    console.log('AnimatedCounter effect:', { isInView, hasAnimated, end });
+    if (isInView && !hasAnimated) {
+      console.log('Starting animation for:', end);
+      setHasAnimated(true);
+      
+      let currentCount = 0;
+      const steps = 60; // 60 steps
+      const increment = end / steps;
+      const stepDuration = (duration * 1000) / steps;
+      
+      const interval = setInterval(() => {
+        currentCount += increment;
+        if (currentCount >= end) {
+          currentCount = end;
+          clearInterval(interval);
+        }
+        setCount(Math.floor(currentCount));
+      }, stepDuration);
+
+      return () => clearInterval(interval);
+    }
+  }, [isInView, hasAnimated, end, duration]);
+
+  // Fallback: se não estiver em view, ainda mostra o número
+  useEffect(() => {
+    if (!isInView && !hasAnimated) {
+      setCount(end);
+    }
+  }, [isInView, hasAnimated, end]);
+
+  // Força a animação após um delay para debug
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasAnimated) {
+        console.log('Forcing animation for:', end);
+        setHasAnimated(true);
+        setCount(end);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [hasAnimated, end]);
+
+  return (
+    <span ref={ref}>
+      {count.toLocaleString()}{suffix}
+    </span>
+  );
+};
+
+// Seção de estatísticas
+const StatsSection = styled(motion.section)`
+  background: linear-gradient(135deg, #0a192f 0%, #112240 100%);
+  padding: 4rem 2rem 6rem 2rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(77, 181, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234db5ff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+`;
+
+const StatsContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+`;
+
+const StatCard = styled(motion.div)`
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  border: 1px solid rgba(77, 181, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(77, 181, 255, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    padding: 2rem 1.5rem;
+  }
+`;
+
+const StatIcon = styled.div<{ color: string }>`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: ${props => props.color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+  color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 768px) {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+  }
+`;
+
+const StatNumber = styled.div`
+  font-size: 3rem;
+  font-weight: 700;
+  color: #4db5ff;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px rgba(77, 181, 255, 0.3);
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+`;
+
+const StatLabel = styled.div`
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  font-weight: 500;
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+`;
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -1286,6 +1465,52 @@ Aguardo retorno. Obrigado!`;
             </TextContent>
           </ContentWrapper>
         </ParallaxSection>
+
+        <StatsSection
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <StatsContainer>
+            <StatCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <StatIcon color="#4db5ff">📚</StatIcon>
+              <StatNumber>
+                <AnimatedCounter end={1000} />+
+              </StatNumber>
+              <StatLabel>Livros registrados</StatLabel>
+            </StatCard>
+            <StatCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <StatIcon color="#25D366">👥</StatIcon>
+              <StatNumber>
+                <AnimatedCounter end={500} />+
+              </StatNumber>
+              <StatLabel>Alunos registrados</StatLabel>
+            </StatCard>
+            <StatCard
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <StatIcon color="#FF6B6B">🔥</StatIcon>
+              <StatNumber>
+                <AnimatedCounter end={100} />+
+              </StatNumber>
+              <StatLabel>Alunos ativos mensalmente</StatLabel>
+            </StatCard>
+          </StatsContainer>
+        </StatsSection>
 
         <Section
           id="produto"
