@@ -157,4 +157,58 @@
 .links a:hover {
   color: var(--primary-color-hover, #3367d6);
   text-decoration: underline;
+}
+
+.betaSection {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.betaQuestion {
+  margin-bottom: 16px;
+  color: #555;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.whatsappButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #25D366;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2);
+  text-decoration: none;
+  margin: 0 auto;
+}
+
+.whatsappButton:hover {
+  background-color: #128C7E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.3);
+}
+
+.whatsappButton:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.whatsappButton img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whatsappButton:hover img {
+  transform: scale(1.1);
 } 
