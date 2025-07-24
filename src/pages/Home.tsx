@@ -1803,6 +1803,49 @@ Aguardo retorno. Obrigado!`;
             </StatCard>
           </StatsContainer>
           
+          {/* Ilustrações decorativas para o slogan */}
+          <DecorativeContainer>
+            <DecorativeShape
+              color="#4db5ff"
+              size="60px"
+              position="top: 10%; left: 5%;"
+              rotation={25}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 0.8 }}
+            />
+            <FloatingIcon
+              color="#25D366"
+              size="25px"
+              position="top: 20%; right: 8%;"
+              icon="✨"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.5}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 0.15, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 1.0 }}
+            />
+            <DecorativeShape
+              color="#FF6B6B"
+              size="50px"
+              position="bottom: 15%; right: 5%;"
+              rotation={-20}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.2}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 1.2 }}
+            />
+          </DecorativeContainer>
+
           <SloganContainer
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -1844,6 +1887,61 @@ Aguardo retorno. Obrigado!`;
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
+          {/* Ilustrações decorativas para a seção de produto */}
+          <DecorativeContainer>
+            <DecorativeShape
+              color="#4db5ff"
+              size="100px"
+              position="top: 15%; left: 8%;"
+              rotation={20}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 0.3 }}
+            />
+            <BookShape
+              color="#25D366"
+              size="70px"
+              position="top: 25%; right: 12%;"
+              rotation={-15}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              whileInView={{ opacity: 0.12, scale: 1, rotate: -15 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: 0.6 }}
+            />
+            <FloatingIcon
+              color="#FF6B6B"
+              size="40px"
+              position="bottom: 20%; left: 15%;"
+              icon="📊"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.5}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 0.15, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.9 }}
+            />
+            <DecorativeShape
+              color="#4db5ff"
+              size="80px"
+              position="bottom: 30%; right: 8%;"
+              rotation={60}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.2}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 1.2 }}
+            />
+          </DecorativeContainer>
           <ProductSection>
             <ProductGrid>
               <ProductDescription
@@ -2044,6 +2142,74 @@ Aguardo retorno. Obrigado!`;
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
+          {/* Ilustrações decorativas para a seção de contato */}
+          <DecorativeContainer>
+            <DecorativeShape
+              color="#4db5ff"
+              size="120px"
+              position="top: 10%; right: 10%;"
+              rotation={45}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 0.2 }}
+            />
+            <BookShape
+              color="#25D366"
+              size="60px"
+              position="top: 30%; left: 8%;"
+              rotation={30}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              whileInView={{ opacity: 0.12, scale: 1, rotate: 30 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: 0.5 }}
+            />
+            <FloatingIcon
+              color="#FF6B6B"
+              size="35px"
+              position="bottom: 25%; right: 15%;"
+              icon="💬"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.6}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 0.15, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.8 }}
+            />
+            <DecorativeShape
+              color="#4db5ff"
+              size="90px"
+              position="bottom: 15%; left: 12%;"
+              rotation={-30}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.2}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 1.1 }}
+            />
+            <FloatingIcon
+              color="#25D366"
+              size="30px"
+              position="top: 60%; left: 20%;"
+              icon="📧"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 0.15, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 1.4 }}
+            />
+          </DecorativeContainer>
           <Title variants={fadeInUp}>
             Entre em Contato
           </Title>
