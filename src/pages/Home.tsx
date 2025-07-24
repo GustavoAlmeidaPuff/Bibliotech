@@ -1431,6 +1431,209 @@ const DecorativeContainer = styled.div`
   z-index: 1;
 `;
 
+// Componente de partículas interativas
+const ParticleSystem = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+`;
+
+const Particle = styled(motion.div)<{ color: string; size: number }>`
+  position: absolute;
+  width: ${props => props.size}px;
+  height: ${props => props.size}px;
+  background: ${props => props.color};
+  border-radius: 50%;
+  opacity: 0.6;
+  filter: blur(1px);
+`;
+
+// Componente de efeito de digitação
+const TypewriterText = styled.span`
+  border-right: 2px solid #4db5ff;
+  animation: blink 1s infinite;
+  
+  @keyframes blink {
+    0%, 50% { border-color: transparent; }
+    51%, 100% { border-color: #4db5ff; }
+  }
+`;
+
+const TypewriterEffect: React.FC<{ text: string; speed?: number }> = ({ text, speed = 100 }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText(prev => prev + text[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, speed);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, text, speed]);
+
+  return <TypewriterText>{displayText}</TypewriterText>;
+};
+
+// Componente de indicadores de seção
+const SectionIndicators = styled.div`
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  @media (max-width: 768px) {
+    right: 15px;
+    gap: 10px;
+  }
+`;
+
+const SectionDot = styled(motion.button)<{ isActive: boolean }>`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: ${props => props.isActive ? '#4db5ff' : 'rgba(255, 255, 255, 0.3)'};
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    background: #4db5ff;
+    transform: scale(1.2);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    border: 2px solid #4db5ff;
+    border-radius: 50%;
+    opacity: ${props => props.isActive ? 0.5 : 0};
+    transition: opacity 0.3s ease;
+  }
+`;
+
+// Componente de gradiente animado
+const AnimatedGradient = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    #0a192f,
+    #112240,
+    #1a1a1a,
+    #0a192f
+  );
+  background-size: 400% 400%;
+  z-index: -1;
+  pointer-events: none;
+  
+  animation: gradientShift 15s ease infinite;
+  
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+`;
+
+// Componente de efeito de brilho
+const GlowEffect = styled(motion.div)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(77, 181, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 0;
+`;
+
+// Melhorar o efeito de hover nos cards de estatísticas
+const EnhancedStatCard = styled(StatCard)`
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(77, 181, 255, 0.1),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+`;
+
+// Componente de loading inicial
+const LoadingScreen = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0a192f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
+
+const LoadingText = styled(motion.div)`
+  font-size: 2rem;
+  color: #4db5ff;
+  font-weight: 600;
+  letter-spacing: 2px;
+`;
+
+// Componente de scroll reveal melhorado
+const ScrollReveal = styled(motion.div)`
+  opacity: 0;
+  transform: translateY(50px);
+  
+  &.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+`;
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -1443,6 +1646,12 @@ const Home: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const gridVideoRef = useRef<HTMLVideoElement>(null);
+  
+  // Novos estados para melhorias
+  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
+  const [activeSection, setActiveSection] = useState(0);
+  const [showTypewriter, setShowTypewriter] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // estados do formulário de contato
   const [contactForm, setContactForm] = useState<ContactFormData>({
@@ -1496,6 +1705,20 @@ Aguardo retorno. Obrigado!`;
         const parallaxX = Math.sin(scrollY * 0.002) * 100;
         mouseX.set(parallaxX);
       }
+      
+      // Detectar seção ativa
+      const sections = ['inicio', 'produto', 'contato'];
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      
+      sections.forEach((sectionId, index) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(index);
+          }
+        }
+      });
     };
 
     const handleResize = () => {
@@ -1515,10 +1738,35 @@ Aguardo retorno. Obrigado!`;
         const decorativeX = (e.clientX - centerX) / centerX;
         const decorativeY = (e.clientY - centerY) / centerY;
         setDecorativeMousePos({ x: decorativeX, y: decorativeY });
+        
+        // Gerar partículas ocasionalmente
+        if (Math.random() < 0.1) {
+          const newParticle = {
+            id: Date.now(),
+            x: e.clientX,
+            y: e.clientY,
+            color: ['#4db5ff', '#25D366', '#FF6B6B'][Math.floor(Math.random() * 3)],
+            size: Math.random() * 4 + 2
+          };
+          setParticles(prev => [...prev.slice(-20), newParticle]); // Manter apenas 20 partículas
+        }
       }
     };
 
+    // Gerar partículas iniciais
+    const generateInitialParticles = () => {
+      const initialParticles = Array.from({ length: 15 }, (_, i) => ({
+        id: i,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        color: ['#4db5ff', '#25D366', '#FF6B6B'][Math.floor(Math.random() * 3)],
+        size: Math.random() * 4 + 2
+      }));
+      setParticles(initialParticles);
+    };
+
     handleResize();
+    generateInitialParticles();
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
@@ -1558,10 +1806,89 @@ Aguardo retorno. Obrigado!`;
     visible: { opacity: 1, y: 0 }
   };
 
+  // Função para scroll suave
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Função para mostrar typewriter após delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTypewriter(true);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Loading screen
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
+      {/* Loading Screen */}
+      <AnimatePresence>
+        {isLoading && (
+          <LoadingScreen
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <LoadingText
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              BIBLIOTECH
+            </LoadingText>
+          </LoadingScreen>
+        )}
+      </AnimatePresence>
+
       <Header />
       <HomeContainer>
+        {/* Gradiente animado de fundo */}
+        <AnimatedGradient />
+        <GlowEffect />
+        
+        {/* Sistema de partículas */}
+        <ParticleSystem>
+          {particles.map((particle) => (
+            <Particle
+              key={particle.id}
+              color={particle.color}
+              size={particle.size}
+              style={{
+                left: particle.x,
+                top: particle.y,
+              }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.6, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ duration: 2 }}
+            />
+          ))}
+        </ParticleSystem>
+        
+        {/* Indicadores de seção */}
+        <SectionIndicators>
+          {['inicio', 'produto', 'contato'].map((sectionId, index) => (
+            <SectionDot
+              key={sectionId}
+              isActive={activeSection === index}
+              onClick={() => scrollToSection(sectionId)}
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
+            />
+          ))}
+        </SectionIndicators>
+
         <ProgressBar
           style={{ width: `${scrollProgress}%` }}
           initial={{ width: 0 }}
@@ -1707,7 +2034,12 @@ Aguardo retorno. Obrigado!`;
               transition={{ duration: 1, delay: 0.2 }}
             >
               <Title isLight>
-                Bem-vindo à&nbsp;<NeonText>BIBLIOTECH</NeonText>
+                Bem-vindo à&nbsp;
+                {showTypewriter ? (
+                  <TypewriterEffect text="BIBLIOTECH" speed={150} />
+                ) : (
+                  <NeonText>BIBLIOTECH</NeonText>
+                )}
               </Title>
               <Subtitle isLight>
                 Bibliotecas escolares com foco no&nbsp;<NeonText>aluno!</NeonText>
@@ -1765,7 +2097,7 @@ Aguardo retorno. Obrigado!`;
             />
           </DecorativeContainer>
           <StatsContainer>
-            <StatCard
+            <EnhancedStatCard
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1776,8 +2108,8 @@ Aguardo retorno. Obrigado!`;
                 <AnimatedCounter end={1000} />+
               </StatNumber>
               <StatLabel>Livros registrados</StatLabel>
-            </StatCard>
-            <StatCard
+            </EnhancedStatCard>
+            <EnhancedStatCard
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1788,8 +2120,8 @@ Aguardo retorno. Obrigado!`;
                 <AnimatedCounter end={500} />+
               </StatNumber>
               <StatLabel>Leitores registrados</StatLabel>
-            </StatCard>
-            <StatCard
+            </EnhancedStatCard>
+            <EnhancedStatCard
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -1800,7 +2132,7 @@ Aguardo retorno. Obrigado!`;
                 <AnimatedCounter end={100} />+
               </StatNumber>
               <StatLabel>Leitores ativos mensalmente</StatLabel>
-            </StatCard>
+            </EnhancedStatCard>
           </StatsContainer>
           
           {/* Ilustrações decorativas para o slogan */}
@@ -2025,6 +2357,36 @@ Aguardo retorno. Obrigado!`;
                     </PlayOverlay>
                   </VideoContainer>
                 </ScaleOnScroll>
+                
+                {/* Ilustrações decorativas ao redor do vídeo */}
+                <DecorativeContainer>
+                  <FloatingIcon
+                    color="#4db5ff"
+                    size="30px"
+                    position="top: -15px; right: -15px;"
+                    icon="🎬"
+                    mouseX={decorativeMousePos.x}
+                    mouseY={decorativeMousePos.y}
+                    speed={0.4}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 0.2, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.8 }}
+                  />
+                  <DecorativeShape
+                    color="#25D366"
+                    size="40px"
+                    position="bottom: -20px; left: -20px;"
+                    rotation={45}
+                    mouseX={decorativeMousePos.x}
+                    mouseY={decorativeMousePos.y}
+                    speed={0.3}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 0.1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.5, delay: 1.0 }}
+                  />
+                </DecorativeContainer>
               </ProductVideoContainer>
             </ProductGrid>
           </ProductSection>
