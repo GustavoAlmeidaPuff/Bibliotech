@@ -275,7 +275,6 @@ const Header: React.FC = () => {
         </LogoWrapper>
         <LogoText>
           <h1>Bibliotech.<span style={{ color: '#4cb4fd', fontSize: '1.5rem' }}>tech</span></h1>
-          <span>by proton</span>
         </LogoText>
       </LogoContainer>
 

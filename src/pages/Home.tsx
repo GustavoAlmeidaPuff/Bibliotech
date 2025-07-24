@@ -2190,7 +2190,7 @@ Aguardo retorno. Obrigado!`;
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 1.0 }}
             >
-              <SloganHighlight>Desenvolvido</SloganHighlight> para alunos
+              <SloganHighlight>Desenvolvido</SloganHighlight> por alunos
             </SloganText>
             <SloganText
               initial={{ opacity: 0, x: -20 }}
