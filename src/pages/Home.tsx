@@ -1332,6 +1332,88 @@ const SloganHighlight = styled.span`
   text-shadow: 0 0 10px rgba(77, 181, 255, 0.3);
 `;
 
+// Componentes de ilustrações decorativas
+const DecorativeShape = styled(motion.div)<{ 
+  color: string; 
+  size: string; 
+  position: string;
+  rotation?: number;
+}>`
+  position: absolute;
+  width: ${props => props.size};
+  height: ${props => props.size};
+  background: ${props => props.color};
+  border-radius: 50%;
+  opacity: 0.1;
+  filter: blur(1px);
+  ${props => props.position}
+  transform: rotate(${props => props.rotation || 0}deg);
+  z-index: 1;
+  pointer-events: none;
+`;
+
+const BookShape = styled(motion.div)<{ 
+  color: string; 
+  size: string; 
+  position: string;
+  rotation?: number;
+}>`
+  position: absolute;
+  width: ${props => props.size};
+  height: ${props => props.size};
+  background: ${props => props.color};
+  border-radius: 8px;
+  opacity: 0.15;
+  ${props => props.position}
+  transform: rotate(${props => props.rotation || 0}deg);
+  z-index: 1;
+  pointer-events: none;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    right: 20%;
+    bottom: 20%;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+  }
+`;
+
+const FloatingIcon = styled(motion.div)<{ 
+  color: string; 
+  size: string; 
+  position: string;
+  icon: string;
+}>`
+  position: absolute;
+  width: ${props => props.size};
+  height: ${props => props.size};
+  background: ${props => props.color};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  opacity: 0.2;
+  ${props => props.position}
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+`;
+
+const DecorativeContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+`;
+
 const Home: React.FC = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -1477,6 +1559,97 @@ Aguardo retorno. Obrigado!`;
               y: backgroundY,
             }}
           />
+          
+          {/* Ilustrações decorativas */}
+          <DecorativeContainer>
+            {/* Formas circulares flutuantes */}
+            <DecorativeShape
+              color="#4db5ff"
+              size="120px"
+              position="top: 15%; left: 10%;"
+              rotation={45}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.1, scale: 1 }}
+              transition={{ duration: 2, delay: 0.5 }}
+            />
+            <DecorativeShape
+              color="#25D366"
+              size="80px"
+              position="top: 25%; right: 15%;"
+              rotation={-30}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.1, scale: 1 }}
+              transition={{ duration: 2, delay: 0.8 }}
+            />
+            <DecorativeShape
+              color="#FF6B6B"
+              size="100px"
+              position="bottom: 20%; left: 20%;"
+              rotation={60}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.1, scale: 1 }}
+              transition={{ duration: 2, delay: 1.1 }}
+            />
+            
+            {/* Formas de livros */}
+            <BookShape
+              color="#4db5ff"
+              size="60px"
+              position="top: 40%; right: 25%;"
+              rotation={15}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              animate={{ opacity: 0.15, scale: 1, rotate: 15 }}
+              transition={{ duration: 1.5, delay: 0.3 }}
+            />
+            <BookShape
+              color="#FF6B6B"
+              size="80px"
+              position="bottom: 30%; right: 10%;"
+              rotation={-20}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              animate={{ opacity: 0.15, scale: 1, rotate: -20 }}
+              transition={{ duration: 1.5, delay: 0.6 }}
+            />
+            <BookShape
+              color="#25D366"
+              size="70px"
+              position="bottom: 15%; left: 35%;"
+              rotation={45}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              animate={{ opacity: 0.15, scale: 1, rotate: 45 }}
+              transition={{ duration: 1.5, delay: 0.9 }}
+            />
+            
+            {/* Ícones flutuantes */}
+            <FloatingIcon
+              color="#4db5ff"
+              size="50px"
+              position="top: 60%; left: 15%;"
+              icon="📚"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 0.2, y: 0 }}
+              transition={{ duration: 1, delay: 1.2 }}
+            />
+            <FloatingIcon
+              color="#25D366"
+              size="40px"
+              position="top: 70%; right: 20%;"
+              icon="👥"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 0.2, y: 0 }}
+              transition={{ duration: 1, delay: 1.4 }}
+            />
+            <FloatingIcon
+              color="#FF6B6B"
+              size="45px"
+              position="bottom: 40%; left: 45%;"
+              icon="🔥"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 0.2, y: 0 }}
+              transition={{ duration: 1, delay: 1.6 }}
+            />
+          </DecorativeContainer>
+          
           <ContentWrapper>
             <TextContent
               initial={{ opacity: 0, y: 100 }}
@@ -1499,6 +1672,39 @@ Aguardo retorno. Obrigado!`;
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
+          {/* Ilustrações decorativas para a seção de estatísticas */}
+          <DecorativeContainer>
+            <DecorativeShape
+              color="#4db5ff"
+              size="150px"
+              position="top: 10%; right: 5%;"
+              rotation={30}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 0.2 }}
+            />
+            <DecorativeShape
+              color="#25D366"
+              size="100px"
+              position="bottom: 10%; left: 5%;"
+              rotation={-45}
+              initial={{ opacity: 0, scale: 0 }}
+              whileInView={{ opacity: 0.08, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 2, delay: 0.5 }}
+            />
+            <BookShape
+              color="#FF6B6B"
+              size="90px"
+              position="top: 20%; left: 10%;"
+              rotation={25}
+              initial={{ opacity: 0, scale: 0, rotate: 0 }}
+              whileInView={{ opacity: 0.12, scale: 1, rotate: 25 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: 0.8 }}
+            />
+          </DecorativeContainer>
           <StatsContainer>
             <StatCard
               initial={{ opacity: 0, y: 50 }}
