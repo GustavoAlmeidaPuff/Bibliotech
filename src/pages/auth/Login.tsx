@@ -6,7 +6,7 @@ import { settingsService } from '../../services/firebase';
 import { LoginFormData } from '../../types/common';
 import { ROUTES } from '../../constants';
 import styles from './Login.module.css';
-import { UserCircleIcon } from '@heroicons/react/24/solid';
+import { UserCircleIcon, ArrowLeftIcon } from '@heroicons/react/24/solid';
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -59,8 +59,22 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate(ROUTES.HOME);
+  };
+
   return (
     <div className={styles.container}>
+      <button 
+        className={styles.backButton}
+        onClick={handleGoBack}
+        type="button"
+        aria-label="Voltar"
+      >
+        <ArrowLeftIcon className={styles.backIcon} />
+        <span>Voltar</span>
+      </button>
+      
       <div className={styles.loginCard}>
         <div className={styles.logo}>
           <UserCircleIcon style={{ width: 48, height: 48, color: 'white' }} />
