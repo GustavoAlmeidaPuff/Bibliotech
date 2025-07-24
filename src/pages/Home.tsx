@@ -2034,7 +2034,7 @@ Aguardo retorno. Obrigado!`;
               transition={{ duration: 1, delay: 0.2 }}
             >
               <Title isLight>
-                Bem-vindo à&nbsp;
+                Bem-vindo ao&nbsp;
                 {showTypewriter ? (
                   <TypewriterEffect text="BIBLIOTECH" speed={150} />
                 ) : (
