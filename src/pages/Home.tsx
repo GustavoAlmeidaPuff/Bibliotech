@@ -1138,9 +1138,7 @@ const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: strin
   const isInView = useInView(ref, { once: true, margin: "-200px 0px -200px 0px" });
 
   useEffect(() => {
-    console.log('AnimatedCounter effect:', { isInView, hasAnimated, end });
     if (isInView && !hasAnimated) {
-      console.log('Starting animation for:', end);
       setHasAnimated(true);
       
       let currentCount = 0;
@@ -1167,19 +1165,6 @@ const AnimatedCounter: React.FC<{ end: number; duration?: number; suffix?: strin
       setCount(end);
     }
   }, [isInView, hasAnimated, end]);
-
-  // Força a animação após um delay para debug
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasAnimated) {
-        console.log('Forcing animation for:', end);
-        setHasAnimated(true);
-        setCount(end);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [hasAnimated, end]);
 
   return (
     <span ref={ref}>
@@ -1303,6 +1288,48 @@ const StatLabel = styled.div`
   @media (max-width: 768px) {
     font-size: 1rem;
   }
+`;
+
+const SloganContainer = styled(motion.div)`
+  text-align: center;
+  margin-top: 4rem;
+  padding: 2rem 0;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #4db5ff, transparent);
+  }
+`;
+
+const SloganText = styled(motion.div)`
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 300;
+  color: #ffffff;
+  line-height: 1.6;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  margin: 0 3rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+    line-height: 1.4;
+    display: block;
+    margin: 0.8rem 0;
+  }
+`;
+
+const SloganHighlight = styled.span`
+  color: #4db5ff;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(77, 181, 255, 0.3);
 `;
 
 const Home: React.FC = () => {
@@ -1491,11 +1518,11 @@ Aguardo retorno. Obrigado!`;
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <StatIcon color="#25D366">👥</StatIcon>
+              <StatIcon color="#25D37B">👥</StatIcon>
               <StatNumber>
                 <AnimatedCounter end={500} />+
               </StatNumber>
-              <StatLabel>Alunos registrados</StatLabel>
+              <StatLabel>Leitores registrados</StatLabel>
             </StatCard>
             <StatCard
               initial={{ opacity: 0, y: 50 }}
@@ -1503,13 +1530,45 @@ Aguardo retorno. Obrigado!`;
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <StatIcon color="#FF6B6B">🔥</StatIcon>
+              <StatIcon color="#FF6B6A">🔥</StatIcon>
               <StatNumber>
                 <AnimatedCounter end={100} />+
               </StatNumber>
-              <StatLabel>Alunos ativos mensalmente</StatLabel>
+              <StatLabel>Leitores ativos mensalmente</StatLabel>
             </StatCard>
           </StatsContainer>
+          
+          <SloganContainer
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
+            <SloganText
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+            >
+              <SloganHighlight>Desenvolvido</SloganHighlight> para alunos
+            </SloganText>
+            <SloganText
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+            >
+              <SloganHighlight>Validado</SloganHighlight> por escolas
+            </SloganText>
+            <SloganText
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 1.3 }}
+            >
+              <SloganHighlight>Criado</SloganHighlight> para o futuro
+            </SloganText>
+          </SloganContainer>
         </StatsSection>
 
         <Section
