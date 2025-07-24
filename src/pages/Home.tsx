@@ -1338,6 +1338,9 @@ const DecorativeShape = styled(motion.div)<{
   size: string; 
   position: string;
   rotation?: number;
+  mouseX: number;
+  mouseY: number;
+  speed: number;
 }>`
   position: absolute;
   width: ${props => props.size};
@@ -1347,9 +1350,12 @@ const DecorativeShape = styled(motion.div)<{
   opacity: 0.1;
   filter: blur(1px);
   ${props => props.position}
-  transform: rotate(${props => props.rotation || 0}deg);
+  transform: 
+    rotate(${props => props.rotation || 0}deg)
+    translate(${props => props.mouseX * props.speed}px, ${props => props.mouseY * props.speed}px);
   z-index: 1;
   pointer-events: none;
+  transition: transform 0.3s ease-out;
 `;
 
 const BookShape = styled(motion.div)<{ 
@@ -1357,6 +1363,9 @@ const BookShape = styled(motion.div)<{
   size: string; 
   position: string;
   rotation?: number;
+  mouseX: number;
+  mouseY: number;
+  speed: number;
 }>`
   position: absolute;
   width: ${props => props.size};
@@ -1365,9 +1374,12 @@ const BookShape = styled(motion.div)<{
   border-radius: 8px;
   opacity: 0.15;
   ${props => props.position}
-  transform: rotate(${props => props.rotation || 0}deg);
+  transform: 
+    rotate(${props => props.rotation || 0}deg)
+    translate(${props => props.mouseX * props.speed}px, ${props => props.mouseY * props.speed}px);
   z-index: 1;
   pointer-events: none;
+  transition: transform 0.3s ease-out;
   
   &::before {
     content: '';
@@ -1386,6 +1398,9 @@ const FloatingIcon = styled(motion.div)<{
   size: string; 
   position: string;
   icon: string;
+  mouseX: number;
+  mouseY: number;
+  speed: number;
 }>`
   position: absolute;
   width: ${props => props.size};
@@ -1398,9 +1413,11 @@ const FloatingIcon = styled(motion.div)<{
   font-size: 1.5rem;
   opacity: 0.2;
   ${props => props.position}
+  transform: translate(${props => props.mouseX * props.speed}px, ${props => props.mouseY * props.speed}px);
   z-index: 1;
   pointer-events: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-out;
 `;
 
 const DecorativeContainer = styled.div`
@@ -1420,6 +1437,7 @@ const Home: React.FC = () => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [decorativeMousePos, setDecorativeMousePos] = useState({ x: 0, y: 0 });
   const titleRef = useRef<HTMLDivElement>(null);
   const [titleRect, setTitleRect] = useState<DOMRect | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -1492,6 +1510,11 @@ Aguardo retorno. Obrigado!`;
         const moveY = (e.clientY - centerY) * 0.8;
         mouseX.set(moveX);
         mouseY.set(moveY);
+        
+        // Movimento para as ilustrações decorativas
+        const decorativeX = (e.clientX - centerX) / centerX;
+        const decorativeY = (e.clientY - centerY) / centerY;
+        setDecorativeMousePos({ x: decorativeX, y: decorativeY });
       }
     };
 
@@ -1568,6 +1591,9 @@ Aguardo retorno. Obrigado!`;
               size="120px"
               position="top: 15%; left: 10%;"
               rotation={45}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 0.1, scale: 1 }}
               transition={{ duration: 2, delay: 0.5 }}
@@ -1577,6 +1603,9 @@ Aguardo retorno. Obrigado!`;
               size="80px"
               position="top: 25%; right: 15%;"
               rotation={-30}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.5}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 0.1, scale: 1 }}
               transition={{ duration: 2, delay: 0.8 }}
@@ -1586,6 +1615,9 @@ Aguardo retorno. Obrigado!`;
               size="100px"
               position="bottom: 20%; left: 20%;"
               rotation={60}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.2}
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 0.1, scale: 1 }}
               transition={{ duration: 2, delay: 1.1 }}
@@ -1597,6 +1629,9 @@ Aguardo retorno. Obrigado!`;
               size="60px"
               position="top: 40%; right: 25%;"
               rotation={15}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
               initial={{ opacity: 0, scale: 0, rotate: 0 }}
               animate={{ opacity: 0.15, scale: 1, rotate: 15 }}
               transition={{ duration: 1.5, delay: 0.3 }}
@@ -1606,6 +1641,9 @@ Aguardo retorno. Obrigado!`;
               size="80px"
               position="bottom: 30%; right: 10%;"
               rotation={-20}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.6}
               initial={{ opacity: 0, scale: 0, rotate: 0 }}
               animate={{ opacity: 0.15, scale: 1, rotate: -20 }}
               transition={{ duration: 1.5, delay: 0.6 }}
@@ -1615,6 +1653,9 @@ Aguardo retorno. Obrigado!`;
               size="70px"
               position="bottom: 15%; left: 35%;"
               rotation={45}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
               initial={{ opacity: 0, scale: 0, rotate: 0 }}
               animate={{ opacity: 0.15, scale: 1, rotate: 45 }}
               transition={{ duration: 1.5, delay: 0.9 }}
@@ -1626,6 +1667,9 @@ Aguardo retorno. Obrigado!`;
               size="50px"
               position="top: 60%; left: 15%;"
               icon="📚"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.7}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 0.2, y: 0 }}
               transition={{ duration: 1, delay: 1.2 }}
@@ -1635,6 +1679,9 @@ Aguardo retorno. Obrigado!`;
               size="40px"
               position="top: 70%; right: 20%;"
               icon="👥"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 0.2, y: 0 }}
               transition={{ duration: 1, delay: 1.4 }}
@@ -1644,6 +1691,9 @@ Aguardo retorno. Obrigado!`;
               size="45px"
               position="bottom: 40%; left: 45%;"
               icon="🔥"
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.5}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 0.2, y: 0 }}
               transition={{ duration: 1, delay: 1.6 }}
@@ -1679,6 +1729,9 @@ Aguardo retorno. Obrigado!`;
               size="150px"
               position="top: 10%; right: 5%;"
               rotation={30}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.2}
               initial={{ opacity: 0, scale: 0 }}
               whileInView={{ opacity: 0.08, scale: 1 }}
               viewport={{ once: true }}
@@ -1689,6 +1742,9 @@ Aguardo retorno. Obrigado!`;
               size="100px"
               position="bottom: 10%; left: 5%;"
               rotation={-45}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.3}
               initial={{ opacity: 0, scale: 0 }}
               whileInView={{ opacity: 0.08, scale: 1 }}
               viewport={{ once: true }}
@@ -1699,6 +1755,9 @@ Aguardo retorno. Obrigado!`;
               size="90px"
               position="top: 20%; left: 10%;"
               rotation={25}
+              mouseX={decorativeMousePos.x}
+              mouseY={decorativeMousePos.y}
+              speed={0.4}
               initial={{ opacity: 0, scale: 0, rotate: 0 }}
               whileInView={{ opacity: 0.12, scale: 1, rotate: 25 }}
               viewport={{ once: true }}
