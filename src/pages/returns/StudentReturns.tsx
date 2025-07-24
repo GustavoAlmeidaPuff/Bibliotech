@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { selectRandomQuestions } from '../../constants';
 
 import styles from './Returns.module.css';
 
@@ -21,6 +22,8 @@ interface Loan {
   completed?: boolean; // Indicador se a leitura foi concluída
 }
 
+
+
 const StudentReturns = () => {
   const [activeLoans, setActiveLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,9 +33,13 @@ const StudentReturns = () => {
   const [readingCompleted, setReadingCompleted] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+
 
   useEffect(() => {
     fetchActiveLoans();
@@ -81,6 +88,7 @@ const StudentReturns = () => {
     setReadingCompleted(false);
     setReadingProgress(0);
     setShowConfirmDialog(true);
+    setShowQuestions(false);
   };
 
   const handleReadingProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +100,14 @@ const StudentReturns = () => {
       setReadingCompleted(true);
     } else {
       setReadingCompleted(false);
+    }
+
+    // Mostrar perguntas se o progresso for maior que 50%
+    if (value > 50 && !showQuestions) {
+      setSelectedQuestions(selectRandomQuestions(3));
+      setShowQuestions(true);
+    } else if (value <= 50) {
+      setShowQuestions(false);
     }
   };
 
@@ -116,6 +132,7 @@ const StudentReturns = () => {
       setReturnSuccess(`"${selectedLoan.bookTitle}" devolvido com sucesso!`);
       setShowConfirmDialog(false);
       setSelectedLoan(null);
+      setShowQuestions(false);
       
       // Atualizar a lista de empréstimos ativos
       fetchActiveLoans();
@@ -250,31 +267,31 @@ const StudentReturns = () => {
           <div className={styles.modalContent}>
             <h3>Confirmar Devolução</h3>
             <p>Livro: <strong>{selectedLoan.bookTitle}</strong></p>
-                          <p>Aluno: <strong>
-                <span 
-                  style={{
-                    cursor: 'pointer',
-                    color: '#4a90e2',
-                    borderBottom: '1px dotted #4a90e2',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/students/${selectedLoan.studentId}`);
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#2c5aa0';
-                    e.currentTarget.style.borderBottomStyle = 'solid';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = '#4a90e2';
-                    e.currentTarget.style.borderBottomStyle = 'dotted';
-                  }}
-                  title={`Ir para o perfil de ${selectedLoan.studentName}`}
-                >
-                  {selectedLoan.studentName}
-                </span>
-              </strong></p>
+            <p>Aluno: <strong>
+              <span 
+                style={{
+                  cursor: 'pointer',
+                  color: '#4a90e2',
+                  borderBottom: '1px dotted #4a90e2',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/students/${selectedLoan.studentId}`);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#2c5aa0';
+                  e.currentTarget.style.borderBottomStyle = 'solid';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#4a90e2';
+                  e.currentTarget.style.borderBottomStyle = 'dotted';
+                }}
+                title={`Ir para o perfil de ${selectedLoan.studentName}`}
+              >
+                {selectedLoan.studentName}
+              </span>
+            </strong></p>
             
             <div className={styles.readingInfo}>
               <h4>Informações de Leitura</h4>
@@ -312,6 +329,28 @@ const StudentReturns = () => {
                 </div>
               </div>
             </div>
+
+            {showQuestions && (
+              <div className={styles.verificationSection}>
+                <div className={styles.verificationAlert}>
+                  <strong>Importante:</strong> Essas perguntas são essenciais para que tenhamos um bom controle de quanto o aluno leu. Pedimos que o ato de fazer as perguntas (quando os alunos falam que leram mais de 50%) vire rotina para ter um bom controle.
+                </div>
+                
+                <h4>Perguntas de Verificação</h4>
+                <p className={styles.verificationSubtitle}>
+                  Faça essas perguntas ao aluno para verificar se ele realmente leu o conteúdo:
+                </p>
+                
+                <div className={styles.questionsList}>
+                  {selectedQuestions.map((question, index) => (
+                    <div key={index} className={styles.questionItem}>
+                      <span className={styles.questionNumber}>{index + 1}.</span>
+                      <span className={styles.questionText}>{question}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className={styles.modalActions}>
               <button 

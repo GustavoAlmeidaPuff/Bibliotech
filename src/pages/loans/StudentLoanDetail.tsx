@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { selectRandomQuestions } from '../../constants';
+
 
 import styles from './StudentLoanDetail.module.css';
 
@@ -22,6 +24,8 @@ interface Loan {
   completed?: boolean;
 }
 
+
+
 const StudentLoanDetail = () => {
   const { loanId } = useParams<{ loanId: string }>();
   const navigate = useNavigate();
@@ -30,11 +34,15 @@ const StudentLoanDetail = () => {
   const [loan, setLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [showReturnDialog, setShowReturnDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [readingCompleted, setReadingCompleted] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [processing, setProcessing] = useState(false);
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+
+
   
   useEffect(() => {
     fetchLoanDetails();
@@ -148,6 +156,7 @@ const StudentLoanDetail = () => {
       });
 
       setShowReturnDialog(false);
+      setShowQuestions(false);
       await fetchLoanDetails(); // Re-fetch data to update UI
 
     } catch (err) {
@@ -163,6 +172,14 @@ const StudentLoanDetail = () => {
     const value = parseInt(e.target.value, 10);
     setReadingProgress(value);
     setReadingCompleted(value === 100);
+
+    // Mostrar perguntas se o progresso for maior que 50%
+    if (value > 50 && !showQuestions) {
+      setSelectedQuestions(selectRandomQuestions(3));
+      setShowQuestions(true);
+    } else if (value <= 50) {
+      setShowQuestions(false);
+    }
   };
 
   const handleCancelLoan = async () => {
@@ -378,6 +395,28 @@ const StudentLoanDetail = () => {
                 </div>
               </div>
             </div>
+
+            {showQuestions && (
+              <div className={styles.verificationSection}>
+                <div className={styles.verificationAlert}>
+                  <strong>Importante:</strong> Essas perguntas são essenciais para que tenhamos um bom controle de quanto o aluno leu. Pedimos que o ato de fazer as perguntas (quando os alunos falam que leram mais de 50%) vire rotina para ter um bom controle.
+                </div>
+                
+                <h4>Perguntas de Verificação</h4>
+                <p className={styles.verificationSubtitle}>
+                  Faça essas perguntas ao aluno para verificar se ele realmente leu o conteúdo:
+                </p>
+                
+                <div className={styles.questionsList}>
+                  {selectedQuestions.map((question, index) => (
+                    <div key={index} className={styles.questionItem}>
+                      <span className={styles.questionNumber}>{index + 1}.</span>
+                      <span className={styles.questionText}>{question}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className={styles.modalActions}>
                <button 

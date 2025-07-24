@@ -174,9 +174,11 @@
 .modalContent {
   background-color: white;
   border-radius: 8px;
-  padding: 2rem;
   width: 90%;
   max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -184,13 +186,15 @@
   margin-top: 0;
   margin-bottom: 1rem;
   color: #333;
+  padding: 1.5rem 1.5rem 0 1.5rem;
 }
 
 .readingInfo {
-  margin: 1.5rem 0;
-  padding: 1rem;
+  margin: 0;
+  padding: 1rem 1.5rem;
   background-color: #f9f9f9;
   border-radius: 8px;
+  margin: 0 1.5rem;
 }
 
 .readingInfo h4 {
@@ -238,7 +242,12 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border-top: 1px solid #eee;
+  background-color: white;
+  flex-shrink: 0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .cancelButton,
@@ -267,4 +276,70 @@
 
 .confirmButton:hover {
   background-color: #2171cd;
+}
+
+/* Estilos para a seção de verificação */
+.verificationSection {
+  margin: 1rem 1.5rem;
+  padding: 0.75rem;
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.verificationAlert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  color: #856404;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.verificationSection h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1rem;
+}
+
+.verificationSubtitle {
+  margin-bottom: 1rem;
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.questionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.questionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #4a90e2;
+}
+
+.questionNumber {
+  font-weight: 600;
+  color: #4a90e2;
+  min-width: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.questionText {
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  flex: 1;
 } 
