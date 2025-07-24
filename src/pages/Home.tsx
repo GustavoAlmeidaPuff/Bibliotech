@@ -1548,7 +1548,7 @@ Aguardo retorno. Obrigado!`;
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.7 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
             >
               <SloganHighlight>Desenvolvido</SloganHighlight> para alunos
             </SloganText>
@@ -1556,7 +1556,7 @@ Aguardo retorno. Obrigado!`;
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 1.0 }}
+              transition={{ duration: 0.6, delay: 1.7 }}
             >
               <SloganHighlight>Validado</SloganHighlight> por escolas
             </SloganText>
@@ -1564,7 +1564,7 @@ Aguardo retorno. Obrigado!`;
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 1.3 }}
+              transition={{ duration: 0.6, delay: 2.4 }}
             >
               <SloganHighlight>Criado</SloganHighlight> para o futuro
             </SloganText>
