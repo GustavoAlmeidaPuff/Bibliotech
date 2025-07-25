@@ -135,7 +135,7 @@ const Students = () => {
   };
 
   const handleRowClick = (studentId: string) => {
-    navigate(`/students/${studentId}/edit`);
+    navigate(`/students/${studentId}`);
   };
 
   const handleFilterChange = (field: keyof Filters, value: string) => {

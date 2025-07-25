@@ -39,6 +39,25 @@
   background-color: #e0e0e0;
 }
 
+.editButton {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.editButton:hover {
+  background-color: #357abd;
+}
+
 .whatsappButton {
   background-color: #25D366;
   color: white;
