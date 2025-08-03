@@ -4,6 +4,7 @@ import { collection, query, getDocs, doc, deleteDoc, orderBy } from 'firebase/fi
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useInfiniteScroll } from '../../hooks';
+import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './Students.module.css';
 
 interface Student {
@@ -226,7 +227,17 @@ const Students = () => {
                 className={styles.filterButton}
                 onClick={() => setShowFilters(!showFilters)}
               >
-                Filtros
+                {showFilters ? (
+                  <>
+                    <XMarkIcon className={styles.buttonIcon} />
+                    Ocultar Filtros
+                  </>
+                ) : (
+                  <>
+                    <FunnelIcon className={styles.buttonIcon} />
+                    Mostrar Filtros
+                  </>
+                )}
               </button>
               <Link to="/students/register" className={styles.registerButton}>
                 Registrar Aluno
