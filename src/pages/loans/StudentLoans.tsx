@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, doc, updateDoc, orderBy, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 import styles from './Loans.module.css';
@@ -54,20 +55,7 @@ const StudentLoans = () => {
   
   const { currentUser } = useAuth();
 
-  useEffect(() => {
-    fetchLoans();
-  }, [currentUser]);
-
-  useEffect(() => {
-    if (showMessage) {
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [showMessage]);
-
-  const fetchLoans = async () => {
+  const fetchLoans = useCallback(async () => {
     if (!currentUser) return;
     
     try {
@@ -133,7 +121,20 @@ const StudentLoans = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchLoans();
+  }, [fetchLoans]);
+
+  useEffect(() => {
+    if (showMessage) {
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showMessage]);
 
   const handleFilterChange = (field: keyof Filters, value: string) => {
     setFilters(prev => ({
@@ -311,6 +312,24 @@ const StudentLoans = () => {
 
   const currentLoans = filtersApplied ? filteredLoans : loans;
 
+  // Hook de paginação com scroll infinito
+  const {
+    displayedItems: displayedLoans,
+    isLoading: isLoadingMore,
+    loadingRef,
+    resetPagination
+  } = useInfiniteScroll({
+    items: currentLoans,
+    itemsPerPage: 30,
+    threshold: 200,
+    enabled: !loading
+  });
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    resetPagination();
+  }, [filtersApplied, filteredLoans, loans, resetPagination]);
+
 
 
   return (
@@ -443,7 +462,7 @@ const StudentLoans = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentLoans.map(loan => (
+                    {displayedLoans.map(loan => (
                       <tr 
                         key={loan.id} 
                         className={`${styles.loanRow} ${loan.status === 'returned' ? styles.returnedRow : ''}`}
@@ -486,6 +505,9 @@ const StudentLoans = () => {
                     ))}
                   </tbody>
                 </table>
+                <div ref={loadingRef} className={styles.loadingMore}>
+                  {isLoadingMore ? 'Carregando mais locações...' : ''}
+                </div>
               </div>
             )}
           </div>

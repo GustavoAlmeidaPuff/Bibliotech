@@ -569,4 +569,14 @@
 
 .detailsButton:hover {
   background-color: #303f9f;
+}
+
+.loadingMore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  min-height: 40px;
 } 
