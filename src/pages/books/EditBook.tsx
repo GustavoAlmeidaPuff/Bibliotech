@@ -535,7 +535,13 @@ const EditBook = () => {
         ) : loanHistory.length > 0 ? (
           <div className={styles.historyList}>
             {loanHistory.map(loan => (
-              <div key={loan.id} className={styles.historyCard}>
+              <div 
+                key={loan.id} 
+                className={styles.historyCard}
+                onClick={() => navigate(`/student-loan-detail/${loan.id}`)}
+                style={{ cursor: 'pointer' }}
+                title="Clique para ver detalhes da retirada"
+              >
                 <div className={styles.historyHeader}>
                   <div className={styles.studentName}>
                   <span 
