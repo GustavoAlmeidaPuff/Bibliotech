@@ -60,20 +60,20 @@ const StaffWithdrawalConfirmation = () => {
       
       // Buscar empréstimos ativos para este livro (tanto de alunos quanto de funcionários)
       const [studentLoans, staffLoans] = await Promise.all([
-        // Empréstimos de alunos
+        // Empréstimos de alunos (apenas ativos)
         getDocs(query(
           collection(db, `users/${currentUser.uid}/loans`),
           where('bookId', '==', bookData.id),
           where('status', '==', 'active')
         )),
-        // Empréstimos de funcionários
+        // Empréstimos de funcionários (todos, pois não têm status)
         getDocs(query(
           collection(db, `users/${currentUser.uid}/staffLoans`),
           where('bookId', '==', bookData.id)
         ))
       ]);
       
-      // Extrair códigos que estão emprestados
+      // Extrair códigos que estão emprestados (apenas empréstimos ativos)
       const borrowedCodes = [
         ...studentLoans.docs.map(doc => doc.data().bookCode),
         ...staffLoans.docs.map(doc => doc.data().bookCode)

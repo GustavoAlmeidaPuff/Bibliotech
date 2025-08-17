@@ -142,15 +142,16 @@ const StaffLoans = () => {
     try {
       const { loanId, bookId } = confirmDialog;
       
-      // 1. Atualiza o livro para disponível
-      const bookRef = doc(db, `users/${currentUser.uid}/books/${bookId}`);
-      await updateDoc(bookRef, { available: true });
+      // CORREÇÃO: Remove apenas o registro de locação
+      // O sistema de estoque é calculado dinamicamente baseado nos códigos 
+      // disponíveis versus códigos emprestados, então não precisamos atualizar
+      // o campo 'available' (que é obsoleto)
       
-      // 2. Remove o registro de locação
+      // Remove o registro de locação do funcionário
       const loanRef = doc(db, `users/${currentUser.uid}/staffLoans/${loanId}`);
       await deleteDoc(loanRef);
       
-      // 3. Atualiza a lista
+      // Atualiza a lista na interface
       setLoans(prev => prev.filter(loan => loan.id !== loanId));
       setConfirmDialog({show: false, loanId: '', bookId: '', staffName: '', bookTitle: ''});
       

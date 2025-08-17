@@ -128,6 +128,11 @@ const StudentReturns = () => {
         updatedAt: serverTimestamp()
       });
       
+      // CORREÇÃO: Liberar o código do exemplar para torná-lo disponível novamente
+      // O código específico do exemplar agora fica disponível para novo empréstimo
+      // Nota: O sistema de estoque agora é calculado dinamicamente baseado nos códigos
+      // disponíveis versus códigos emprestados, então não precisamos atualizar quantity
+      
       // Atualizar a interface
       setReturnSuccess(`"${selectedLoan.bookTitle}" devolvido com sucesso!`);
       setShowConfirmDialog(false);

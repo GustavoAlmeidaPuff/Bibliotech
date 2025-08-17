@@ -155,6 +155,10 @@ const StudentLoanDetail = () => {
         updatedAt: serverTimestamp()
       });
 
+      // CORREÇÃO: O código específico do exemplar agora fica disponível para novo empréstimo
+      // O sistema de estoque é calculado dinamicamente baseado nos códigos disponíveis 
+      // versus códigos emprestados, então não precisamos atualizar quantity manualmente
+
       setShowReturnDialog(false);
       setShowQuestions(false);
       await fetchLoanDetails(); // Re-fetch data to update UI
@@ -188,22 +192,16 @@ const StudentLoanDetail = () => {
     try {
       setProcessing(true);
       
-      // 1. Atualizar a quantidade do livro (incrementar +1)
-      const bookRef = doc(db, `users/${currentUser.uid}/books/${loan.bookId}`);
-      const bookDoc = await getDoc(bookRef);
+      // CORREÇÃO: Remove apenas o registro de locação
+      // O sistema de estoque é calculado dinamicamente baseado nos códigos 
+      // disponíveis versus códigos emprestados, então não precisamos atualizar
+      // o campo 'quantity' manualmente
       
-      if (bookDoc.exists()) {
-        const bookData = bookDoc.data();
-        await updateDoc(bookRef, {
-          quantity: (bookData.quantity || 0) + 1
-        });
-      }
-      
-      // 2. Excluir o registro de locação
+      // Excluir o registro de locação (isso libera automaticamente o código do exemplar)
       const loanRef = doc(db, `users/${currentUser.uid}/loans/${loan.id}`);
       await deleteDoc(loanRef);
       
-      // 3. Redirecionar para a página de locações com mensagem
+      // Redirecionar para a página de locações com mensagem
       navigate('/student-loans', { 
         state: { 
           message: `Locação do livro "${loan.bookTitle}" cancelada com sucesso` 

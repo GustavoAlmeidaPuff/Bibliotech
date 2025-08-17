@@ -182,9 +182,6 @@ const Layout: React.FC = () => {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <Link to="/dashboard" className={styles.logoLink}>
-            <div className={styles.logoWrapper}>
-              <img src="/images/sys/logo.png" alt="Bibliotech Logo" className={styles.logo} />
-            </div>
             <h1>{settings.schoolName}</h1>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

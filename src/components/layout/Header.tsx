@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
-import ReactAtom from '../shared/ReactAtom';
+
 
 const HeaderContainer = styled.header<{ isTransparent: boolean }>`
   position: fixed;
@@ -270,9 +270,6 @@ const Header: React.FC = () => {
   return (
     <HeaderContainer isTransparent={isTransparent}>
       <LogoContainer onClick={() => scrollToSection('inicio')}>
-        <LogoWrapper>
-          <ReactAtom size="2.5rem" asLogo />
-        </LogoWrapper>
         <LogoText>
           <h1>Bibliotech.<span style={{ color: '#4cb4fd', fontSize: '1.5rem' }}>tech</span></h1>
         </LogoText>

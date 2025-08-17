@@ -66,7 +66,7 @@ const CodeSelection = () => {
       
       const activeLoansSnapshot = await getDocs(activeLoansQuery);
       
-      // Extrair códigos que estão emprestados
+      // Extrair códigos que estão emprestados (apenas empréstimos ativos)
       const borrowedCodes = activeLoansSnapshot.docs
         .map(doc => doc.data().bookCode)
         .filter(code => code); // Remove valores undefined/null
