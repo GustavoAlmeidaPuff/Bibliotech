@@ -57,11 +57,25 @@
   padding: 1.25rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .statCard:hover {
   transform: translateY(-2px);
+}
+
+.clickableCard {
+  cursor: pointer !important;
+}
+
+.clickableCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.clickableCard:active {
+  transform: translateY(0);
 }
 
 .statCard h3 {

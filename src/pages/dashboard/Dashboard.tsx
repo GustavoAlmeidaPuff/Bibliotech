@@ -41,6 +41,8 @@ interface StatCardProps {
   title: string;
   value: string | number;
   description: string;
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
 interface Student {
@@ -96,11 +98,42 @@ interface ClassroomPerformance {
   averageCompletion: number;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, description }) => (
-  <div className={styles.statCard}>
+const StatCard: React.FC<StatCardProps> = ({ title, value, description, onClick, clickable = false }) => (
+  <div 
+    className={`${styles.statCard} ${clickable ? styles.clickableCard : ''}`}
+    onClick={onClick}
+    style={{
+      cursor: clickable ? 'pointer' : 'default',
+      transition: clickable ? 'all 0.2s ease' : 'none'
+    }}
+    onMouseEnter={(e) => {
+      if (clickable) {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (clickable) {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '';
+      }
+    }}
+  >
     <h3>{title}</h3>
     <div className={styles.value}>{value}</div>
     <p>{description}</p>
+    {clickable && (
+      <div style={{
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        fontSize: '12px',
+        color: '#4a90e2',
+        opacity: 0.7
+      }}>
+        ↗
+      </div>
+    )}
   </div>
 );
 
@@ -603,32 +636,43 @@ const Dashboard = () => {
     {
       title: 'Livros Emprestados',
       value: activeLoansCount,
-      description: 'Total de livros atualmente emprestados'
+      description: 'Total de livros atualmente emprestados',
+      clickable: true,
+      onClick: () => navigate('/student-loans')
     },
     {
       title: 'Devoluções Pendentes',
       value: overdueLoansCount,
-      description: 'Livros com devolução atrasada'
+      description: 'Livros com devolução atrasada',
+      clickable: true,
+      onClick: () => navigate('/student-loans')
     },
     {
       title: 'Livros no Acervo',
       value: totalBooksCount,
-      description: 'Total de livros disponíveis'
+      description: 'Total de livros disponíveis',
+      clickable: true,
+      onClick: () => navigate('/books')
     },
     {
       title: 'Leitores Registrados',
       value: totalReadersCount,
-      description: 'Total de alunos cadastrados'
+      description: 'Total de alunos cadastrados',
+      clickable: true,
+      onClick: () => navigate('/students')
     },
     {
       title: 'Leitores Ativos',
       value: activeReadersCount,
-      description: 'Alunos com leituras no trimestre'
+      description: 'Alunos com leituras no trimestre',
+      clickable: true,
+      onClick: () => navigate('/staff-loans')
     },
     {
       title: 'Total de Leituras',
       value: totalBooksRead,
-      description: 'Inclui leituras parciais como pontuação'
+      description: 'Inclui leituras parciais como pontuação',
+      clickable: false
     }
   ];
 
@@ -652,7 +696,14 @@ const Dashboard = () => {
       <h2>Dashboard</h2>
       <div className={styles.statsGrid}>
         {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
+          <StatCard 
+            key={index} 
+            title={stat.title}
+            value={stat.value}
+            description={stat.description}
+            onClick={stat.onClick}
+            clickable={stat.clickable}
+          />
         ))}
       </div>
       
@@ -720,7 +771,31 @@ const Dashboard = () => {
                 <tbody>
                   {topBooks.map((book, index) => (
                     <tr key={book.id} className={index === 0 ? styles.topRanked : ''}>
-                      <td>{book.title}</td>
+                      <td>
+                        <span 
+                          style={{
+                            cursor: 'pointer',
+                            color: '#4a90e2',
+                            borderBottom: '1px dotted #4a90e2',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/books/${book.id}`);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#2c5aa0';
+                            e.currentTarget.style.borderBottomStyle = 'solid';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#4a90e2';
+                            e.currentTarget.style.borderBottomStyle = 'dotted';
+                          }}
+                          title={`Editar ${book.title}`}
+                        >
+                          {book.title}
+                        </span>
+                      </td>
                       <td>{book.borrowCount}</td>
                     </tr>
                   ))}
