@@ -10,6 +10,34 @@
   font-size: 1.5rem;
 }
 
+/* Indicador de cache */
+.cacheIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #1976d2;
+}
+
+.cacheIcon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #1976d2;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .sectionTitle {
   margin-top: 2rem;
   margin-bottom: 1.5rem;

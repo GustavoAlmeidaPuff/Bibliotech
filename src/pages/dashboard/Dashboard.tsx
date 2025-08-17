@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, getDocs, where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDashboardCache } from '../../hooks/useDashboardCache';
+import { useCacheInvalidation } from '../../hooks/useCacheInvalidation';
+import DashboardSkeleton from '../../components/ui/DashboardSkeleton';
 
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
@@ -104,40 +107,58 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, description }) => (
 const Dashboard = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  
+  // Cache management
+  const cache = useDashboardCache(currentUser?.uid || '');
+  const [initialLoading, setInitialLoading] = useState(!cache.hasCache);
+  const [backgroundLoading, setBackgroundLoading] = useState(false);
   
   // Estados para estatísticas principais
-  const [activeLoansCount, setActiveLoansCount] = useState(0);
-  const [overdueLoansCount, setOverdueLoansCount] = useState(0);
-  const [totalBooksCount, setTotalBooksCount] = useState(0);
-  const [activeReadersCount, setActiveReadersCount] = useState(0);
-  const [totalBooksRead, setTotalBooksRead] = useState<number>(0);
-  const [totalReadersCount, setTotalReadersCount] = useState(0);
+  const [activeLoansCount, setActiveLoansCount] = useState(cache.cachedData?.activeLoansCount || 0);
+  const [overdueLoansCount, setOverdueLoansCount] = useState(cache.cachedData?.overdueLoansCount || 0);
+  const [totalBooksCount, setTotalBooksCount] = useState(cache.cachedData?.totalBooksCount || 0);
+  const [activeReadersCount, setActiveReadersCount] = useState(cache.cachedData?.activeReadersCount || 0);
+  const [totalBooksRead, setTotalBooksRead] = useState<number>(cache.cachedData?.totalBooksRead || 0);
+  const [totalReadersCount, setTotalReadersCount] = useState(cache.cachedData?.totalReadersCount || 0);
   
   // Estados para gráficos e insights
-  const [genreData, setGenreData] = useState<GenreData[]>([]);
-  const [topBooks, setTopBooks] = useState<TopBook[]>([]);
-  const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
-  const [classroomPerformance, setClassroomPerformance] = useState<ClassroomPerformance[]>([]);
+  const [genreData, setGenreData] = useState<GenreData[]>(cache.cachedData?.genreData || []);
+  const [topBooks, setTopBooks] = useState<TopBook[]>(cache.cachedData?.topBooks || []);
+  const [topStudents, setTopStudents] = useState<TopStudent[]>(cache.cachedData?.topStudents || []);
+  const [classroomPerformance, setClassroomPerformance] = useState<ClassroomPerformance[]>(cache.cachedData?.classroomPerformance || []);
   const [monthlyLoanData, setMonthlyLoanData] = useState<{
     labels: string[],
     borrowed: number[],
     returned: number[]
-  }>({
+  }>(cache.cachedData?.monthlyLoanData || {
     labels: [],
     borrowed: [],
     returned: []
   });
-  const [completionRateData, setCompletionRateData] = useState<{labels: string[], rates: number[]}>({
+  const [completionRateData, setCompletionRateData] = useState<{labels: string[], rates: number[]}>
+  (cache.cachedData?.completionRateData || {
     labels: [],
     rates: []
   });
 
-  const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = useCallback(async (forceRefresh = false) => {
     if (!currentUser) return;
 
     try {
-      setLoading(true);
+      // Se não é force refresh e temos cache válido, não faz nada
+      if (!forceRefresh && cache.hasCache && !cache.shouldRevalidate) {
+        return;
+      }
+
+      // Se temos cache, carrega em background
+      const isBackground = cache.hasCache;
+      
+      if (isBackground) {
+        setBackgroundLoading(true);
+        cache.setIsValidating(true);
+      } else {
+        setInitialLoading(true);
+      }
       
       // 1. pega todos os livros
       const booksRef = collection(db, `users/${currentUser.uid}/books`);
@@ -212,13 +233,44 @@ const Dashboard = () => {
       processClassroomPerformance(loans, students);
       processMonthlyLoanData(loans);
       processCompletionRateData(loans);
+
+      // Aguarda um pouco para que todos os states sejam atualizados
+      // e então salva no cache
+      setTimeout(() => {
+        const dashboardData = {
+          activeLoansCount,
+          overdueLoansCount,
+          totalBooksCount,
+          activeReadersCount,
+          totalBooksRead,
+          totalReadersCount,
+          genreData,
+          topBooks,
+          topStudents,
+          classroomPerformance,
+          monthlyLoanData,
+          completionRateData
+        };
+        cache.saveToCache(dashboardData);
+      }, 100);
       
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard:', error);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setBackgroundLoading(false);
+      cache.setIsValidating(false);
     }
-  }, [currentUser]);
+  }, [currentUser, cache]);
+
+  // Cache invalidation quando dados importantes mudam
+  useCacheInvalidation({
+    onInvalidate: () => {
+      console.log('Dashboard cache invalidated - fetching fresh data');
+      cache.markAsStale();
+      fetchDashboardData(true);
+    }
+  });
 
   useEffect(() => {
     fetchDashboardData();
@@ -230,12 +282,19 @@ const Dashboard = () => {
     
     // Configurar atualização periódica
     const intervalId = setInterval(() => {
-      fetchDashboardData();
+      fetchDashboardData(true); // Force refresh no background
     }, 300000); // 5 minutos (300000 millisegundos)
     
     // limpa o intervalo quando o componente for desmontado
     return () => clearInterval(intervalId);
   }, [fetchDashboardData]);
+
+  // Força atualização quando dados ficam stale
+  useEffect(() => {
+    if (cache.isStale && !cache.isValidating) {
+      fetchDashboardData();
+    }
+  }, [cache.isStale, cache.isValidating, fetchDashboardData]);
 
   const processMainStats = (loans: Loan[], students: Student[]) => {
     // Contagem de empréstimos ativos
@@ -573,17 +632,23 @@ const Dashboard = () => {
     }
   ];
 
-  if (loading) {
-    return (
-      <div className={styles.dashboard}>
-        <h2>Dashboard</h2>
-        <div className={styles.loading}>Carregando dados...</div>
-      </div>
-    );
+  // Se é carregamento inicial e não temos cache, mostra skeleton
+  if (initialLoading && !cache.hasCache) {
+    return <DashboardSkeleton />;
   }
+
+  // Se temos cache mas está carregando em background, mostra dados com indicador
+  const showCacheIndicator = backgroundLoading || cache.isValidating;
 
   return (
     <div className={styles.dashboard}>
+      {showCacheIndicator && (
+        <div className={styles.cacheIndicator}>
+          <div className={styles.cacheIcon}></div>
+          <span>Atualizando dados em segundo plano...</span>
+        </div>
+      )}
+      
       <h2>Dashboard</h2>
       <div className={styles.statsGrid}>
         {stats.map((stat, index) => (
