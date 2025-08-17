@@ -376,7 +376,13 @@ const StudentDashboard = () => {
                   <h3>Livros Emprestados Atualmente</h3>
                   <div className={styles.loansList}>
                     {activeLoans.map(loan => (
-                      <div key={loan.id} className={styles.loanCard}>
+                      <div 
+                        key={loan.id} 
+                        className={styles.loanCard}
+                        onClick={() => navigate(`/student-loan-detail/${loan.id}`)}
+                        style={{ cursor: 'pointer' }}
+                        title="Clique para ver detalhes do empréstimo"
+                      >
                         <div className={styles.loanTitle}>{loan.bookTitle}</div>
                         <div className={styles.loanDetails}>
                           <div>Emprestado: {format(loan.borrowDate, 'dd/MM/yyyy')}</div>

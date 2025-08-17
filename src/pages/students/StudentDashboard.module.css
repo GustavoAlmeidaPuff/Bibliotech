@@ -242,6 +242,14 @@
   font-size: 0.9rem;
 }
 
+.loansTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.loansTable tbody tr:hover {
+  background-color: #f5f8ff;
+}
+
 .active {
   color: #4a90e2;
 }

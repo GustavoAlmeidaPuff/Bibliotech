@@ -580,7 +580,12 @@ const StudentDashboard = () => {
                   </thead>
                   <tbody>
                     {loans.slice(0, 5).map(loan => (
-                      <tr key={loan.id}>
+                      <tr 
+                        key={loan.id}
+                        onClick={() => navigate(`/student-loan-detail/${loan.id}`)}
+                        style={{ cursor: 'pointer' }}
+                        title="Clique para ver detalhes do empréstimo"
+                      >
                         <td>{loan.bookTitle}</td>
                         <td>{format(loan.borrowDate, 'dd/MM/yyyy')}</td>
                         <td className={loan.status === 'returned' ? styles.returned : styles.active}>
