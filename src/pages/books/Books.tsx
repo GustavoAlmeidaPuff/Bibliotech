@@ -89,7 +89,7 @@ const Books = () => {
     fetchBooks();
   }, [fetchBooks]);
 
-  const sortBooks = (booksToSort: Book[]) => {
+  const sortBooks = useCallback((booksToSort: Book[]) => {
     const booksCopy = [...booksToSort];
 
     if (sortBy === 'alphabetical') {
@@ -104,10 +104,10 @@ const Books = () => {
         }
       });
     }
-  };
+  }, [sortBy]);
 
   const currentBooks = filtersApplied ? filteredBooks : books;
-  const sortedBooks = useMemo(() => sortBooks(currentBooks), [currentBooks, sortBy, sortBooks]);
+  const sortedBooks = useMemo(() => sortBooks(currentBooks), [currentBooks, sortBooks]);
 
   console.log('Books pagination debug:', {
     totalBooks: books.length,
