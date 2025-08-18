@@ -60,6 +60,36 @@
   max-width: 600px;
 }
 
+/* Alerta de notificação */
+.notificationAlert {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196f3;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  animation: pulse-notification 2s ease-in-out infinite;
+}
+
+.bellIcon {
+  font-size: 1.5rem;
+  animation: ring 2s ease-in-out infinite;
+}
+
+.alertText {
+  text-align: left;
+  color: #1565c0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.alertText strong {
+  color: #0d47a1;
+  font-weight: 600;
+}
+
 .messageArea h2 {
   color: #e67e22;
   font-size: 2rem;
@@ -108,6 +138,26 @@
 }
 
 /* Animações */
+@keyframes pulse-notification {
+  0%, 100% { 
+    box-shadow: 0 2px 10px rgba(33, 150, 243, 0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(-10deg); }
+  20% { transform: rotate(10deg); }
+  40%, 60% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  70%, 90% { transform: rotate(-2deg); }
+  80% { transform: rotate(2deg); }
+}
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -130,5 +180,15 @@
   
   .messageArea h2 {
     font-size: 1.5rem;
+  }
+  
+  .notificationAlert {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .alertText {
+    text-align: center;
   }
 }
