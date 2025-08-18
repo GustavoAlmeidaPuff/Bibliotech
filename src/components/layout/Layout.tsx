@@ -331,6 +331,14 @@ const Layout: React.FC = () => {
               <UserGroupIcon className={styles.linkIcon} />
               Professores e Funcionários
             </Link>
+            <Link 
+              to="/classes" 
+              className={isActiveLink('/classes') ? styles.activeLink : ''}
+              onClick={handleLinkClick}
+            >
+              <AcademicCapIcon className={styles.linkIcon} />
+              Turmas
+            </Link>
           </div>
 
           <div className={styles.navSection}>

@@ -56,6 +56,7 @@ export const ROUTES = {
   STUDENTS: '/students',
   STAFF: '/staff',
   BOOKS: '/books',
+  CLASSES: '/classes',
   LOANS: '/loans',
   RETURNS: '/returns',
   WITHDRAWALS: '/withdrawals',
