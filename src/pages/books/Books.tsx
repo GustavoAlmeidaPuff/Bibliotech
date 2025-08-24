@@ -68,10 +68,10 @@ const Books = () => {
 
   // Função para renderizar tags
   const renderTags = (book: Book) => {
-    if (!book.tags || book.tags.length === 0) return null;
+    if (!book.tags || book.tags.length === 0) return '-';
     
     const tags = getTagsByIds(book.tags);
-    if (tags.length === 0) return null;
+    if (tags.length === 0) return '-';
 
     return (
       <div className={styles.tagContainer}>
@@ -507,17 +507,19 @@ const Books = () => {
                             />
                           </div>
                         </td>
-                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.title}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.title || '-'}</td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{getDisplayCode(book)}</td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
                           {book.authors ? (Array.isArray(book.authors) ? book.authors.join(', ') : book.authors) : '-'}
                         </td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
-                          {book.genres?.map(genre => (
-                            <span key={genre} className={styles.tag}>
-                              {genre}
-                            </span>
-                          ))}
+                          {book.genres && book.genres.length > 0 ? (
+                            book.genres.map(genre => (
+                              <span key={genre} className={styles.tag}>
+                                {genre}
+                              </span>
+                            ))
+                          ) : '-'}
                         </td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
                           {renderTags(book)}
