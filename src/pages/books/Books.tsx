@@ -5,7 +5,8 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
 import { useInfiniteScroll } from '../../hooks';
-import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import * as XLSX from 'xlsx';
 import styles from './Books.module.css';
 
 interface Book {
@@ -298,6 +299,73 @@ const Books = () => {
     }
   };
 
+  const handleExportToExcel = () => {
+    try {
+      // Preparar os dados para exportação
+      const dataToExport = books.map((book, index) => {
+        const bookTags = book.tags ? getTagsByIds(book.tags).map(tag => tag.name).join(', ') : '';
+        const bookAuthors = book.authors 
+          ? (Array.isArray(book.authors) ? book.authors.join(', ') : book.authors)
+          : '';
+        const bookGenres = book.genres ? book.genres.join(', ') : '';
+        const bookCodes = getAllCodes(book).join(', ') || '';
+
+        return {
+          '#': index + 1,
+          'Título': book.title || '',
+          'Código(s)': bookCodes,
+          'Autor(es)': bookAuthors,
+          'Editora': book.publisher || '',
+          'Gêneros': bookGenres,
+          'Tags': bookTags,
+          'Prateleira': book.shelf || '',
+          'Coleção': book.collection || '',
+          'Quantidade': book.quantity || 1,
+          'Data de Aquisição': book.acquisitionDate || '',
+          'Descrição': book.description || ''
+        };
+      });
+
+      // Criar workbook e worksheet
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      
+      // Adicionar a planilha ao workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Livros');
+
+      // Ajustar largura das colunas
+      const colWidths = [
+        { wch: 5 },   // #
+        { wch: 30 },  // Título
+        { wch: 15 },  // Código(s)
+        { wch: 25 },  // Autor(es)
+        { wch: 20 },  // Editora
+        { wch: 20 },  // Gêneros
+        { wch: 20 },  // Tags
+        { wch: 15 },  // Prateleira
+        { wch: 15 },  // Coleção
+        { wch: 12 },  // Quantidade
+        { wch: 15 },  // Data de Aquisição
+        { wch: 30 }   // Descrição
+      ];
+      ws['!cols'] = colWidths;
+
+      // Gerar nome do arquivo com data atual
+      const hoje = new Date();
+      const dataFormatada = hoje.toLocaleDateString('pt-BR').replace(/\//g, '-');
+      const nomeArquivo = `acervo-biblioteca-${dataFormatada}.xlsx`;
+
+      // Fazer download do arquivo
+      XLSX.writeFile(wb, nomeArquivo);
+      
+      // Mostrar mensagem de sucesso
+      alert(`Arquivo exportado com sucesso! ${books.length} livros foram incluídos no arquivo "${nomeArquivo}".`);
+    } catch (error) {
+      console.error('Erro ao exportar para Excel:', error);
+      alert('Erro ao exportar dados. Tente novamente.');
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -365,6 +433,15 @@ const Books = () => {
                     Mostrar Filtros
                   </>
                 )}
+              </button>
+              <button
+                className={styles.exportButton}
+                onClick={handleExportToExcel}
+                disabled={books.length === 0}
+                title="Exportar todos os livros para Excel"
+              >
+                <ArrowDownTrayIcon className={styles.buttonIcon} />
+                Exportar Excel
               </button>
               <button 
                 className={styles.registerButton}

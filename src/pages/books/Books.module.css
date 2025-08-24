@@ -19,12 +19,15 @@
   margin: 0;
   color: var(--text-primary);
   font-size: 1.8rem;
+  flex: 1;
 }
 
 .headerActions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .buttonIcon {
@@ -50,6 +53,32 @@
 .registerButton:hover {
   background-color: var(--primary-dark);
   transform: translateY(-1px);
+}
+
+.exportButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #059669;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exportButton:hover:not(:disabled) {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+.exportButton:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .deleteButton {
@@ -562,12 +591,19 @@
 
   .header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .header h2 {
+    text-align: center;
+    margin-bottom: 1rem;
   }
 
   .headerActions {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .booksGrid {
