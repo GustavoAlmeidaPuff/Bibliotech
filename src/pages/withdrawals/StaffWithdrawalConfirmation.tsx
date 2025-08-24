@@ -209,7 +209,7 @@ const StaffWithdrawalConfirmation = () => {
   // Função para exibir os códigos
   const getDisplayCode = (book: Book): string => {
     if (book.codes && book.codes.length > 0) {
-      return book.codes.length > 1 ? 'diversos' : book.codes[0];
+      return book.codes.length > 1 ? `${book.codes.length} cópias` : book.codes[0];
     }
     return book.code || '-';
   };
