@@ -610,11 +610,12 @@ const Books = () => {
                       className={styles.bookLink}
                     >
                       <p className={styles.bookCode}>Código: {getDisplayCode(book)}</p>
-                      {book.authors && (
-                        <p className={styles.bookAuthors}>
-                          {Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}
-                        </p>
-                      )}
+                      <p className={styles.bookAuthors}>
+                        {book.authors 
+                          ? (Array.isArray(book.authors) ? book.authors.join(', ') : book.authors)
+                          : '-'
+                        }
+                      </p>
                       {book.genres && (
                         <div className={styles.genreTags}>
                           {book.genres.map(genre => (

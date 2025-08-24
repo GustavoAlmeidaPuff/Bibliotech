@@ -175,6 +175,8 @@ const StudentLoanDetail = () => {
   const handleReadingProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     setReadingProgress(value);
+    
+    // Considerar automaticamente como leitura concluída quando atingir 100%
     setReadingCompleted(value === 100);
 
     // Mostrar perguntas se o progresso for maior que 50%
@@ -358,22 +360,6 @@ const StudentLoanDetail = () => {
             
             <div className={styles.readingInfo}>
               <h4>Informações de Leitura</h4>
-              
-              <div className={styles.readingCompletedField}>
-                <label>
-                  <input 
-                    type="checkbox" 
-                    checked={readingCompleted}
-                    onChange={(e) => {
-                      setReadingCompleted(e.target.checked);
-                      if (e.target.checked) {
-                        setReadingProgress(100);
-                      }
-                    }}
-                  />
-                  Leitura concluída
-                </label>
-              </div>
               
               <div className={styles.progressField}>
                 <label>Progresso da leitura: {readingProgress}%</label>
