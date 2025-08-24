@@ -53,7 +53,6 @@
 - 📱 **Design Responsivo** - Interface otimizada para todos os dispositivos
 - 🔒 **Multi-tenancy** - Suporte a múltiplas escolas
 - ⚡ **Performance** - Carregamento rápido com lazy loading
-- 🌐 **PWA Ready** - Funciona offline e pode ser instalado
 - 🎨 **Interface Moderna** - Design atrativo com animações fluidas
 - 📈 **Relatórios Avançados** - Análises detalhadas de performance
 
@@ -63,7 +62,6 @@
 
 ### 👥 **Sistema de Autenticação**
 - **Firebase Auth** integrado com múltiplos provedores
-- **Perfis diferenciados**: Administrador, Bibliotecário, Aluno
 - **Recuperação de senha** automática
 - **Proteção de rotas** baseada em permissões
 - **Sessões persistentes** com refresh automático

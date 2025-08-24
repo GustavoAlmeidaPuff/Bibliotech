@@ -4,7 +4,6 @@ import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, getD
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
-import { useAuthors } from '../../contexts/AuthorsContext';
 import { useDistinctCodes } from '../../hooks/useDistinctCodes';
 import AutocompleteInput from '../../components/AutocompleteInput';
 
@@ -14,7 +13,7 @@ interface BookForm {
   codes: string[];
   title: string;
   genres: string[];
-  authors: string[];
+  authors: string;
   publisher: string;
   acquisitionDate: string;
   shelf: string;
@@ -42,7 +41,7 @@ const EditBook = () => {
     codes: [],
     title: '',
     genres: [],
-    authors: [],
+    authors: '',
     publisher: '',
     acquisitionDate: new Date().toISOString().split('T')[0],
     shelf: '',
@@ -52,7 +51,6 @@ const EditBook = () => {
   
   const [currentCode, setCurrentCode] = useState('');
   const [currentGenre, setCurrentGenre] = useState('');
-  const [currentAuthor, setCurrentAuthor] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [loanHistory, setLoanHistory] = useState<LoanHistory[]>([]);
@@ -61,7 +59,6 @@ const EditBook = () => {
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
-  const { authors, addAuthor, capitalizeAuthor } = useAuthors();
   const useDistinctCodesEnabled = useDistinctCodes();
   const navigate = useNavigate();
 
@@ -151,14 +148,17 @@ const EditBook = () => {
           // Compatibilidade com versão antiga (code -> codes)
           const formattedData = {
             ...bookData,
-            codes: bookData.codes || (bookData.code ? [bookData.code] : [])
+            codes: bookData.codes || (bookData.code ? [bookData.code] : []),
+            // Converte array de autores para string se necessário (compatibilidade)
+            authors: Array.isArray(bookData.authors) 
+              ? bookData.authors.join(', ') 
+              : (bookData.authors || '')
           } as BookForm;
           
           setFormData(formattedData);
           
-          // Adiciona os gêneros e autores às listas de sugestões
+          // Adiciona os gêneros às listas de sugestões
           formattedData.genres.forEach(addGenre);
-          formattedData.authors.forEach(addAuthor);
           
           // Buscar histórico de retiradas após carregar o livro
           await fetchLoanHistory();
@@ -175,7 +175,7 @@ const EditBook = () => {
     };
 
     fetchBook();
-  }, [currentUser, bookId, navigate, addGenre, addAuthor]);
+  }, [currentUser, bookId, navigate, addGenre]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,28 +236,10 @@ const EditBook = () => {
     }
   };
 
-  const handleAuthorSelect = (author: string) => {
-    const capitalizedAuthor = capitalizeAuthor(author);
-    if (!formData.authors.includes(capitalizedAuthor)) {
-      setFormData(prev => ({
-        ...prev,
-        authors: [...prev.authors, capitalizedAuthor]
-      }));
-      addAuthor(capitalizedAuthor);
-    }
-  };
-
   const removeGenre = (genre: string) => {
     setFormData(prev => ({
       ...prev,
       genres: prev.genres.filter(g => g !== genre)
-    }));
-  };
-
-  const removeAuthor = (author: string) => {
-    setFormData(prev => ({
-      ...prev,
-      authors: prev.authors.filter(a => a !== author)
     }));
   };
 
@@ -388,29 +370,14 @@ const EditBook = () => {
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <AutocompleteInput
+                <label htmlFor="authors">Autores</label>
+                <input
+                  type="text"
                   id="authors"
-                  label="Autores"
-                  value={currentAuthor}
-                  onChange={setCurrentAuthor}
-                  onSelect={handleAuthorSelect}
-                  suggestions={authors}
-                  placeholder="Digite para adicionar"
+                  value={formData.authors}
+                  onChange={e => setFormData(prev => ({ ...prev, authors: e.target.value }))}
+                  placeholder="Ex: João Silva, Maria Santos"
                 />
-                <div className={styles.tags}>
-                  {formData.authors.map(author => (
-                    <span key={author} className={styles.tag}>
-                      {author}
-                      <button
-                        type="button"
-                        onClick={() => removeAuthor(author)}
-                        className={styles.removeTag}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
               </div>
 
               <div className={styles.formGroup}>
