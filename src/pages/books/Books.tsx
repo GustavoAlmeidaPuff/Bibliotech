@@ -29,6 +29,7 @@ interface Filters {
   title: string;
   code: string;
   author: string;
+  tags: string[]; // Array de IDs das tags selecionadas para filtro
 }
 
 type SortOption = 'alphabetical' | 'dateAdded';
@@ -46,11 +47,12 @@ const Books = () => {
   const [filters, setFilters] = useState<Filters>({
     title: '',
     code: '',
-    author: ''
+    author: '',
+    tags: []
   });
   
   const { currentUser } = useAuth();
-  const { getTagsByIds } = useTags();
+  const { getTagsByIds, tags } = useTags();
   const navigate = useNavigate();
 
   const getDisplayCode = (book: Book): string => {
@@ -178,7 +180,7 @@ const Books = () => {
 
   const applyFilters = () => {
     let result = [...books];
-    const hasActiveFilters = Object.values(filters).some(Boolean);
+    const hasActiveFilters = filters.title || filters.code || filters.author || filters.tags.length > 0;
     
     if (!hasActiveFilters) {
       setFilteredBooks([]);
@@ -214,6 +216,14 @@ const Books = () => {
       });
     }
 
+    if (filters.tags.length > 0) {
+      result = result.filter(book => {
+        if (!book.tags || book.tags.length === 0) return false;
+        // Verifica se o livro tem pelo menos uma das tags selecionadas
+        return filters.tags.some(selectedTagId => book.tags!.includes(selectedTagId));
+      });
+    }
+
     setFilteredBooks(result);
     setFiltersApplied(true);
   };
@@ -225,11 +235,28 @@ const Books = () => {
     }));
   };
 
+  const handleTagSelect = (tagId: string) => {
+    if (!tagId || filters.tags.includes(tagId)) return;
+    
+    setFilters(prev => ({
+      ...prev,
+      tags: [...prev.tags, tagId]
+    }));
+  };
+
+  const removeSelectedTag = (tagId: string) => {
+    setFilters(prev => ({
+      ...prev,
+      tags: prev.tags.filter(id => id !== tagId)
+    }));
+  };
+
   const clearFilters = () => {
     setFilters({
       title: '',
       code: '',
-      author: ''
+      author: '',
+      tags: []
     });
     setFilteredBooks([]);
     setFiltersApplied(false);
@@ -389,13 +416,70 @@ const Books = () => {
                 placeholder="Filtrar por autor..."
               />
             </div>
+
+            <div className={styles.filterGroup}>
+              <label htmlFor="tags">Tags</label>
+              <select
+                id="tags"
+                value=""
+                onChange={(e) => handleTagSelect(e.target.value)}
+              >
+                <option value="">Selecionar tag...</option>
+                {tags
+                  .filter(tag => !filters.tags.includes(tag.id))
+                  .map(tag => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.name}
+                    </option>
+                  ))
+                }
+              </select>
+              
+              {filters.tags.length > 0 && (
+                <div className={styles.selectedTags}>
+                  {filters.tags.map(tagId => {
+                    const tag = tags.find(t => t.id === tagId);
+                    if (!tag) return null;
+                    
+                    return (
+                      <div key={tagId} className={styles.selectedTag}>
+                        <span 
+                          className={styles.tagChip}
+                          style={{ 
+                            backgroundColor: tag.color + '20',
+                            borderColor: tag.color,
+                            color: tag.color
+                          }}
+                        >
+                          {tag.name}
+                          <button
+                            type="button"
+                            className={styles.removeTagButton}
+                            onClick={() => removeSelectedTag(tagId)}
+                            aria-label={`Remover ${tag.name}`}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </form>
 
           <div className={styles.filterActions}>
             <button
+              className={styles.applyFiltersButton}
+              onClick={applyFilters}
+            >
+              Aplicar Filtros
+            </button>
+            <button
               className={styles.clearFiltersButton}
               onClick={clearFilters}
-              disabled={!Object.values(filters).some(Boolean)}
+              disabled={!filters.title && !filters.code && !filters.author && filters.tags.length === 0}
             >
               Limpar Filtros
             </button>
