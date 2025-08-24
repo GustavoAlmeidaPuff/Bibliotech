@@ -13,6 +13,7 @@ import {
   where
 } from 'firebase/firestore';
 import { reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import TagManager from '../../components/TagManager';
 import styles from './Settings.module.css';
 
 const Settings = () => {
@@ -464,6 +465,10 @@ const Settings = () => {
               {loading ? 'Salvando...' : 'Salvar Configurações'}
             </button>
           </div>
+        </div>
+        
+        <div className={styles.settingsSection}>
+          <TagManager />
         </div>
         
         <div className={styles.settingsSection}>

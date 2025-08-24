@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
 import { useDistinctCodes } from '../../hooks/useDistinctCodes';
 import AutocompleteInput from '../../components/AutocompleteInput';
+import TagAutocomplete from '../../components/TagAutocomplete';
 
 import styles from './RegisterBook.module.css'; // Reusando os estilos do RegisterBook
 
@@ -13,6 +14,7 @@ interface BookForm {
   codes: string[];
   title: string;
   genres: string[];
+  tags: string[]; // Array de IDs das tags
   authors: string;
   publisher: string;
   acquisitionDate: string;
@@ -41,6 +43,7 @@ const EditBook = () => {
     codes: [],
     title: '',
     genres: [],
+    tags: [],
     authors: '',
     publisher: '',
     acquisitionDate: new Date().toISOString().split('T')[0],
@@ -152,7 +155,9 @@ const EditBook = () => {
             // Converte array de autores para string se necessário (compatibilidade)
             authors: Array.isArray(bookData.authors) 
               ? bookData.authors.join(', ') 
-              : (bookData.authors || '')
+              : (bookData.authors || ''),
+            // Garante que tags seja um array
+            tags: bookData.tags || []
           } as BookForm;
           
           setFormData(formattedData);
@@ -175,7 +180,7 @@ const EditBook = () => {
     };
 
     fetchBook();
-  }, [currentUser, bookId, navigate, addGenre]);
+  }, [currentUser, bookId, navigate]); // Removido addGenre das dependências
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -240,6 +245,23 @@ const EditBook = () => {
     setFormData(prev => ({
       ...prev,
       genres: prev.genres.filter(g => g !== genre)
+    }));
+  };
+
+  // Funções para gerenciar tags
+  const handleTagSelect = (tagId: string) => {
+    if (!formData.tags.includes(tagId)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tagId]
+      }));
+    }
+  };
+
+  const handleTagRemove = (tagId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(id => id !== tagId)
     }));
   };
 
@@ -439,6 +461,17 @@ const EditBook = () => {
                   </span>
                 ))}
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <TagAutocomplete
+                id="tags"
+                label="Tags"
+                selectedTags={formData.tags}
+                onTagSelect={handleTagSelect}
+                onTagRemove={handleTagRemove}
+                placeholder="Digite para buscar ou criar tags..."
+              />
             </div>
 
             <div className={styles.formGroup}>

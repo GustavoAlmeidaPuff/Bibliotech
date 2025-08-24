@@ -6,12 +6,14 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
 import { useDistinctCodes } from '../../hooks/useDistinctCodes';
 import AutocompleteInput from '../../components/AutocompleteInput';
+import TagAutocomplete from '../../components/TagAutocomplete';
 import styles from './RegisterBook.module.css';
 
 interface BookForm {
   codes: string[];
   title: string;
   genres: string[];
+  tags: string[]; // Array de IDs das tags
   authors: string;
   publisher: string;
   acquisitionDate: string;
@@ -70,6 +72,7 @@ const RegisterBook = () => {
     codes: [],
     title: '',
     genres: [],
+    tags: [],
     authors: '',
     publisher: '',
     acquisitionDate: new Date().toISOString().split('T')[0], // Data atual como padrão
@@ -284,6 +287,23 @@ const RegisterBook = () => {
     }));
   };
 
+  // Funções para gerenciar tags
+  const handleTagSelect = (tagId: string) => {
+    if (!formData.tags.includes(tagId)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tagId]
+      }));
+    }
+  };
+
+  const handleTagRemove = (tagId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(id => id !== tagId)
+    }));
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -447,6 +467,17 @@ const RegisterBook = () => {
                   </span>
                 ))}
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <TagAutocomplete
+                id="tags"
+                label="Tags"
+                selectedTags={formData.tags}
+                onTagSelect={handleTagSelect}
+                onTagRemove={handleTagRemove}
+                placeholder="Digite para buscar ou criar tags..."
+              />
             </div>
 
             <div className={styles.formGroup}>

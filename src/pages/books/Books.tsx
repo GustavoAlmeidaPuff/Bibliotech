@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTags } from '../../contexts/TagsContext';
 import { useInfiniteScroll } from '../../hooks';
 import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon } from '@heroicons/react/24/outline';
 import styles from './Books.module.css';
@@ -13,7 +14,8 @@ interface Book {
   codes?: string[];
   title: string;
   genres?: string[];
-  authors?: string[];
+  tags?: string[]; // Array de IDs das tags
+  authors?: string[] | string;
   publisher?: string;
   acquisitionDate?: string;
   shelf?: string;
@@ -47,6 +49,7 @@ const Books = () => {
   });
   
   const { currentUser } = useAuth();
+  const { getTagsByIds } = useTags();
   const navigate = useNavigate();
 
   const getDisplayCode = (book: Book): string => {
@@ -61,6 +64,32 @@ const Books = () => {
       return book.codes;
     }
     return book.code ? [book.code] : [];
+  };
+
+  // Função para renderizar tags
+  const renderTags = (book: Book) => {
+    if (!book.tags || book.tags.length === 0) return null;
+    
+    const tags = getTagsByIds(book.tags);
+    if (tags.length === 0) return null;
+
+    return (
+      <div className={styles.tagContainer}>
+        {tags.map(tag => (
+          <span 
+            key={tag.id} 
+            className={styles.bookTag}
+            style={{ 
+              backgroundColor: tag.color + '20',
+              borderColor: tag.color,
+              color: tag.color
+            }}
+          >
+            {tag.name}
+          </span>
+        ))}
+      </div>
+    );
   };
 
   const fetchBooks = useCallback(async () => {
@@ -171,11 +200,17 @@ const Books = () => {
     }
 
     if (filters.author) {
-      result = result.filter(book => 
-        book.authors?.some(author => 
-          author.toLowerCase().includes(filters.author.toLowerCase())
-        )
-      );
+      result = result.filter(book => {
+        if (!book.authors) return false;
+        
+        if (Array.isArray(book.authors)) {
+          return book.authors.some(author => 
+            author.toLowerCase().includes(filters.author.toLowerCase())
+          );
+        } else {
+          return book.authors.toLowerCase().includes(filters.author.toLowerCase());
+        }
+      });
     }
 
     setFilteredBooks(result);
@@ -415,7 +450,7 @@ const Books = () => {
                       <p className={styles.bookCode}>Código: {getDisplayCode(book)}</p>
                       {book.authors && (
                         <p className={styles.bookAuthors}>
-                          {book.authors.join(', ')}
+                          {Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}
                         </p>
                       )}
                       {book.genres && (
@@ -427,6 +462,7 @@ const Books = () => {
                           ))}
                         </div>
                       )}
+                      {renderTags(book)}
                     </Link>
                   </div>
                 ))}
@@ -444,6 +480,7 @@ const Books = () => {
                       <th>Código</th>
                       <th>Autor</th>
                       <th>Gêneros</th>
+                      <th>Tags</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -472,13 +509,18 @@ const Books = () => {
                         </td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.title}</td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{getDisplayCode(book)}</td>
-                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>{book.authors?.join(', ') || '-'}</td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
+                          {book.authors ? (Array.isArray(book.authors) ? book.authors.join(', ') : book.authors) : '-'}
+                        </td>
                         <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
                           {book.genres?.map(genre => (
                             <span key={genre} className={styles.tag}>
                               {genre}
                             </span>
                           ))}
+                        </td>
+                        <td onClick={() => navigate(`/books/${book.id}`)} style={{ cursor: 'pointer' }}>
+                          {renderTags(book)}
                         </td>
                       </tr>
                     ))}

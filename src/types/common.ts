@@ -27,12 +27,18 @@ export interface Staff extends BaseEntity {
   userId: string;
 }
 
+export interface Tag extends BaseEntity {
+  name: string;
+  color: string;
+  userId: string;
+}
+
 export interface Book extends BaseEntity {
   title: string;
   author: string;
   isbn?: string;
   category: string;
-  tags: string[];
+  tags: string[]; // Array de IDs das tags
   available: boolean;
   totalCopies: number;
   availableCopies: number;

@@ -538,4 +538,34 @@
   50% {
     opacity: 1;
   }
+}
+
+/* Estilos para tags dos livros */
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+.bookTag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+}
+
+/* Ajustes para tags em tabela */
+.booksList .tagContainer {
+  margin-top: 0;
+}
+
+.booksList .bookTag {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
 } 
