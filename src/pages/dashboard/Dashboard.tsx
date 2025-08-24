@@ -72,6 +72,7 @@ interface Book {
   authors?: string[];
   genres?: string[];
   code: string;
+  description?: string;
 }
 
 interface TopStudent {

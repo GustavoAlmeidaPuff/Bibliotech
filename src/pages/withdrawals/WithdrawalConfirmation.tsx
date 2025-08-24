@@ -26,6 +26,7 @@ interface Book {
   authors?: string[];
   publisher?: string;
   quantity: number;
+  description?: string;
 }
 
 interface LocationState {

@@ -21,6 +21,7 @@ interface BookForm {
   shelf: string;
   collection: string;
   quantity: number;
+  description: string;
 }
 
 interface LoanHistory {
@@ -49,7 +50,8 @@ const EditBook = () => {
     acquisitionDate: new Date().toISOString().split('T')[0],
     shelf: '',
     collection: '',
-    quantity: 1
+    quantity: 1,
+    description: ''
   });
   
   const [currentCode, setCurrentCode] = useState('');
@@ -157,7 +159,9 @@ const EditBook = () => {
               ? bookData.authors.join(', ') 
               : (bookData.authors || ''),
             // Garante que tags seja um array
-            tags: bookData.tags || []
+            tags: bookData.tags || [],
+            // Garante que description seja uma string (compatibilidade com livros antigos)
+            description: bookData.description || ''
           } as BookForm;
           
           setFormData(formattedData);
@@ -411,6 +415,18 @@ const EditBook = () => {
                   onChange={e => setFormData(prev => ({ ...prev, collection: e.target.value }))}
                 />
               </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label htmlFor="description">Descrição</label>
+              <textarea
+                id="description"
+                className={styles.descriptionTextarea}
+                value={formData.description}
+                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Digite uma breve descrição do livro, sinopse ou observações (opcional)"
+                rows={4}
+              />
             </div>
 
             <div className={styles.formRow}>

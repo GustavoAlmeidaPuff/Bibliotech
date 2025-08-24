@@ -25,6 +25,7 @@ interface Book {
   publisher?: string;
   quantity?: number;
   availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
+  description?: string;
 }
 
 interface LocationState {

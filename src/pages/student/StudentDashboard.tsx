@@ -54,6 +54,7 @@ interface Book {
   title: string;
   genres?: string[];
   authors?: string[];
+  description?: string;
 }
 
 const StudentDashboard = () => {

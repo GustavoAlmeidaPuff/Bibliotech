@@ -28,6 +28,7 @@ interface Book {
   id: string;
   title: string;
   available: boolean;
+  description?: string;
 }
 
 interface Staff {

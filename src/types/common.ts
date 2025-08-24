@@ -43,6 +43,7 @@ export interface Book extends BaseEntity {
   totalCopies: number;
   availableCopies: number;
   userId: string;
+  description?: string;
 }
 
 export interface Loan extends BaseEntity {

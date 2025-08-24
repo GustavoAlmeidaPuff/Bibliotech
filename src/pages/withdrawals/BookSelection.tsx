@@ -21,6 +21,7 @@ interface Book {
   acquisitionDate?: string;
   shelf?: string;
   collection?: string;
+  description?: string;
   quantity?: number;
   availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
 }

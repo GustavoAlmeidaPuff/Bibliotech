@@ -22,6 +22,7 @@ interface Book {
   collection?: string;
   quantity?: number;
   createdAt?: number;
+  description?: string;
 }
 
 interface Filters {
