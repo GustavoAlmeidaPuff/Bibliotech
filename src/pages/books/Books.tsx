@@ -4,8 +4,8 @@ import { collection, query, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTags } from '../../contexts/TagsContext';
-import { useInfiniteScroll } from '../../hooks';
-import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { useInfiniteScroll, useBarcodeGenerator } from '../../hooks';
+import { PlusIcon, TrashIcon, FunnelIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon, ArrowsUpDownIcon, ArrowDownTrayIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import * as XLSX from 'xlsx';
 import styles from './Books.module.css';
 
@@ -55,6 +55,7 @@ const Books = () => {
   const { currentUser } = useAuth();
   const { getTagsByIds, tags } = useTags();
   const navigate = useNavigate();
+  const { generatePDF, isGenerating } = useBarcodeGenerator();
 
   const getDisplayCode = (book: Book): string => {
     if (book.codes && book.codes.length > 0) {
@@ -299,6 +300,35 @@ const Books = () => {
     }
   };
 
+  const handleGenerateBarcodes = async () => {
+    if (selectedBooks.length === 0) {
+      alert('Selecione pelo menos um livro para gerar etiquetas.');
+      return;
+    }
+
+    try {
+      // Filtrar livros selecionados
+      const selectedBooksData = books.filter(book => selectedBooks.includes(book.id));
+      
+      // Gerar PDF com etiquetas
+      await generatePDF(selectedBooksData);
+      
+      // Limpar seleção após sucesso
+      setSelectedBooks([]);
+      
+      // Mostrar feedback de sucesso
+      const totalCodes = selectedBooksData.reduce((total, book) => {
+        return total + getAllCodes(book).length;
+      }, 0);
+      
+      alert(`Etiquetas geradas com sucesso! ${totalCodes} etiqueta(s) de ${selectedBooksData.length} livro(s) pronta(s) para impressão e recorte.`);
+      
+    } catch (error) {
+      console.error('Erro ao gerar etiquetas:', error);
+      alert('Erro ao gerar etiquetas. Tente novamente.');
+    }
+  };
+
   const handleExportToExcel = () => {
     try {
       // Preparar os dados para exportação
@@ -378,6 +408,15 @@ const Books = () => {
                 onClick={handleSelectAll}
               >
                 {selectedBooks.length === displayedBooks.length ? 'Desmarcar Todos' : 'Selecionar Todos'}
+              </button>
+              <button
+                className={styles.printButton}
+                onClick={handleGenerateBarcodes}
+                disabled={isGenerating}
+                title="Gerar etiquetas com códigos de barras dos livros selecionados"
+              >
+                <PrinterIcon className={styles.buttonIcon} />
+                {isGenerating ? 'Gerando...' : 'Gerar Etiquetas'}
               </button>
               <button
                 className={styles.deleteButton}
