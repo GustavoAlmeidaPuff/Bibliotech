@@ -102,6 +102,43 @@ const Layout: React.FC = () => {
     setIsNotificationsOpen(false);
   };
 
+  const generateWhatsAppMessageFromNotification = (notification: Notification) => {
+    if (notification.type === 'update') return '';
+    
+    const daysOverdue = notification.daysOverdue || 0;
+    
+    let statusMessage = '';
+    if (daysOverdue > 0) {
+      statusMessage = `🔴 *Status:* Atrasado há ${daysOverdue} ${daysOverdue === 1 ? 'dia' : 'dias'}`;
+    } else {
+      statusMessage = `⚠️ *Status:* Prazo de devolução próximo`;
+    }
+    
+    const message = `📚 *Lembrete de Devolução - Bibliotech*
+
+👤 *Aluno:* ${notification.studentName}
+📖 *Livro:* ${notification.bookTitle}
+
+${statusMessage}
+
+${daysOverdue > 0 
+  ? '🔴 Por favor, devolva o livro o mais rápido possível.' 
+  : '🟡 Lembre-se de devolver o livro no prazo.'
+}
+
+📍 *Biblioteca Escolar*`;
+
+    return encodeURIComponent(message);
+  };
+
+  const handleWhatsAppNotificationFromNotification = (notification: Notification) => {
+    const message = generateWhatsAppMessageFromNotification(notification);
+    if (message) {
+      const whatsappUrl = `https://wa.me/?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    }
+  };
+
   const renderNotificationContent = (notification: Notification) => {
     if (notification.type === 'update') {
       return (
@@ -128,10 +165,6 @@ const Layout: React.FC = () => {
     return (
       <>
         <div className={styles.notificationTitle}>
-          {notification.title.replace(
-            `Aluno(a) ${notification.studentName}`,
-            ''
-          )}
           <span 
             style={{
               cursor: 'pointer',
@@ -157,10 +190,7 @@ const Layout: React.FC = () => {
           >
             Aluno(a) {notification.studentName}
           </span>
-          {notification.title.replace(
-            `Aluno(a) ${notification.studentName} está com a devolução do livro "${notification.bookTitle}" atrasada!`,
-            ` está com a devolução do livro "${notification.bookTitle}" atrasada!`
-          )}
+          {` está com a devolução do livro "${notification.bookTitle}" atrasada!`}
         </div>
         <div className={styles.notificationMessage}>
           {notification.message}
@@ -172,6 +202,18 @@ const Layout: React.FC = () => {
           <span className={`${styles.notificationBadgeType} ${styles[notification.type]}`}>
             {notification.daysOverdue} dia(s) de atraso
           </span>
+        </div>
+        <div className={styles.notificationActions}>
+          <button 
+            className={styles.whatsappNotificationButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleWhatsAppNotificationFromNotification(notification);
+            }}
+            title="Enviar lembrete por WhatsApp"
+          >
+            WhatsApp
+          </button>
         </div>
       </>
     );

@@ -139,6 +139,55 @@ const StudentLoanDetail = () => {
     if (daysLeft <= 3) return styles.statusWarning;
     return styles.statusActive;
   };
+
+  const generateWhatsAppMessage = () => {
+    if (!loan) return '';
+    
+    const daysLeft = getDaysLeft(loan.dueDate);
+    const borrowDateTime = formatDateTime(loan.borrowDate);
+    const dueDate = formatDate(loan.dueDate);
+    
+    let statusMessage = '';
+    
+    if (daysLeft < 0) {
+      const overdueDays = Math.abs(daysLeft);
+      statusMessage = `📅 *Status:* Atrasado há ${overdueDays} ${overdueDays === 1 ? 'dia' : 'dias'}`;
+    } else if (daysLeft === 0) {
+      statusMessage = `⚠️ *Status:* Vence hoje`;
+    } else if (daysLeft === 1) {
+      statusMessage = `⏰ *Status:* Vence amanhã`;
+    } else {
+      statusMessage = `✅ *Status:* ${daysLeft} ${daysLeft === 1 ? 'dia restante' : 'dias restantes'}`;
+    }
+    
+    const message = `📚 *Lembrete de Devolução - Bibliotech*
+
+👤 *Aluno:* ${loan.studentName}
+📖 *Livro:* ${loan.bookTitle}
+🏷️ *Código:* ${loan.bookCode || 'N/A'}
+
+📅 *Retirado em:* ${borrowDateTime}
+📆 *Prazo de devolução:* ${dueDate}
+
+${statusMessage}
+
+${daysLeft < 0 
+  ? '🔴 Por favor, devolva o livro o mais rápido possível.' 
+  : daysLeft <= 3 
+    ? '🟡 Lembre-se de devolver o livro no prazo.' 
+    : '🟢 Aproveite sua leitura!'
+}
+
+📍 *Biblioteca Escolar*`;
+
+    return encodeURIComponent(message);
+  };
+
+  const handleWhatsAppNotification = () => {
+    const message = generateWhatsAppMessage();
+    const whatsappUrl = `https://wa.me/?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+  };
   
   const handleReturnLoan = async () => {
     if (!currentUser || !loan) return;
@@ -325,28 +374,38 @@ const StudentLoanDetail = () => {
               )}
             </div>
             
-            {loan.status === 'active' && (
-              <div className={styles.actionsSection}>
-                <button 
-                  className={styles.returnButton}
-                  onClick={() => {
-                    setReadingProgress(loan.readingProgress || 0);
-                    setReadingCompleted(loan.completed || false);
-                    setShowReturnDialog(true);
-                  }}
-                  disabled={processing}
-                >
-                  Devolver
-                </button>
-                <button 
-                  className={styles.cancelButton}
-                  onClick={() => setShowCancelDialog(true)}
-                  disabled={processing}
-                >
-                  Cancelar Retirada
-                </button>
-              </div>
-            )}
+            <div className={styles.actionsSection}>
+              <button 
+                className={styles.whatsappButton}
+                onClick={handleWhatsAppNotification}
+                title="Enviar lembrete por WhatsApp"
+              >
+                Avisar no WhatsApp
+              </button>
+              
+              {loan.status === 'active' && (
+                <>
+                  <button 
+                    className={styles.returnButton}
+                    onClick={() => {
+                      setReadingProgress(loan.readingProgress || 0);
+                      setReadingCompleted(loan.completed || false);
+                      setShowReturnDialog(true);
+                    }}
+                    disabled={processing}
+                  >
+                    Devolver
+                  </button>
+                  <button 
+                    className={styles.cancelButton}
+                    onClick={() => setShowCancelDialog(true)}
+                    disabled={processing}
+                  >
+                    Cancelar Retirada
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -134,11 +134,13 @@ const RegisterBook = () => {
       allBooksSnapshot.docs.forEach(doc => {
         const bookData = doc.data();
         const bookCodes = bookData.codes || (bookData.code ? [bookData.code] : []); // Compatibilidade com versão antiga
+        const writtenOffCodes = bookData.writtenOffCodes || []; // Códigos baixados
         const bookTitle = bookData.title || '';
         
-        // Verificar códigos duplicados
+        // Verificar códigos duplicados (ignorando códigos baixados)
+        const activeCodes = bookCodes.filter((code: string) => !writtenOffCodes.includes(code));
         const hasDuplicateCode = codes.some(code => 
-          bookCodes.some((bookCode: string) => 
+          activeCodes.some((bookCode: string) => 
             bookCode.toLowerCase() === code.toLowerCase()
           )
         );
@@ -146,7 +148,7 @@ const RegisterBook = () => {
         if (hasDuplicateCode) {
           foundDuplicates.push({
             id: doc.id,
-            codes: bookCodes,
+            codes: activeCodes, // Usar apenas códigos ativos
             title: bookTitle
           });
         }

@@ -10,8 +10,15 @@ import TagAutocomplete from '../../components/TagAutocomplete';
 
 import styles from './RegisterBook.module.css'; // Reusando os estilos do RegisterBook
 
+interface WriteOffInfo {
+  code: string;
+  reason: string;
+  date: Date;
+}
+
 interface BookForm {
   codes: string[];
+  writtenOffCodes?: WriteOffInfo[]; // Códigos que foram baixados com motivo
   title: string;
   genres: string[];
   tags: string[]; // Array de IDs das tags
@@ -42,6 +49,7 @@ const EditBook = () => {
   const { bookId } = useParams<{ bookId: string }>();
   const [formData, setFormData] = useState<BookForm>({
     codes: [],
+    writtenOffCodes: [],
     title: '',
     genres: [],
     tags: [],
@@ -61,11 +69,70 @@ const EditBook = () => {
   const [loanHistory, setLoanHistory] = useState<LoanHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [borrowedCodes, setBorrowedCodes] = useState<string[]>([]);
+  const [showCodeMenu, setShowCodeMenu] = useState<string | null>(null);
+  const [restorableCodeStatus, setRestorableCodeStatus] = useState<{[key: string]: boolean}>({});
+  const [showWriteOffModal, setShowWriteOffModal] = useState(false);
+  const [codeToWriteOff, setCodeToWriteOff] = useState<string>('');
+  const [writeOffReason, setWriteOffReason] = useState('');
   
   const { currentUser } = useAuth();
   const { genres, addGenre, capitalizeTag } = useTags();
   const useDistinctCodesEnabled = useDistinctCodes();
   const navigate = useNavigate();
+
+  // Função para buscar códigos que estão emprestados
+  const fetchBorrowedCodes = async () => {
+    if (!currentUser || !bookId) return;
+
+    try {
+      // Buscar empréstimos ativos de alunos
+      const studentLoansRef = collection(db, `users/${currentUser.uid}/loans`);
+      const studentLoansQuery = query(
+        studentLoansRef,
+        where('bookId', '==', bookId),
+        where('status', '==', 'active')
+      );
+      
+      // Buscar empréstimos de funcionários
+      const staffLoansRef = collection(db, `users/${currentUser.uid}/staffLoans`);
+      const staffLoansQuery = query(
+        staffLoansRef,
+        where('bookId', '==', bookId)
+      );
+      
+      const [studentLoansSnap, staffLoansSnap] = await Promise.all([
+        getDocs(studentLoansQuery),
+        getDocs(staffLoansQuery)
+      ]);
+      
+      const borrowedCodesList = [
+        ...studentLoansSnap.docs.map(doc => doc.data().bookCode),
+        ...staffLoansSnap.docs.map(doc => doc.data().bookCode)
+      ].filter(code => code); // Remove valores undefined/null
+      
+      setBorrowedCodes(borrowedCodesList);
+    } catch (err) {
+      console.error('Erro ao buscar códigos emprestados:', err);
+    }
+  };
+
+  // Função para verificar status de restauração dos códigos baixados
+  const updateRestorableStatus = async (writtenOffCodes: WriteOffInfo[]) => {
+    if (!currentUser || !bookId || !writtenOffCodes.length) return;
+
+    try {
+      const status: {[key: string]: boolean} = {};
+      
+      for (const writeOffInfo of writtenOffCodes) {
+        status[writeOffInfo.code] = await canRestoreCode(writeOffInfo.code);
+      }
+      
+      setRestorableCodeStatus(status);
+    } catch (err) {
+      console.error('Erro ao verificar status de restauração:', err);
+    }
+  };
 
   const fetchLoanHistory = async () => {
     if (!currentUser || !bookId) return;
@@ -139,6 +206,21 @@ const EditBook = () => {
     }
   };
 
+  // Fechar menu ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(`.${styles.codeWrapper}`)) {
+        setShowCodeMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchBook = async () => {
       if (!currentUser || !bookId) return;
@@ -154,6 +236,16 @@ const EditBook = () => {
           const formattedData = {
             ...bookData,
             codes: bookData.codes || (bookData.code ? [bookData.code] : []),
+            // Migração: converter formato antigo para novo
+            writtenOffCodes: (bookData.writtenOffCodes || []).map((item: any) => {
+              if (typeof item === 'string') {
+                // Formato antigo: apenas string
+                return { code: item, reason: 'Motivo não informado', date: new Date() };
+              } else {
+                // Formato novo: objeto completo
+                return item;
+              }
+            }),
             // Converte array de autores para string se necessário (compatibilidade)
             authors: Array.isArray(bookData.authors) 
               ? bookData.authors.join(', ') 
@@ -169,8 +261,13 @@ const EditBook = () => {
           // Adiciona os gêneros às listas de sugestões
           formattedData.genres.forEach(addGenre);
           
-          // Buscar histórico de retiradas após carregar o livro
-          await fetchLoanHistory();
+          // Buscar histórico de retiradas e códigos emprestados após carregar o livro
+          await Promise.all([fetchLoanHistory(), fetchBorrowedCodes()]);
+          
+          // Verificar status de restauração dos códigos baixados
+          if (formattedData.writtenOffCodes && formattedData.writtenOffCodes.length > 0) {
+            await updateRestorableStatus(formattedData.writtenOffCodes);
+          }
         } else {
           setError('Livro não encontrado');
           navigate('/books');
@@ -294,6 +391,49 @@ const EditBook = () => {
     return loan.status === 'returned' ? styles.statusReturned : styles.statusActive;
   };
 
+  // Função para determinar o estilo de um código
+  const getCodeStyle = (code: string) => {
+    if (borrowedCodes.includes(code)) {
+      return 'borrowed'; // Amarelo - código retirado
+    }
+    return 'available'; // Azul normal - código disponível
+  };
+
+  // Função para determinar o estilo de um código baixado
+  const getWrittenOffCodeStyle = () => {
+    return 'writtenOff'; // Cinza - código baixado
+  };
+
+  // Função para verificar se um código pode ser restaurado
+  const canRestoreCode = async (code: string): Promise<boolean> => {
+    if (!currentUser || !bookId) return false;
+    
+    try {
+      const booksRef = collection(db, `users/${currentUser.uid}/books`);
+      const allBooksQuery = query(booksRef);
+      const allBooksSnapshot = await getDocs(allBooksQuery);
+      
+      return !allBooksSnapshot.docs.some(doc => {
+        // Pular o livro atual
+        if (doc.id === bookId) return false;
+        
+        const bookData = doc.data();
+        const bookCodes = bookData.codes || [];
+        const writtenOffCodes = (bookData.writtenOffCodes || []).map((item: any) => 
+          typeof item === 'string' ? item : item.code
+        );
+        
+        // Verificar se o código está ativo (não baixado) em outro livro
+        const activeCodes = bookCodes.filter((bookCode: string) => !writtenOffCodes.includes(bookCode));
+        
+        return activeCodes.some((activeCode: string) => activeCode.toLowerCase() === code.toLowerCase());
+      });
+    } catch (err) {
+      console.error('Erro ao verificar se código pode ser restaurado:', err);
+      return false;
+    }
+  };
+
   // Função para adicionar código
   const handleAddCode = () => {
     const code = currentCode.trim();
@@ -306,12 +446,176 @@ const EditBook = () => {
     }
   };
 
-  // Função para remover código
-  const removeCode = (codeToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      codes: prev.codes.filter(code => code !== codeToRemove)
-    }));
+  // Função para abrir modal de baixa
+  const openWriteOffModal = (code: string) => {
+    setCodeToWriteOff(code);
+    setWriteOffReason('');
+    setShowWriteOffModal(true);
+    setShowCodeMenu(null);
+  };
+
+  // Função para confirmar baixa com motivo
+  const confirmWriteOff = async () => {
+    if (!writeOffReason.trim()) {
+      setError('Por favor, informe o motivo da baixa.');
+      return;
+    }
+    
+    await writeOffCode(codeToWriteOff, writeOffReason.trim());
+    setShowWriteOffModal(false);
+    setCodeToWriteOff('');
+    setWriteOffReason('');
+  };
+
+  // Função para dar baixa em um código
+  const writeOffCode = async (code: string, reason: string) => {
+    if (!currentUser || !bookId) return;
+    
+    try {
+      // Verificar se o código está emprestado
+      if (borrowedCodes.includes(code)) {
+        setError('Não é possível dar baixa em um código que está emprestado. Aguarde a devolução.');
+        return;
+      }
+      
+      const newWriteOffInfo: WriteOffInfo = {
+        code,
+        reason,
+        date: new Date()
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        codes: prev.codes.filter(c => c !== code),
+        writtenOffCodes: [...(prev.writtenOffCodes || []), newWriteOffInfo]
+      }));
+      
+      // Salvar no banco imediatamente
+      const bookData = {
+        ...formData,
+        codes: formData.codes.filter(c => c !== code),
+        writtenOffCodes: [...(formData.writtenOffCodes || []), newWriteOffInfo],
+        updatedAt: serverTimestamp(),
+      };
+      
+      const bookRef = doc(db, `users/${currentUser.uid}/books/${bookId}`);
+      await updateDoc(bookRef, bookData);
+      
+      // Atualizar status de restauração para o novo código baixado
+      await updateRestorableStatus([...(formData.writtenOffCodes || []), newWriteOffInfo]);
+      
+      setShowCodeMenu(null);
+    } catch (err) {
+      console.error('Erro ao dar baixa no código:', err);
+      setError('Erro ao dar baixa no código. Tente novamente.');
+    }
+  };
+
+  // Função para desfazer baixa (desbaixar)
+  const restoreCode = async (code: string) => {
+    if (!currentUser || !bookId) return;
+    
+    try {
+      // Verificar se já existe um código igual ativo em outro livro
+      const booksRef = collection(db, `users/${currentUser.uid}/books`);
+      const allBooksQuery = query(booksRef);
+      const allBooksSnapshot = await getDocs(allBooksQuery);
+      
+      let codeAlreadyExists = false;
+      let conflictingBookTitle = '';
+      
+      allBooksSnapshot.docs.forEach(doc => {
+        // Pular o livro atual
+        if (doc.id === bookId) return;
+        
+        const bookData = doc.data();
+        const bookCodes = bookData.codes || [];
+        const writtenOffCodes = (bookData.writtenOffCodes || []).map((item: any) => 
+          typeof item === 'string' ? item : item.code
+        );
+        
+        // Verificar se o código está ativo (não baixado) em outro livro
+        const activeCodes = bookCodes.filter((bookCode: string) => !writtenOffCodes.includes(bookCode));
+        
+        if (activeCodes.some((activeCode: string) => activeCode.toLowerCase() === code.toLowerCase())) {
+          codeAlreadyExists = true;
+          conflictingBookTitle = bookData.title || 'Livro sem título';
+        }
+      });
+      
+      if (codeAlreadyExists) {
+        setError(`Não é possível restaurar o código "${code}" pois já existe um código igual ativo no livro "${conflictingBookTitle}".`);
+        setShowCodeMenu(null);
+        return;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        codes: [...prev.codes, code],
+        writtenOffCodes: (prev.writtenOffCodes || []).filter(item => item.code !== code)
+      }));
+      
+      // Salvar no banco imediatamente
+      const bookData = {
+        ...formData,
+        codes: [...formData.codes, code],
+        writtenOffCodes: (formData.writtenOffCodes || []).filter(item => item.code !== code),
+        updatedAt: serverTimestamp(),
+      };
+      
+      const bookRef = doc(db, `users/${currentUser.uid}/books/${bookId}`);
+      await updateDoc(bookRef, bookData);
+      
+      // Atualizar status de restauração dos códigos baixados restantes
+      const remainingWrittenOffCodes = (formData.writtenOffCodes || []).filter(item => item.code !== code);
+      if (remainingWrittenOffCodes.length > 0) {
+        await updateRestorableStatus(remainingWrittenOffCodes);
+      }
+      
+      setShowCodeMenu(null);
+    } catch (err) {
+      console.error('Erro ao restaurar código:', err);
+      setError('Erro ao restaurar código. Tente novamente.');
+    }
+  };
+
+  // Função para excluir código permanentemente
+  const deleteCodePermanently = async (code: string) => {
+    if (!currentUser || !bookId) return;
+    
+    if (!window.confirm(`Tem certeza que deseja excluir permanentemente o código "${code}"? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+    
+    try {
+      // Verificar se o código está emprestado
+      if (borrowedCodes.includes(code)) {
+        setError('Não é possível excluir um código que está emprestado. Aguarde a devolução.');
+        return;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        codes: prev.codes.filter(c => c !== code),
+        writtenOffCodes: (prev.writtenOffCodes || []).filter(item => item.code !== code)
+      }));
+      
+      // Salvar no banco imediatamente
+      const bookData = {
+        ...formData,
+        codes: formData.codes.filter(c => c !== code),
+        writtenOffCodes: (formData.writtenOffCodes || []).filter(item => item.code !== code),
+        updatedAt: serverTimestamp(),
+      };
+      
+      const bookRef = doc(db, `users/${currentUser.uid}/books/${bookId}`);
+      await updateDoc(bookRef, bookData);
+      
+      setShowCodeMenu(null);
+    } catch (err) {
+      console.error('Erro ao excluir código:', err);
+      setError('Erro ao excluir código. Tente novamente.');
+    }
   };
 
   if (loading) {
@@ -363,22 +667,115 @@ const EditBook = () => {
                 </div>
               </div>
               <div className={styles.codesList}>
+                {/* Códigos ativos */}
                 {formData.codes.map(code => (
-                  <span key={code} className={styles.codeTag}>
-                    {code}
-                    <button
-                      type="button"
-                      onClick={() => removeCode(code)}
-                      className={styles.removeTag}
+                  <div key={code} className={styles.codeWrapper}>
+                    <span 
+                      className={`${styles.codeTag} ${styles[getCodeStyle(code)]}`}
+                      onClick={() => setShowCodeMenu(showCodeMenu === code ? null : code)}
+                      style={{ cursor: 'pointer', position: 'relative' }}
+                      title={borrowedCodes.includes(code) ? 'Código retirado' : 'Código disponível - Clique para opções'}
                     >
-                      ×
+                    {code}
+                    </span>
+                    
+                    {showCodeMenu === code && (
+                      <div className={styles.codeMenu}>
+                        <button
+                          type="button"
+                          onClick={() => openWriteOffModal(code)}
+                          className={styles.menuItem}
+                          disabled={borrowedCodes.includes(code)}
+                        >
+                          <span className={styles.menuIcon}>↓</span>
+                          Dar Baixa
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteCodePermanently(code)}
+                          className={styles.menuItemDanger}
+                          disabled={borrowedCodes.includes(code)}
+                        >
+                          <span className={styles.menuIcon}>⌫</span>
+                          Excluir
+                        </button>
+
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Códigos baixados */}
+                {formData.writtenOffCodes && formData.writtenOffCodes.map(writeOffInfo => (
+                  <div key={`written-off-${writeOffInfo.code}`} className={styles.codeWrapper}>
+                    <span 
+                      className={`${styles.codeTag} ${styles[getWrittenOffCodeStyle()]}`}
+                      onClick={() => setShowCodeMenu(showCodeMenu === `written-off-${writeOffInfo.code}` ? null : `written-off-${writeOffInfo.code}`)}
+                      style={{ cursor: 'pointer', position: 'relative' }}
+                      title="Código baixado - Clique para opções"
+                    >
+                      {writeOffInfo.code}
+                    </span>
+                    
+                    {showCodeMenu === `written-off-${writeOffInfo.code}` && (
+                      <div className={styles.codeMenu}>
+                        <button
+                          type="button"
+                          className={styles.menuItem}
+                          title={`Motivo: ${writeOffInfo.reason}\nData: ${new Date(writeOffInfo.date).toLocaleDateString('pt-BR')}`}
+                        >
+                          <span className={styles.menuIcon}>ⓘ</span>
+                          Motivo
+                          <span className={styles.menuIcon}>→</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => restoreCode(writeOffInfo.code)}
+                          className={styles.menuItem}
+                          disabled={restorableCodeStatus[writeOffInfo.code] === false}
+                          title={restorableCodeStatus[writeOffInfo.code] === false ? 'Não é possível restaurar: código já existe em outro livro' : 'Restaurar código'}
+                        >
+                          <span className={styles.menuIcon}>↑</span>
+                          Restaurar
+                          {restorableCodeStatus[writeOffInfo.code] === false && <span className={styles.blockedIcon}>⊘</span>}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteCodePermanently(writeOffInfo.code)}
+                          className={styles.menuItemDanger}
+                        >
+                          <span className={styles.menuIcon}>⌫</span>
+                          Excluir
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowCodeMenu(null)}
+                          className={styles.menuItemCancel}
+                        >
+                          <span className={styles.menuIcon}>×</span>
+                          Cancelar
                     </button>
-                  </span>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
               {formData.codes.length === 0 && (
                 <div className={styles.emptyCodesMessage}>
                   Adicione pelo menos um código para o livro
+                </div>
+              )}
+              
+              {/* Legenda dos códigos */}
+              {(formData.codes.length > 0 || (formData.writtenOffCodes && formData.writtenOffCodes.length > 0)) && (
+                <div className={styles.codeLegend}>
+                  <small>
+                    <strong>Legenda:</strong> 
+                    <span className={styles.legendItem}><span className={styles.legendColor} style={{backgroundColor: 'var(--primary-color)'}}></span> Disponível</span>
+                    <span className={styles.legendItem}><span className={styles.legendColor} style={{backgroundColor: '#f59e0b'}}></span> Retirado</span>
+                    <span className={styles.legendItem}><span className={styles.legendColor} style={{backgroundColor: '#6b7280'}}></span> Baixado</span><br />
+                    • Clique nos códigos para ver opções
+                  </small>
                 </div>
               )}
             </div>
@@ -611,6 +1008,57 @@ const EditBook = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Confirmação de Baixa */}
+      {showWriteOffModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>Confirmar Baixa do Código</h3>
+              <button 
+                className={styles.modalCloseButton}
+                onClick={() => setShowWriteOffModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <p>Você está dando baixa no código: <strong>{codeToWriteOff}</strong></p>
+              <p>Por favor, informe o motivo da baixa:</p>
+              
+              <textarea
+                className={styles.reasonTextarea}
+                value={writeOffReason}
+                onChange={(e) => setWriteOffReason(e.target.value)}
+                placeholder="Ex: Livro perdido, danificado, roubado..."
+                maxLength={500}
+                rows={4}
+              />
+              
+              <div className={styles.characterCount}>
+                {writeOffReason.length}/500 caracteres
+              </div>
+            </div>
+            
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.cancelButton}
+                onClick={() => setShowWriteOffModal(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className={styles.confirmButton}
+                onClick={confirmWriteOff}
+                disabled={!writeOffReason.trim()}
+              >
+                Confirmar Baixa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
