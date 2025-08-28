@@ -137,3 +137,4 @@ Para dúvidas sobre esta funcionalidade, contate o desenvolvedor.
 ---
 
 **⚡ Dica:** Mantenha este arquivo como referência para ativar/desativar rapidamente quando necessário!
+'

@@ -21,7 +21,7 @@ interface Book {
   id: string;
   codes: string[];
   title: string;
-  authors?: string[];
+  authors?: string[] | string;
   publisher?: string;
   quantity?: number;
   availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
@@ -196,8 +196,8 @@ const CodeSelection = () => {
             <BookOpenIcon className={styles.selectedBookIcon} />
             <div className={styles.selectedBookDetails}>
               <h3>{book?.title}</h3>
-              {book?.authors && book.authors.length > 0 && (
-                <p>Por: {book.authors.join(', ')}</p>
+              {book?.authors && (Array.isArray(book.authors) ? book.authors.length > 0 : book.authors) && (
+                <p>Por: {Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}</p>
               )}
               <p className={styles.availableCount}>
                 {book?.availableCodes?.length} exemplar(es) disponível(eis)

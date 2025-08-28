@@ -15,7 +15,7 @@ interface Book {
   code?: string;
   codes?: string[];
   title: string;
-  authors?: string[];
+  authors?: string[] | string;
   genres?: string[];
   publisher?: string;
   acquisitionDate?: string;
@@ -196,9 +196,16 @@ const SelectStaffBook = () => {
               const matchesCode = !codeFilter || getAllCodes(book).some(code => 
           code.toLowerCase().includes(codeFilter)
         );
-      const matchesAuthor = !authorFilter || (book.authors && book.authors.some(author => 
-        author.toLowerCase().includes(authorFilter)
-      ));
+      const matchesAuthor = !authorFilter || (() => {
+        if (!book.authors) return false;
+        if (Array.isArray(book.authors)) {
+          return book.authors.some(author => author.toLowerCase().includes(authorFilter));
+        }
+        if (typeof book.authors === 'string') {
+          return book.authors.toLowerCase().includes(authorFilter);
+        }
+        return false;
+      })();
       return matchesTitle && matchesCode && matchesAuthor;
     });
     
@@ -362,9 +369,9 @@ const SelectStaffBook = () => {
                     <div className={styles.bookInfo}>
                       <h3 className={styles.bookTitle}>{book.title}</h3>
                                               <p className={styles.bookCode}>Código: {getDisplayCode(book)}</p>
-                      {book.authors && book.authors.length > 0 && (
+                      {book.authors && (Array.isArray(book.authors) ? book.authors.length > 0 : book.authors) && (
                         <p className={styles.bookAuthors}>
-                          Autores: {book.authors.join(', ')}
+                          Autores: {Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}
                         </p>
                       )}
                       {book.publisher && (

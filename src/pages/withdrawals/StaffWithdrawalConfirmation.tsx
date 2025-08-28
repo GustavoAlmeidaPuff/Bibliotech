@@ -22,7 +22,7 @@ interface Book {
   code?: string;
   codes?: string[];
   title: string;
-  authors?: string[];
+  authors?: string[] | string;
   publisher?: string;
   availableCodes?: string[]; // Códigos disponíveis calculados dinamicamente
   description?: string;
@@ -318,10 +318,10 @@ const StaffWithdrawalConfirmation = () => {
                 </div>
               )}
               
-              {book?.authors && book.authors.length > 0 && (
+              {book?.authors && (Array.isArray(book.authors) ? book.authors.length > 0 : book.authors) && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Autores:</span>
-                  <span className={styles.detailValue}>{book.authors.join(', ')}</span>
+                  <span className={styles.detailValue}>{Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}</span>
                 </div>
               )}
               {book?.publisher && (
