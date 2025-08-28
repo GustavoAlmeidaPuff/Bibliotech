@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useScroll, useInView } from 'framer-motion';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useAsync } from '../hooks/useAsync';
 import Header from '../components/layout/Header';
 import WhatsAppButton from '../components/shared/WhatsAppButton';
 
@@ -236,6 +239,88 @@ const Subtitle = styled(motion.p)<{ isLight?: boolean }>`
   span {
     color: ${props => props.isLight ? '#4db5ff' : '#0078d4'};
     font-weight: 500;
+  }
+`;
+
+// Configuração para habilitar/desabilitar login de convidado (para facilitar remoção)
+const GUEST_LOGIN_ENABLED = true;
+const GUEST_CREDENTIALS = {
+  email: 'bibliotech.convidado@gmail.com',
+  password: 'convidado123'
+};
+
+const GuestLoginButton = styled(motion.button)`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 18px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  margin-top: 2rem;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transition: left 0.5s ease;
+    z-index: 0;
+  }
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
+    
+    &::before {
+      left: 0;
+    }
+  }
+  
+  &:active {
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  span {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 16px 28px;
+    font-size: 1rem;
+    margin-top: 1.5rem;
+    width: 90%;
+    max-width: 280px;
+  }
+`;
+
+const GuestLoginIcon = styled.span`
+  font-size: 1.2em;
+  animation: pulse 2s infinite;
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
   }
 `;
 
@@ -1647,6 +1732,11 @@ const Home: React.FC = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const gridVideoRef = useRef<HTMLVideoElement>(null);
   
+  // Hooks para login de convidado
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { execute: executeGuestLogin, isLoading: isGuestLoading } = useAsync<void>();
+  
   // Novos estados para melhorias
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; color: string; size: number }>>([]);
   const [activeSection, setActiveSection] = useState(0);
@@ -1689,6 +1779,16 @@ Aguardo retorno. Obrigado!`;
     const whatsappUrl = `https://wa.me/5551997188572?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
+  };
+
+  // Função para login de convidado
+  const handleGuestLogin = async () => {
+    try {
+      await executeGuestLogin(() => login(GUEST_CREDENTIALS.email, GUEST_CREDENTIALS.password));
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Erro no login de convidado:', error);
+    }
   };
 
   useEffect(() => {
@@ -2044,6 +2144,22 @@ Aguardo retorno. Obrigado!`;
               <Subtitle isLight>
                 Bibliotecas escolares com foco no&nbsp;<NeonText>aluno!</NeonText>
               </Subtitle>
+              {GUEST_LOGIN_ENABLED && (
+                <GuestLoginButton
+                  onClick={handleGuestLogin}
+                  disabled={isGuestLoading}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 1.8 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <span>
+                    <GuestLoginIcon>🚀</GuestLoginIcon>
+                    {isGuestLoading ? 'Entrando...' : 'Acesso Demo'}
+                  </span>
+                </GuestLoginButton>
+              )}
             </TextContent>
           </ContentWrapper>
         </ParallaxSection>

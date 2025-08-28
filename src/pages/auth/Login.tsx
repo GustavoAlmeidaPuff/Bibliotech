@@ -8,6 +8,13 @@ import { ROUTES } from '../../constants';
 import styles from './Login.module.css';
 import { UserCircleIcon, ArrowLeftIcon } from '@heroicons/react/24/solid';
 
+// Configuração para habilitar/desabilitar login de convidado (para facilitar remoção)
+const GUEST_LOGIN_ENABLED = true;
+const GUEST_CREDENTIALS = {
+  email: 'bibliotech.convidado@gmail.com',
+  password: 'convidado123'
+};
+
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -61,6 +68,15 @@ const Login: React.FC = () => {
 
   const handleGoBack = () => {
     navigate(ROUTES.HOME);
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      await executeLogin(() => login(GUEST_CREDENTIALS.email, GUEST_CREDENTIALS.password));
+      navigate(ROUTES.DASHBOARD);
+    } catch (error) {
+      console.error('Erro no login de convidado:', error);
+    }
   };
 
   return (
@@ -126,6 +142,22 @@ const Login: React.FC = () => {
             {isLoading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
+        {GUEST_LOGIN_ENABLED && (
+          <div className={styles.guestLogin}>
+            <button 
+              type="button" 
+              disabled={isLoading} 
+              className={styles.guestLoginButton}
+              onClick={handleGuestLogin}
+            >
+              {isLoading ? 'Entrando...' : 'Login de Convidado'}
+            </button>
+            <p className={styles.guestLoginText}>
+              Acesso rápido para demonstração
+            </p>
+          </div>
+        )}
         
         <div className={styles.links}>
           <Link to="/forgot-password">Esqueceu a senha?</Link>
