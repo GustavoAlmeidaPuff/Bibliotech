@@ -2156,7 +2156,7 @@ Aguardo retorno. Obrigado!`;
                 >
                   <span>
                     <GuestLoginIcon>🚀</GuestLoginIcon>
-                    {isGuestLoading ? 'Entrando...' : 'Acesso Demo'}
+                    {isGuestLoading ? 'Entrando...' : 'Acessar como convidado'}
                   </span>
                 </GuestLoginButton>
               )}
