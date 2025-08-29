@@ -123,7 +123,7 @@ const Layout: React.FC = () => {
     }
   };
 
-  const generateWhatsAppMessageFromNotification = (notification: Notification) => {
+  const generateWhatsAppMessageFromNotification = async (notification: Notification) => {
     if (notification.type === 'update') return '';
     
     const daysOverdue = notification.daysOverdue || 0;
@@ -134,20 +134,39 @@ const Layout: React.FC = () => {
     } else {
       statusMessage = `⚠️ *Status:* Prazo de devolução próximo`;
     }
+
+    // Buscar data de retirada do empréstimo
+    let borrowDateText = '';
+    if (notification.loanId && currentUser) {
+      try {
+        const loanRef = doc(db, `users/${currentUser.uid}/loans`, notification.loanId);
+        const loanDoc = await getDoc(loanRef);
+        
+        if (loanDoc.exists()) {
+          const loanData = loanDoc.data();
+          const borrowDate = loanData.borrowDate?.toDate ? loanData.borrowDate.toDate() : new Date(loanData.borrowDate);
+          borrowDateText = `📅 *Data de Retirada:* ${borrowDate.toLocaleDateString('pt-BR')}`;
+        }
+      } catch (error) {
+        console.error('Erro ao buscar data de retirada:', error);
+      }
+    }
     
     const message = `📚 *Lembrete de Devolução - Bibliotech*
 
 👤 *Aluno:* ${notification.studentName}
 📖 *Livro:* ${notification.bookTitle}
+${borrowDateText ? `\n${borrowDateText}` : ''}
 
 ${statusMessage}
 
 ${daysOverdue > 0 
-  ? '🔴 Por favor, devolva o livro o mais rápido possível.' 
+  ? '🔴 Por favor, retornar à biblioteca.' 
   : '🟡 Lembre-se de devolver o livro no prazo.'
 }
 
-📍 *Biblioteca Escolar*`;
+📍 *Biblioteca Escolar*
+💻 *Feito através do Bibliotech*`;
 
     return message;
   };
@@ -184,7 +203,7 @@ ${daysOverdue > 0
       }
 
       // Gerar mensagem
-      const message = generateWhatsAppMessageFromNotification(notification);
+      const message = await generateWhatsAppMessageFromNotification(notification);
       const encodedMessage = encodeURIComponent(message);
       
       // Adicionar código do país (55 para Brasil) se não estiver presente
