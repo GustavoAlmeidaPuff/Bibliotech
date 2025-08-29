@@ -5,6 +5,8 @@ import { useAsync } from '../../hooks/useAsync';
 import { settingsService } from '../../services/firebase';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useNotifications, Notification } from '../../contexts/NotificationsContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 import {
   UserGroupIcon,
   AcademicCapIcon,
@@ -23,7 +25,7 @@ const Layout: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   
-  const { logout } = useAuth();
+  const { logout, currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { settings } = useSettings();
@@ -102,6 +104,25 @@ const Layout: React.FC = () => {
     setIsNotificationsOpen(false);
   };
 
+  // Função para buscar dados do aluno
+  const getStudentData = async (studentId: string) => {
+    if (!currentUser || !studentId) return null;
+    
+    try {
+      const studentRef = doc(db, `users/${currentUser.uid}/students`, studentId);
+      const studentDoc = await getDoc(studentRef);
+      
+      if (studentDoc.exists()) {
+        return studentDoc.data();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados do aluno:', error);
+      return null;
+    }
+  };
+
   const generateWhatsAppMessageFromNotification = (notification: Notification) => {
     if (notification.type === 'update') return '';
     
@@ -128,14 +149,56 @@ ${daysOverdue > 0
 
 📍 *Biblioteca Escolar*`;
 
-    return encodeURIComponent(message);
+    return message;
   };
 
-  const handleWhatsAppNotificationFromNotification = (notification: Notification) => {
-    const message = generateWhatsAppMessageFromNotification(notification);
-    if (message) {
-      const whatsappUrl = `https://wa.me/?text=${message}`;
+  const handleWhatsAppNotificationFromNotification = async (notification: Notification) => {
+    if (!notification.studentId) {
+      alert('ID do aluno não encontrado na notificação');
+      return;
+    }
+
+    try {
+      // Buscar dados do aluno para obter o número de telefone
+      const studentData = await getStudentData(notification.studentId);
+      
+      if (!studentData) {
+        alert('Dados do aluno não encontrados');
+        return;
+      }
+
+      // Verificar se o aluno tem número de telefone
+      const phoneNumber = studentData.contact || studentData.number;
+      
+      if (!phoneNumber) {
+        alert('Número de telefone não encontrado para este aluno');
+        return;
+      }
+
+      // Limpar número de telefone (remover caracteres não numéricos)
+      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+      
+      if (cleanPhoneNumber.length < 10) {
+        alert('Número de telefone inválido');
+        return;
+      }
+
+      // Gerar mensagem
+      const message = generateWhatsAppMessageFromNotification(notification);
+      const encodedMessage = encodeURIComponent(message);
+      
+      // Adicionar código do país (55 para Brasil) se não estiver presente
+      const fullPhoneNumber = cleanPhoneNumber.startsWith('55') 
+        ? cleanPhoneNumber 
+        : `55${cleanPhoneNumber}`;
+      
+      // Abrir WhatsApp com número específico do aluno
+      const whatsappUrl = `https://wa.me/${fullPhoneNumber}?text=${encodedMessage}`;
       window.open(whatsappUrl, '_blank');
+      
+    } catch (error) {
+      console.error('Erro ao enviar mensagem pelo WhatsApp:', error);
+      alert('Erro ao tentar enviar mensagem pelo WhatsApp');
     }
   };
 
