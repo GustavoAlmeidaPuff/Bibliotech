@@ -165,28 +165,90 @@ const StudentLoanDetail = () => {
 👤 *Aluno:* ${loan.studentName}
 📖 *Livro:* ${loan.bookTitle}
 🏷️ *Código:* ${loan.bookCode || 'N/A'}
-
-📅 *Retirado em:* ${borrowDateTime}
+📅 *Data de Retirada:* ${borrowDateTime}
 📆 *Prazo de devolução:* ${dueDate}
 
 ${statusMessage}
 
 ${daysLeft < 0 
-  ? '🔴 Por favor, devolva o livro o mais rápido possível.' 
+  ? '🔴 Por favor, retornar à biblioteca.' 
   : daysLeft <= 3 
     ? '🟡 Lembre-se de devolver o livro no prazo.' 
     : '🟢 Aproveite sua leitura!'
 }
 
-📍 *Biblioteca Escolar*`;
+📍 *Biblioteca Escolar*
+💻 *Feito através do Bibliotech*`;
 
     return encodeURIComponent(message);
   };
 
-  const handleWhatsAppNotification = () => {
-    const message = generateWhatsAppMessage();
-    const whatsappUrl = `https://wa.me/?text=${message}`;
-    window.open(whatsappUrl, '_blank');
+  // Função para buscar dados do aluno
+  const getStudentData = async (studentId: string) => {
+    if (!currentUser || !studentId) return null;
+    
+    try {
+      const studentRef = doc(db, `users/${currentUser.uid}/students`, studentId);
+      const studentDoc = await getDoc(studentRef);
+      
+      if (studentDoc.exists()) {
+        return studentDoc.data();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados do aluno:', error);
+      return null;
+    }
+  };
+
+  const handleWhatsAppNotification = async () => {
+    if (!loan?.studentId) {
+      alert('ID do aluno não encontrado');
+      return;
+    }
+
+    try {
+      // Buscar dados do aluno para obter o número de telefone
+      const studentData = await getStudentData(loan.studentId);
+      
+      if (!studentData) {
+        alert('Dados do aluno não encontrados');
+        return;
+      }
+
+      // Verificar se o aluno tem número de telefone
+      const phoneNumber = studentData.contact || studentData.number;
+      
+      if (!phoneNumber) {
+        alert('Número de telefone não encontrado para este aluno');
+        return;
+      }
+
+      // Limpar número de telefone (remover caracteres não numéricos)
+      const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+      
+      if (cleanPhoneNumber.length < 10) {
+        alert('Número de telefone inválido');
+        return;
+      }
+
+      // Gerar mensagem
+      const message = generateWhatsAppMessage();
+      
+      // Adicionar código do país (55 para Brasil) se não estiver presente
+      const fullPhoneNumber = cleanPhoneNumber.startsWith('55') 
+        ? cleanPhoneNumber 
+        : `55${cleanPhoneNumber}`;
+      
+      // Abrir WhatsApp com número específico do aluno
+      const whatsappUrl = `https://wa.me/${fullPhoneNumber}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+      
+    } catch (error) {
+      console.error('Erro ao enviar mensagem pelo WhatsApp:', error);
+      alert('Erro ao tentar enviar mensagem pelo WhatsApp');
+    }
   };
   
   const handleReturnLoan = async () => {
