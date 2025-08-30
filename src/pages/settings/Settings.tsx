@@ -456,6 +456,20 @@ const Settings = () => {
             </p>
           </div>
 
+          <div className={styles.settingGroup}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={settings.useGuardianContact}
+                onChange={(e) => handleSettingChange('useGuardianContact', e.target.checked)}
+              />
+              Usar contato dos responsáveis
+            </label>
+            <p className={styles.helpText}>
+              Quando ativado, as notificações de lembrete de devolução serão direcionadas aos responsáveis, com uma mensagem personalizada solicitando que avisem o aluno sobre a devolução.
+            </p>
+          </div>
+
           <div className={styles.buttonContainer}>
             <button 
               className={styles.saveButton}

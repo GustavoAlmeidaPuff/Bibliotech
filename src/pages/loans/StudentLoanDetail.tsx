@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import { selectRandomQuestions } from '../../constants';
 
 
@@ -30,6 +31,7 @@ const StudentLoanDetail = () => {
   const { loanId } = useParams<{ loanId: string }>();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { settings } = useSettings();
   
   const [loan, setLoan] = useState<Loan | null>(null);
   const [loading, setLoading] = useState(true);
@@ -146,7 +148,36 @@ const StudentLoanDetail = () => {
     const daysLeft = getDaysLeft(loan.dueDate);
     const borrowDateTime = formatDateTime(loan.borrowDate);
     const dueDate = formatDate(loan.dueDate);
+    const borrowDate = formatDate(loan.borrowDate);
     
+    // Verificar se deve usar formato para responsáveis
+    if (settings.useGuardianContact) {
+      const overdueDays = Math.abs(daysLeft);
+      
+      const message = `📚 *Lembrete de Devolução - ${settings.schoolName}*
+
+Prezado(a) responsável,
+
+O(a) aluno(a) *${loan.studentName}* retirou o livro "*${loan.bookTitle}*" da biblioteca no dia ${borrowDate}.
+
+${daysLeft < 0 
+  ? `⚠️ O prazo de devolução já passou há ${overdueDays} ${overdueDays === 1 ? 'dia' : 'dias'}.` 
+  : daysLeft === 0
+    ? '⚠️ O prazo de devolução é hoje.'
+    : daysLeft === 1
+      ? '⏰ O prazo de devolução é amanhã.'
+      : `⏰ O prazo de devolução é ${dueDate}.`
+}
+
+Por favor, lembre o(a) aluno(a) de retornar o livro à biblioteca da escola.
+
+📍 *${settings.schoolName}*
+💻 *Feito através do Bibliotech*`;
+
+      return encodeURIComponent(message);
+    }
+    
+    // Formato original para contato direto com o aluno
     let statusMessage = '';
     
     if (daysLeft < 0) {

@@ -128,13 +128,6 @@ const Layout: React.FC = () => {
     
     const daysOverdue = notification.daysOverdue || 0;
     
-    let statusMessage = '';
-    if (daysOverdue > 0) {
-      statusMessage = `🔴 *Status:* Atrasado há ${daysOverdue} ${daysOverdue === 1 ? 'dia' : 'dias'}`;
-    } else {
-      statusMessage = `⚠️ *Status:* Prazo de devolução próximo`;
-    }
-
     // Buscar data de retirada do empréstimo
     let borrowDateText = '';
     if (notification.loanId && currentUser) {
@@ -145,18 +138,47 @@ const Layout: React.FC = () => {
         if (loanDoc.exists()) {
           const loanData = loanDoc.data();
           const borrowDate = loanData.borrowDate?.toDate ? loanData.borrowDate.toDate() : new Date(loanData.borrowDate);
-          borrowDateText = `📅 *Data de Retirada:* ${borrowDate.toLocaleDateString('pt-BR')}`;
+          borrowDateText = borrowDate.toLocaleDateString('pt-BR');
         }
       } catch (error) {
         console.error('Erro ao buscar data de retirada:', error);
       }
     }
     
+    // Verificar se deve usar formato para responsáveis
+    if (settings.useGuardianContact) {
+      const message = `📚 *Lembrete de Devolução - ${settings.schoolName}*
+
+Prezado(a) responsável,
+
+O(a) aluno(a) *${notification.studentName}* retirou o livro "*${notification.bookTitle}*" da biblioteca ${borrowDateText ? `no dia ${borrowDateText}` : ''}.
+
+${daysOverdue > 0 
+  ? `⚠️ O prazo de devolução já passou há ${daysOverdue} ${daysOverdue === 1 ? 'dia' : 'dias'}.` 
+  : '⏰ O prazo de devolução está se aproximando.'
+}
+
+Por favor, lembre o(a) aluno(a) de retornar o livro à biblioteca da escola.
+
+📍 *${settings.schoolName}*
+💻 *Feito através do Bibliotech*`;
+
+      return message;
+    }
+    
+    // Formato original para contato direto com o aluno
+    let statusMessage = '';
+    if (daysOverdue > 0) {
+      statusMessage = `🔴 *Status:* Atrasado há ${daysOverdue} ${daysOverdue === 1 ? 'dia' : 'dias'}`;
+    } else {
+      statusMessage = `⚠️ *Status:* Prazo de devolução próximo`;
+    }
+    
     const message = `📚 *Lembrete de Devolução - Bibliotech*
 
 👤 *Aluno:* ${notification.studentName}
 📖 *Livro:* ${notification.bookTitle}
-${borrowDateText ? `\n${borrowDateText}` : ''}
+${borrowDateText ? `\n📅 *Data de Retirada:* ${borrowDateText}` : ''}
 
 ${statusMessage}
 
