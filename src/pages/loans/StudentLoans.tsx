@@ -4,7 +4,7 @@ import { collection, query, getDocs, doc, getDoc, updateDoc, orderBy, where, ser
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
-import { FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { FunnelIcon, XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 import styles from './Loans.module.css';
 
@@ -400,6 +400,13 @@ const StudentLoans = () => {
                 {filtersApplied ? 'Filtros Aplicados' : 'Mostrar Filtros'}
               </>
             )}
+          </button>
+          <button 
+            className={styles.registerButton}
+            onClick={() => navigate('/student-withdrawals')}
+          >
+            <PlusIcon className={styles.buttonIcon} />
+            Nova Retirada
           </button>
         </div>
       </div>
