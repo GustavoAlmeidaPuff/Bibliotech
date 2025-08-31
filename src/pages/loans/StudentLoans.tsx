@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { collection, query, getDocs, doc, updateDoc, orderBy, where, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, updateDoc, orderBy, where, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
@@ -12,6 +12,7 @@ interface Loan {
   id: string;
   studentId: string;
   studentName: string;
+  studentClassroom?: string;
   bookId: string;
   bookTitle: string;
   bookCode?: string;
@@ -27,6 +28,7 @@ interface Loan {
 interface Filters {
   studentName: string;
   bookTitle: string;
+  studentClassroom: string;
   status: string;
 }
 
@@ -49,6 +51,7 @@ const StudentLoans = () => {
   const [filters, setFilters] = useState<Filters>({
     studentName: '',
     bookTitle: '',
+    studentClassroom: '',
     status: 'active'
   });
 
@@ -75,9 +78,9 @@ const StudentLoans = () => {
         });
       }
       
-      // Processar todos os documentos
-      let allLoans = querySnapshot.docs.map(doc => {
-        const data = doc.data();
+      // Processar todos os documentos e buscar dados dos alunos
+      const loanPromises = querySnapshot.docs.map(async (loanDoc) => {
+        const data = loanDoc.data();
         
         // Verificar se os campos existem antes de converter
         let borrowDate = null;
@@ -89,17 +92,35 @@ const StudentLoans = () => {
           dueDate = data.dueDate?.toDate ? data.dueDate.toDate() : null;
           createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
         } catch (error) {
-          console.error(`Erro ao converter datas do documento ${doc.id}:`, error);
+          console.error(`Erro ao converter datas do documento ${loanDoc.id}:`, error);
+        }
+        
+        // Buscar dados do aluno para obter a turma
+        let studentClassroom = '';
+        if (data.studentId) {
+          try {
+            const studentRef = doc(db, `users/${currentUser.uid}/students`, data.studentId);
+            const studentSnap = await getDoc(studentRef);
+            if (studentSnap.exists()) {
+              const studentData = studentSnap.data() as any;
+              studentClassroom = studentData.classroom || '';
+            }
+          } catch (error) {
+            console.error(`Erro ao buscar dados do aluno ${data.studentId}:`, error);
+          }
         }
         
         return {
-          id: doc.id,
+          id: loanDoc.id,
           ...data,
+          studentClassroom,
           borrowDate,
           dueDate,
           createdAt
         };
-      }) as Loan[];
+      });
+      
+      const allLoans = await Promise.all(loanPromises) as Loan[];
       
       console.log('Total de locações processadas:', allLoans.length);
       
@@ -168,8 +189,8 @@ const StudentLoans = () => {
       const querySnapshot = await getDocs(q);
       console.log('Total de documentos na coleção para filtros:', querySnapshot.docs.length);
       
-      const allLoans = querySnapshot.docs.map(doc => {
-        const data = doc.data();
+      const loanPromises = querySnapshot.docs.map(async (loanDoc) => {
+        const data = loanDoc.data();
         
         // Verificar se os campos existem antes de converter
         let borrowDate = null;
@@ -181,17 +202,35 @@ const StudentLoans = () => {
           dueDate = data.dueDate?.toDate ? data.dueDate.toDate() : null;
           createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
         } catch (error) {
-          console.error(`Erro ao converter datas do documento ${doc.id}:`, error);
+          console.error(`Erro ao converter datas do documento ${loanDoc.id}:`, error);
+        }
+        
+        // Buscar dados do aluno para obter a turma
+        let studentClassroom = '';
+        if (data.studentId) {
+          try {
+            const studentRef = doc(db, `users/${currentUser.uid}/students`, data.studentId);
+            const studentSnap = await getDoc(studentRef);
+            if (studentSnap.exists()) {
+              const studentData = studentSnap.data() as any;
+              studentClassroom = studentData.classroom || '';
+            }
+          } catch (error) {
+            console.error(`Erro ao buscar dados do aluno ${data.studentId}:`, error);
+          }
         }
         
         return {
-          id: doc.id,
+          id: loanDoc.id,
           ...data,
+          studentClassroom,
           borrowDate,
           dueDate,
           createdAt
         };
-      }) as Loan[];
+      });
+      
+      const allLoans = await Promise.all(loanPromises) as Loan[];
       
       // Aplicar todos os filtros no lado do cliente
       let filtered = [...allLoans];
@@ -214,6 +253,14 @@ const StudentLoans = () => {
       if (bookTitleFilter) {
         filtered = filtered.filter(loan => 
           loan.bookTitle.toLowerCase().includes(bookTitleFilter)
+        );
+      }
+      
+      // Filtrar por turma do aluno
+      const classroomFilter = filters.studentClassroom.toLowerCase().trim();
+      if (classroomFilter) {
+        filtered = filtered.filter(loan => 
+          loan.studentClassroom && loan.studentClassroom.toLowerCase().includes(classroomFilter)
         );
       }
       
@@ -244,8 +291,9 @@ const StudentLoans = () => {
       // Definir se filtros foram aplicados
       const hasNameFilter = studentNameFilter !== '';
       const hasBookFilter = bookTitleFilter !== '';
+      const hasClassroomFilter = classroomFilter !== '';
       const hasStatusFilter = filters.status !== 'active';
-      setFiltersApplied(hasNameFilter || hasBookFilter || hasStatusFilter);
+      setFiltersApplied(hasNameFilter || hasBookFilter || hasClassroomFilter || hasStatusFilter);
     } catch (error) {
       console.error('Erro ao aplicar filtros:', error);
     } finally {
@@ -257,6 +305,7 @@ const StudentLoans = () => {
     setFilters({
       studentName: '',
       bookTitle: '',
+      studentClassroom: '',
       status: 'active'
     });
     setFiltersApplied(false);
@@ -396,6 +445,18 @@ const StudentLoans = () => {
             </div>
 
             <div className={styles.filterGroup}>
+              <label htmlFor="studentClassroom">Turma</label>
+              <input
+                type="text"
+                id="studentClassroom"
+                value={filters.studentClassroom}
+                onChange={(e) => handleFilterChange('studentClassroom', e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Filtrar por turma..."
+              />
+            </div>
+
+            <div className={styles.filterGroup}>
               <label htmlFor="status">Status</label>
               <select
                 id="status"
@@ -456,6 +517,7 @@ const StudentLoans = () => {
                   <thead>
                     <tr>
                       <th>Aluno</th>
+                      <th>Turma</th>
                       <th>Livro</th>
                       <th>Retirado em</th>
                       <th>Status</th>
@@ -494,6 +556,7 @@ const StudentLoans = () => {
                           {loan.studentName}
                         </span>
                       </td>
+                        <td>{loan.studentClassroom || '-'}</td>
                         <td className={styles.bookTitleCell}>{loan.bookTitle}</td>
                         <td>{formatDate(loan.borrowDate)}</td>
                         <td>
