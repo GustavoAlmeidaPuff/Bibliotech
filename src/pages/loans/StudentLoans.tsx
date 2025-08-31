@@ -52,7 +52,7 @@ const StudentLoans = () => {
     studentName: '',
     bookTitle: '',
     studentClassroom: '',
-    status: 'active'
+    status: 'all'
   });
 
   
@@ -274,16 +274,15 @@ const StudentLoans = () => {
       
       setFilteredLoans(filtered);
       
-      // Manter as locações ativas como padrão para a lista principal 
+      // Mostrar todas as locações como padrão para a lista principal 
       // (quando não há filtros aplicados)
       if (!filtersApplied) {
-        const activeOnly = allLoans
-          .filter(loan => loan.status === 'active')
+        const allSorted = allLoans
           .sort((a, b) => {
             if (!a.createdAt || !b.createdAt) return 0;
             return b.createdAt.getTime() - a.createdAt.getTime();
           });
-        setLoans(activeOnly);
+        setLoans(allSorted);
       } else {
         setLoans(filtered);
       }
