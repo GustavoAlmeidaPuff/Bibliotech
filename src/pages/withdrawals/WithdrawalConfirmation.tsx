@@ -23,7 +23,7 @@ interface Book {
   id: string;
   codes: string[];
   title: string;
-  authors?: string[] | string;
+  authors?: string[];
   publisher?: string;
   quantity: number;
   description?: string;
@@ -227,10 +227,10 @@ const WithdrawalConfirmation = () => {
                   <span className={styles.detailValue}>{state.selectedCode}</span>
                 </div>
               )}
-              {book?.authors && (Array.isArray(book.authors) ? book.authors.length > 0 : book.authors) && (
+              {book?.authors && book.authors.length > 0 && (
                 <div className={styles.detailItem}>
                   <span className={styles.detailLabel}>Autores:</span>
-                  <span className={styles.detailValue}>{Array.isArray(book.authors) ? book.authors.join(', ') : book.authors}</span>
+                  <span className={styles.detailValue}>{book.authors.join(', ')}</span>
                 </div>
               )}
               {book?.quantity !== undefined && (

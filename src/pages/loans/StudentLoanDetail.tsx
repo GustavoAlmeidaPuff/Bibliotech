@@ -5,6 +5,11 @@ import { db } from '../../config/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { selectRandomQuestions } from '../../constants';
+import { 
+  ArrowPathIcon, 
+  CheckCircleIcon, 
+  XCircleIcon
+} from '@heroicons/react/24/outline';
 
 
 import styles from './StudentLoanDetail.module.css';
@@ -39,6 +44,7 @@ const StudentLoanDetail = () => {
   const [processing, setProcessing] = useState(false);
   const [showReturnDialog, setShowReturnDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showRenewDialog, setShowRenewDialog] = useState(false);
   const [readingCompleted, setReadingCompleted] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [showQuestions, setShowQuestions] = useState(false);
@@ -360,6 +366,37 @@ ${daysLeft < 0
       setProcessing(false);
     }
   };
+
+  const handleRenewLoan = async () => {
+    if (!currentUser || !loan) return;
+    
+    try {
+      setProcessing(true);
+      setError(null);
+      
+      // Calcular nova data de vencimento usando a configuração loanDuration
+      const newDueDate = new Date();
+      newDueDate.setDate(newDueDate.getDate() + settings.loanDuration);
+      
+      // Atualizar o empréstimo com a nova data de vencimento
+      const loanRef = doc(db, `users/${currentUser.uid}/loans/${loan.id}`);
+      await updateDoc(loanRef, {
+        dueDate: newDueDate,
+        renewedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      
+      setShowRenewDialog(false);
+      await fetchLoanDetails(); // Recarregar dados para atualizar a UI
+      
+    } catch (err) {
+      console.error('Erro ao renovar locação:', err);
+      setError('Erro ao processar a renovação da locação');
+      setShowRenewDialog(false);
+    } finally {
+      setProcessing(false);
+    }
+  };
   
   const handleGoBack = () => {
     navigate('/student-loans');
@@ -479,6 +516,15 @@ ${daysLeft < 0
               {loan.status === 'active' && (
                 <>
                   <button 
+                    className={styles.renewButton}
+                    onClick={() => setShowRenewDialog(true)}
+                    disabled={processing}
+                    title="Renovar por mais tempo conforme configuração da escola"
+                  >
+                    <ArrowPathIcon className={styles.buttonIcon} />
+                    Renovar Retirada
+                  </button>
+                  <button 
                     className={styles.returnButton}
                     onClick={() => {
                       setReadingProgress(loan.readingProgress || 0);
@@ -487,6 +533,7 @@ ${daysLeft < 0
                     }}
                     disabled={processing}
                   >
+                    <CheckCircleIcon className={styles.buttonIcon} />
                     Devolver
                   </button>
                   <button 
@@ -494,6 +541,7 @@ ${daysLeft < 0
                     onClick={() => setShowCancelDialog(true)}
                     disabled={processing}
                   >
+                    <XCircleIcon className={styles.buttonIcon} />
                     Cancelar Retirada
                   </button>
                 </>
@@ -568,6 +616,33 @@ ${daysLeft < 0
                 disabled={processing}
               >
                 {processing ? 'Processando...' : 'Confirmar Devolução'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRenewDialog && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <h3>Confirmar Renovação</h3>
+            <p>Tem certeza que deseja renovar a retirada do livro <strong>"{loan?.bookTitle}"</strong>?</p>
+            <p>A nova data de vencimento será <strong>{settings.loanDuration} dias</strong> a partir de hoje, conforme configuração da escola.</p>
+            
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.modalCancelButton}
+                onClick={() => setShowRenewDialog(false)}
+                disabled={processing}
+              >
+                Cancelar
+              </button>
+              <button 
+                className={styles.modalConfirmButton}
+                onClick={handleRenewLoan}
+                disabled={processing}
+              >
+                {processing ? 'Processando...' : 'Sim, Renovar'}
               </button>
             </div>
           </div>
