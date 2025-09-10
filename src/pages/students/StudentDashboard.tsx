@@ -18,6 +18,7 @@ import {
 } from 'chart.js';
 import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import BookRecommendations from '../../components/recommendations/BookRecommendations';
 import styles from './StudentDashboard.module.css';
 
 // Registrando os componentes necessários do Chart.js
@@ -400,10 +401,22 @@ const StudentDashboard = () => {
       </div>
       
       {loans.length === 0 ? (
-        <div className={styles.emptyState}>
-          <h3>Este aluno ainda não possui histórico de leitura</h3>
-          <p>Quando o aluno começar a retirar livros, os dados aparecerão aqui.</p>
-        </div>
+        <>
+          <div className={styles.emptyState}>
+            <h3>Este aluno ainda não possui histórico de leitura</h3>
+            <p>Quando o aluno começar a retirar livros, os dados aparecerão aqui.</p>
+          </div>
+          
+          {/* Recomendações para novos alunos */}
+          <BookRecommendations
+            userId={currentUser?.uid || ''}
+            studentId={studentId || ''}
+            onBookClick={(bookId) => {
+              // Navegar para detalhes do livro
+              navigate(`/books/${bookId}`);
+            }}
+          />
+        </>
       ) : (
         <>
           <div className={styles.statsGrid}>
@@ -435,6 +448,16 @@ const StudentDashboard = () => {
               <p>Trimestre com mais retiradas</p>
             </div>
           </div>
+          
+          {/* Seção de Recomendações */}
+          <BookRecommendations
+            userId={currentUser?.uid || ''}
+            studentId={studentId || ''}
+            onBookClick={(bookId) => {
+              // Navegar para detalhes do livro
+              navigate(`/books/${bookId}`);
+            }}
+          />
           
           <div className={styles.chartGrid}>
             <div className={styles.chartCard}>

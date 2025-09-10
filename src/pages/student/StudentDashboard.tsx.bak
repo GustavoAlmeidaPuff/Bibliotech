@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useStudentAuth } from '../../contexts/StudentAuthContext';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar, Pie, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,11 +12,12 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  PointElement,
+  LineElement
 } from 'chart.js';
-import { format, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
+import { format, parseISO, startOfMonth, endOfMonth, isWithinInterval, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import BookRecommendations from '../../components/recommendations/BookRecommendations';
 import styles from './StudentDashboard.module.css';
 
 // Registrando os componentes necessários do Chart.js
@@ -27,7 +28,9 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  PointElement,
+  LineElement
 );
 
 interface Loan {
@@ -59,6 +62,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
@@ -146,6 +150,8 @@ const StudentDashboard = () => {
             } as Book);
           }
         }
+        
+        setBooks(booksData);
         
         // Processar dados para visualizações
         processData(loansData, booksData);
@@ -292,16 +298,6 @@ const StudentDashboard = () => {
               </div>
             )}
           </div>
-
-          {/* Seção de Recomendações */}
-          <BookRecommendations
-            userId={studentUser?.userId || ''}
-            studentId={studentUser?.id || ''}
-            onBookClick={(bookId) => {
-              // Navegar para detalhes do livro se necessário
-              console.log('Livro clicado:', bookId);
-            }}
-          />
 
           {loans.length > 0 ? (
             <>
