@@ -81,7 +81,7 @@
 }
 
 .iconContainer svg {
-  color: #F59E0B;
+  color: #0078d4;
   animation: pulse 2s infinite;
 }
 
@@ -135,7 +135,43 @@
   flex-shrink: 0;
 }
 
-.backToProfileButton {
+.howItWorks {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
+
+.howItWorks h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: #E2E8F0;
+  text-align: center;
+}
+
+.howItWorks p {
+  color: #94A3B8;
+  line-height: 1.8;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.howItWorks strong {
+  color: #E2E8F0;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.backToBookButton,
+.backToHomeButton {
   background: linear-gradient(135deg, #0078d4, #106ebe);
   color: white;
   border: none;
@@ -145,17 +181,31 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
 }
 
-.backToProfileButton:hover {
+.backToBookButton:hover,
+.backToHomeButton:hover {
   background: linear-gradient(135deg, #106ebe, #005a9e);
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 120, 212, 0.3);
 }
 
-.backToProfileButton:active {
+.backToBookButton:active,
+.backToHomeButton:active {
   transform: translateY(0);
+}
+
+.backToHomeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #94A3B8;
+}
+
+.backToHomeButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #E2E8F0;
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
 }
 
 /* Responsive */
@@ -184,8 +234,22 @@
     padding: 1rem;
   }
   
-  .backToProfileButton {
+  .backToBookButton,
+  .backToHomeButton {
     padding: 0.875rem 1.5rem;
     font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .buttonGroup {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  
+  .backToBookButton,
+  .backToHomeButton {
+    min-width: 200px;
   }
 }
