@@ -1,6 +1,6 @@
 import { BookWithStats } from './bookRecommendationService';
 
-const OPENROUTER_API_KEY = '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';
+const OPENROUTER_API_KEY = process.env.REACT_APP_OPENROUTER_API_KEY ?? '';
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 const FREE_MODELS = [
